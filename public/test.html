@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backend Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    #response {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+      background: #f0f0f0;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>User Creation Test Form</h1>
+  
+  
+  <div class="form-group">
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Enter your name">
+  </div>
+
+  <div class="form-group">
+    <label for="email">Email:</label>
+    <input type="text" id="email" placeholder="Enter your email">
+  </div>
+
+
+  <div class="form-group">
+    <label for="pdf">pdf:</label>
+    <input type="file" id="pdf" placeholder="submit pdf">
+  </div>
+
+  <div class="form-group">
+    <label for="type">User Type:</label>
+    <select name="type" id="type">
+        <option value="employer">SME</option>
+        <option value="applicant">Applicant</option>
+    </select>
+  </div>
+
+  <button onclick="sendData()">Send POST Request</button>
+  <button onclick="uploadpdf()">upload PDF Request</button>
+
+  <div id="responsepdf"></div>
+  <div id="response"></div>
+</div>
+
+
+<div class="container">
+  <h1>Post Creation Test Form</h1>
+  
+  <div class="form-group">
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Enter your name">
+  </div>
+
+  <div class="form-group">
+    <label for="email">Email:</label>
+    <input type="text" id="email" placeholder="Enter your email">
+  </div>
+
+  <button onclick="sendData()">Send POST Request</button>
+
+  <div id="response"></div>
+</div>
+
+<script>
+async function uploadpdf(){
+    const pdfinput = document.getElementById("pdf")
+    const pdf = pdfinput.files[0];
+      if (!pdf) {
+        document.getElementById("response").textContent = "Please select a PDF first.";
+        return 100;
+      }
+      const responseDiv = document.getElementById('responsepdf');
+      responseDiv.style.display = 'block';
+      responseDiv.textContent = 'Sending...';
+
+    const formData = new FormData();
+    formData.append("file",pdf);
+    try{
+    const res = await fetch('/uploadpdf', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    responseDiv.style.background = '#d4edda';
+    responseDiv.textContent = 'Status: ' + res.status + ' ' + res.statusText + '\n\n' + JSON.stringify(data, null, 2);
+    if(res.status == 200){
+      return data.url
+    }
+    else{
+      return 0
+    }
+    }
+    catch (err) {
+    responseDiv.style.background = '#f8d7da';
+    responseDiv.textContent = 'Error: ' + err.message;
+    }
+  };
+
+</script>
+
+<script>
+async function sendData() {
+    var url = "N/A"
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const type = document.getElementById('type').value.trim();
+    if(type === "applicant"){
+    url = await uploadpdf()
+    }
+    console.log(url)
+    const payload = {
+        name: name,
+        email: email,
+        type: type,
+        path: url
+    };
+
+  const responseDiv = document.getElementById('response');
+  responseDiv.style.display = 'block';
+  responseDiv.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('http://localhost:3000/signup', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    responseDiv.style.background = '#d4edda';
+    responseDiv.textContent = 'Status: ' + res.status + ' ' + res.statusText + '\n\n' + JSON.stringify(data, null, 2);
+  } catch (err) {
+    responseDiv.style.background = '#f8d7da';
+    responseDiv.textContent = 'Error: ' + err.message;
+  }
+}
+</script>
+
+</body>
+</html>

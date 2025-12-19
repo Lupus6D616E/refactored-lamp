@@ -13,3 +13,8 @@ bun run dev
 ```
 
 Open http://localhost:3000/ with your browser to see the result.
+
+## Requirements
+
+Requires PostgreSQL to be installed
+bunx drizzle-kit push to initialize tables
