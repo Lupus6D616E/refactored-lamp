@@ -1,3 +1,5 @@
+'use client';
+ 
 import React, { useState } from 'react';
 
 const ResumeUpload: React.FC = () => {
