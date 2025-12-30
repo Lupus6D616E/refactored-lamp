@@ -1,10 +1,6 @@
 # Elysia with Bun runtime
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
-```
+this is very much vibecoded slop
 
 ## Development
 To start the development server run:
@@ -17,4 +13,4 @@ Open http://localhost:3000/ with your browser to see the result.
 ## Requirements
 
 Requires PostgreSQL to be installed
-bunx drizzle-kit push to initialize tables
+bun x drizzle-kit push to initialize tables

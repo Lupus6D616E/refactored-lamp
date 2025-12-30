@@ -45,4 +45,4 @@ package-lock.json
 #image blobs
 public/images/
 public/output.css
-src/resumes/*
+userdata/

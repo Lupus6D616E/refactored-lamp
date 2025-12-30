@@ -1,6 +1,6 @@
 'use client';
 
-import { authClient } from '@lib/auth-client'; // Adjust if your signOut is exported differently
+import { authClient } from '@lib/auth-client';
 
 export default function LogoutButton() {
 

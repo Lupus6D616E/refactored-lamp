@@ -5,7 +5,7 @@ import { db } from "./db"
 import { eq } from "drizzle-orm";
 import { auth } from './lib/auth';
 import { staticPlugin } from '@elysiajs/static'
-import { session, user } from "src/db/schema";
+import { user } from "src/db/schema";
 const buildCSS = () =>
   new Promise(resolve =>
     exec('tailwindcss -i ./src/app.css -o ./public/output.css',
@@ -85,16 +85,55 @@ const app = new Elysia()
   .get('/user', () => 'ok', {
     role: ['user']
   })
+  .post('/updateprofile',async ({ currentUser:currentUser, body}) => {
+    const userInfo  = body;
+    const uploadDir = './userdata/profiles';
+    await Bun.$`mkdir -p ${uploadDir}`.quiet(); 
+    const filename = `${currentUser.id}.json`;
+    const filepath = `${uploadDir}/${filename}`;
+    await Bun.write(filepath, JSON.stringify(userInfo, null, 2));
+    return {no: filepath}
+  },{
+    role: ['user'],
+    body: t.Object({
+      education: t.String(),
+      address: t.String(),
+      certification1: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      certification2: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      certification3: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      certification4: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      certification5: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      workexperience1: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      workexperience2: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      workexperience3: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      workexperience4: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+      workexperience5: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
+    })
+  })
+  .get("/downloadresume", async ({currentUser,set}) => {
+    if (typeof currentUser.resumeUrl === 'string'){
+      const filePath:string = currentUser.resumeUrl;  // Adjust path as needed
+      set.headers['Content-Type'] = 'application/pdf';
+      set.headers['Content-Disposition'] = `attachment; filename="resume.pdf"`;
+      return Bun.file(filePath)
+    }
+    else{
+      return {
+        success: false,
+        message: 'No resume'
+      }
+    }
+  },{
+    role: ['user']
+  })
   .post('/uploadpdf',
     async ({ currentUser,body}) => {
     const { file } = body;
       const oldResume = currentUser.resumeUrl;
-      const uploadDir = './src/resumes';
+      const uploadDir = './userdata/resumes';
       await Bun.$`mkdir -p ${uploadDir}`.quiet(); 
       const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}.pdf`;
       const filepath = `${uploadDir}/${filename}`;
-    
-      // Write file 
       await Bun.write(filepath, file);
       console.log("file uploaded")
       await db
@@ -108,7 +147,6 @@ const app = new Elysia()
         success: true,
         message: 'PDF uploaded successfully',
         size: file.size,
-        url: `src/uploads/${filename}`, 
       }
       }
       else{
@@ -118,7 +156,6 @@ const app = new Elysia()
           success: true,
           message: 'PDF uploaded and updated successfully',
           size: file.size,
-          url: `src/uploads/${filename}`, 
         }
       }
     },
@@ -136,3 +173,16 @@ const app = new Elysia()
 	.listen(3000, ({ hostname, port }) => {
 		console.log(`Server started http://${hostname}:${port}`);
 	});
+
+  async function loadUserData(userID:string): Promise<string[]> {
+  try {
+    const file = Bun.file(userID);
+    if (await file.exists()) {
+      const data = await file.json();
+      return Array.isArray(data) ? data : [];
+    }
+  } catch (e) {
+    console.error('Error loading file:', e);
+  }
+  return [];
+}

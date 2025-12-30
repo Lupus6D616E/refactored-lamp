@@ -3,7 +3,7 @@ import "@public/output.css";
 
 import logo from "@public/images/logo.svg";
 import reactLogo from '@public/images/react.svg';
-import {SignupForm} from "./signupform";
+import {SignupForm} from "./auth/signupform";
 
 
 export function Bingus() {
