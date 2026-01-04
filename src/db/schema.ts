@@ -1,6 +1,6 @@
 import { integer, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, serial, uniqueIndex, check } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -16,7 +16,7 @@ export const user = pgTable("user", {
   role: (text("role").default("user").notNull()),
   resumeUrl: text("resume_url"),
   address: text("address"),
-  birthdate: timestamp("birthdate"),
+  education: text("education"),
 });
 
 export const session = pgTable(
@@ -77,6 +77,30 @@ export const verification = pgTable(
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
+
+
+export const userWorkExperience = pgTable(
+  'user_work_experience',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    experience: varchar('experience', { length: 100 }).notNull(),
+    position: varchar('position', {length:100}).notNull()
+  }
+)
+
+export const userCertification = pgTable(
+  'user_certification',
+  {
+    id: serial('id').primaryKey(),
+    userId: text('user_id') 
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    certification: varchar('certification', { length: 100 }).notNull(),
+  }
+)
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),

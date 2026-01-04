@@ -1,9 +1,9 @@
 'use client'
 import { createRoot } from 'react-dom/client'
-import  UserProfileCard  from '@components/dashboard/usercard'
+import  UserProfileCard  from '@components/dashboard/info/usercard'
 import LogoutButton from '@components/auth/logout'
-import ResumeUpload from '@components/dashboard/ResumeUpload'
-import { ResumeDownload } from '@components/dashboard/downloadresume'
+import ResumeUpload from '@components/dashboard/upload/ResumeUpload'
+import { ResumeDownload } from '@components/dashboard/info/downloadresume'
 import { authClient } from '@lib/auth-client'; 
 
 

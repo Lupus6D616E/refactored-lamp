@@ -3,9 +3,9 @@ import { exec } from 'child_process'
 import { watch } from 'fs'
 import { db } from "./db"
 import { eq } from "drizzle-orm";
-import { auth } from './lib/auth';
+import { auth } from '@lib/auth';
 import { staticPlugin } from '@elysiajs/static'
-import { user } from "src/db/schema";
+import { user, userCertification, userWorkExperience } from "src/db/schema";
 const buildCSS = () =>
   new Promise(resolve =>
     exec('tailwindcss -i ./src/app.css -o ./public/output.css',
@@ -85,30 +85,93 @@ const app = new Elysia()
   .get('/user', () => 'ok', {
     role: ['user']
   })
-  .post('/updateprofile',async ({ currentUser:currentUser, body}) => {
-    const userInfo  = body;
-    const uploadDir = './userdata/profiles';
-    await Bun.$`mkdir -p ${uploadDir}`.quiet(); 
-    const filename = `${currentUser.id}.json`;
-    const filepath = `${uploadDir}/${filename}`;
-    await Bun.write(filepath, JSON.stringify(userInfo, null, 2));
-    return {no: filepath}
+  .get('/getcertifications', async ({currentUser}) => {
+      const userCertifications = await db
+      .select({
+        id: userCertification.id,
+        certification: userCertification.certification
+      })
+      .from(userCertification)
+      .where(eq(userCertification.userId, currentUser.id));
+
+      return {
+        items:userCertifications}
   },{
-    role: ['user'],
-    body: t.Object({
-      education: t.String(),
-      address: t.String(),
-      certification1: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      certification2: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      certification3: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      certification4: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      certification5: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      workexperience1: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      workexperience2: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      workexperience3: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      workexperience4: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-      workexperience5: t.String({ minLength: 1,maxLength: 500, error: 'Line must not be empty or longer than 500 characters' }),
-    })
+    role:['user']
+  })
+  .post('/addcertification', async ({currentUser, body}) => {
+    await db.insert(userCertification)
+    .values({userId: currentUser.id, certification: body.certification })
+    return{
+      success: 'yes'
+    }
+  },{
+        role: ['user'],
+        body: t.Object({
+          certification: t.String()
+        })
+  })
+  .delete('/certifications/:id', async ({ params, set, currentUser }) => {
+  const certificationId = Number(params.id);
+
+  const item = await db
+    .select()
+    .from(userCertification)
+    .where(eq(userCertification.id, certificationId))
+    .limit(1);
+  if (!item[0] || item[0].userId !== currentUser.id) {
+    set.status = 404;
+    return { error: 'Item not found or unauthorized' };
+  }
+
+  await db.delete(userCertification).where(eq(userCertification.id, certificationId));
+  return { success: true };
+  },{
+    role:['user']
+  })
+  .get('/getexperience', async ({currentUser}) => {
+      const workExperience = await db
+      .select({
+        id: userWorkExperience.id,
+        position: userWorkExperience.position,
+        experience: userWorkExperience.experience
+      })
+      .from(userWorkExperience)
+      .where(eq(userWorkExperience.userId, currentUser.id));
+
+      return {
+        items:workExperience}
+  },{
+    role:['user']
+  })
+  .post('/addexperience', async ({currentUser, body}) => {
+    await db.insert(userWorkExperience)
+    .values({userId: currentUser.id, experience: body.experience, position: body.position})
+    return{
+      success: 'yes'
+      }
+  },{
+        role: ['user'],
+        body: t.Object({
+          experience: t.String(),
+          position: t.String()
+        })
+  })
+  .delete('/workexperience/:id', async ({ params, set, currentUser }) => {
+  const experienceId = Number(params.id);
+  const item = await db
+    .select()
+    .from(userWorkExperience)
+    .where(eq(userWorkExperience.id, experienceId))
+    .limit(1);
+  if (!item[0] || item[0].userId !== currentUser.id) {
+    set.status = 404;
+    return { error: 'Item not found or unauthorized' };
+  }
+  await db.delete(userWorkExperience).where(eq(userWorkExperience.id, experienceId));
+  return { success: true };
+  },{
+    role:['user']
   })
   .get("/downloadresume", async ({currentUser,set}) => {
     if (typeof currentUser.resumeUrl === 'string'){
@@ -168,21 +231,7 @@ const app = new Elysia()
         maxSize: 10 * 1024 * 1024, 
       }),
     }), 
-  } 
-  )
+  })
 	.listen(3000, ({ hostname, port }) => {
 		console.log(`Server started http://${hostname}:${port}`);
 	});
-
-  async function loadUserData(userID:string): Promise<string[]> {
-  try {
-    const file = Bun.file(userID);
-    if (await file.exists()) {
-      const data = await file.json();
-      return Array.isArray(data) ? data : [];
-    }
-  } catch (e) {
-    console.error('Error loading file:', e);
-  }
-  return [];
-}
