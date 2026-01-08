@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { authClient } from "@lib/auth-client"; // your BetterAuth client
+import { authClient } from "backend/src/lib/auth-client"; // your BetterAuth client
 
 export function SignupForm() {
   const [email, setEmail] = useState("");

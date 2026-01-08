@@ -1,11 +1,11 @@
 import { Elysia, Context, t } from "elysia";
 import { exec } from "child_process";
 import { watch } from "fs";
-import { db } from "./db";
+import { db } from "./db/db";
 import { eq } from "drizzle-orm";
-import { auth } from "@lib/auth";
+import { auth } from "backend/src/lib/auth";
 import { staticPlugin } from "@elysiajs/static";
-import { user, userCertification, userWorkExperience } from "src/db/schema";
+import { user, userCertification, userWorkExperience } from "backend/src/db/schema";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(

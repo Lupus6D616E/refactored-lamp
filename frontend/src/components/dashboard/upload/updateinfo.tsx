@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { authClient } from '@lib/auth-client';
+import { authClient } from 'backend/src/lib/auth-client';
 
 export default function UpdateProfileCard() {
   const { data: session, refetch } = authClient.useSession();
