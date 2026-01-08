@@ -7,6 +7,7 @@ export function SignupForm() {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+ 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -16,7 +17,7 @@ export function SignupForm() {
     const { error } = await authClient.signUp.email({
       email,
       password,
-      name, // optional, depending on your schema
+      name,
     });
 
     setLoading(false);
@@ -36,7 +37,7 @@ export function SignupForm() {
 
       <input
         type="text"
-        placeholder="Business Name"
+        placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         className="w-full border p-2 rounded"

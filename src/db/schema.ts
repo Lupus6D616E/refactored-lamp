@@ -1,6 +1,15 @@
-import { integer, varchar } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index, serial, uniqueIndex, check } from "drizzle-orm/pg-core";
+import { varchar } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  serial,
+  uniqueIndex,
+  check,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -13,7 +22,7 @@ export const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-  role: (text("role").default("user").notNull()),
+  role: text("role").default("user").notNull(),
   resumeUrl: text("resume_url"),
   address: text("address"),
   education: text("education"),
@@ -78,29 +87,22 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+export const userWorkExperience = pgTable("user_work_experience", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  experience: varchar("experience", { length: 100 }).notNull(),
+  position: varchar("position", { length: 100 }).notNull(),
+});
 
-export const userWorkExperience = pgTable(
-  'user_work_experience',
-  {
-    id: serial('id').primaryKey(),
-    userId: text('user_id')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    experience: varchar('experience', { length: 100 }).notNull(),
-    position: varchar('position', {length:100}).notNull()
-  }
-)
-
-export const userCertification = pgTable(
-  'user_certification',
-  {
-    id: serial('id').primaryKey(),
-    userId: text('user_id') 
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    certification: varchar('certification', { length: 100 }).notNull(),
-  }
-)
+export const userCertification = pgTable("user_certification", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  certification: varchar("certification", { length: 100 }).notNull(),
+});
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
@@ -121,3 +123,24 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
+export const jobPosts = pgTable("job_posts", {
+  id: serial("id").primaryKey(),
+  businessId: text("business_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("requirements").notNull(),
+  responsibilities: text("responsibilities").notNull(),
+  city: text("city").notNull(),
+  employmentType: text("employment_type").notNull(),
+  salaryRange: text("salary_range").notNull(),
+  instructions: text("instructions").notNull(),
+  postedAt: timestamp("posted_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  status: text("status").notNull(),
+  tags: text("tags")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  contact: text("contact").notNull(),
+});

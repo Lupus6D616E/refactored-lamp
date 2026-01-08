@@ -86,13 +86,6 @@
     <input type="file" id="pdf" placeholder="submit pdf">
   </div>
 
-  <div class="form-group">
-    <label for="type">User Type:</label>
-    <select name="type" id="type">
-        <option value="employer">SME</option>
-        <option value="applicant">Applicant</option>
-    </select>
-  </div>
 
   <button onclick="sendData()">Send POST Request</button>
   <button onclick="uploadpdf()">upload PDF Request</button>
@@ -100,6 +93,29 @@
   <div id="responsepdf"></div>
   <div id="response"></div>
 </div>
+
+<div class="container">
+  <h1>User role change Form</h1>
+  
+  
+  <div class="form-group">
+    <label for="changetypeemail">userId:</label>
+    <input type="text" id="changetypeemail" placeholder="Enter email">
+  </div>
+
+  <div class="form-group">
+    <label for="type">User Type:</label>
+    <select name="type" id="type">
+        <option value="business">business</option>
+        <option value="worker">worker</option>
+    </select>
+  </div>
+
+  <button onclick="changetype()">Send POST Request</button>
+  <div id="responsepdf"></div>
+  <div id="responsechange"></div>
+</div>
+
 
 
 
@@ -179,6 +195,41 @@ async function sendData() {
   }
 }
 </script>
+
+
+<script>
+async function changetype() {
+
+    const email = document.getElementById('changetypeemail').value.trim();
+    const type = document.getElementById('type').value.trim();
+    const payload = {
+        email: email,
+        change: type,
+    };
+
+  const responseDiv = document.getElementById('responsechange');
+  responseDiv.style.display = 'block';
+  responseDiv.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('http://localhost:3000/changetype', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    responseDiv.style.background = '#d4edda';
+    responseDiv.textContent = 'Status: ' + res.status + ' ' + res.statusText + '\n\n' + JSON.stringify(data, null, 2);
+  } catch (err) {
+    responseDiv.style.background = '#f8d7da';
+    responseDiv.textContent = 'Error: ' + err.message;
+  }
+}
+</script>
+
 
 
 </body>

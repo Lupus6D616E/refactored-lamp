@@ -1,9 +1,7 @@
 'use client'
 import { createRoot } from 'react-dom/client'
-import  UserProfileCard  from '@components/dashboard/info/usercard'
+import UserProfileCard  from '@components/dashboard/info/usercard'
 import LogoutButton from '@components/auth/logout'
-import ResumeUpload from '@components/dashboard/upload/ResumeUpload'
-import { ResumeDownload } from '@components/dashboard/info/downloadresume'
 import { authClient } from '@lib/auth-client'; 
 
 
@@ -16,15 +14,13 @@ function App() {
     }
     if (session.user.role != 'business') {
         return (
-            <><p> you are not an admin </p><p> <a href='/public/signin.html'>Return to Sign-In</a></p></>
+            <><p> you are not a business </p><p> <a href='/public/signin.html'>Return to Sign-In</a></p></>
         )
     }
     return (
         <main>
             <UserProfileCard />
             <LogoutButton />
-            <ResumeUpload />
-            <ResumeDownload />
         </main>
     )
 }   
