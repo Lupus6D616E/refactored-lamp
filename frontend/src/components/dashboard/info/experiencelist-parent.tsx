@@ -1,5 +1,5 @@
 import React from "react";
-import ItemsList from "@components/dashboard/info/experiencelist";
+import ItemsList from "frontend/src/components/dashboard/info/experiencelist";
 const ExperienceList = () => {
   type Item = {
     id: number;

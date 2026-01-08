@@ -19,7 +19,7 @@ const buildCSS = () =>
 
 await buildCSS();
 
-const watcher = watch("./public", { recursive: true }, async () => {
+const watcher = watch("frontend/public", { recursive: true }, async () => {
   await buildCSS();
 });
 
@@ -75,7 +75,9 @@ const betterAuth = new Elysia({ name: "better-auth" })
   });
 
 const app = new Elysia()
-  .use(await staticPlugin())
+  .use(await staticPlugin({
+    assets: 'frontend/public'
+  }))
   .use(betterAuth)
   .all("auth/*", betterAuthView)
   .post("/api/postjob",({body}) => {
@@ -302,3 +304,5 @@ const app = new Elysia()
   .listen(3000, ({ hostname, port }) => {
     console.log(`Server started http://${hostname}:${port}`);
   });
+
+  export type App = typeof app 

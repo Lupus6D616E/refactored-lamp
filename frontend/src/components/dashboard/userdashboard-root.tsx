@@ -1,15 +1,15 @@
 'use client'
 import { createRoot } from 'react-dom/client'
-import  UserProfileCard  from '@components/dashboard/info/usercard'
-import LogoutButton from '@components/auth/logout'
-import ResumeUpload from '@components/dashboard/upload/ResumeUpload'
-import { ResumeDownload } from '@components/dashboard/info/downloadresume'
+import  UserProfileCard  from 'frontend/src/components/dashboard/info/usercard'
+import LogoutButton from 'frontend/src/components/auth/logout'
+import ResumeUpload from 'frontend/src/components/dashboard/upload/ResumeUpload'
+import { ResumeDownload } from 'frontend/src/components/dashboard/info/downloadresume'
 import { authClient } from '@lib/auth-client'; 
-import UpdateProfileCard from '@components/dashboard/upload/updateinfo'
-import AddCertificationCard from '@components/dashboard/upload/addcertification'
-import CertificationList from '@components/dashboard/info/certificationlist-parent'
-import AddExperienceCard from '@components/dashboard/upload/addexperience'
-import ExperienceList from '@components/dashboard/info/experiencelist-parent'
+import UpdateProfileCard from 'frontend/src/components/dashboard/upload/updateinfo'
+import AddCertificationCard from 'frontend/src/components/dashboard/upload/addcertification'
+import CertificationList from 'frontend/src/components/dashboard/info/certificationlist-parent'
+import AddExperienceCard from 'frontend/src/components/dashboard/upload/addexperience'
+import ExperienceList from 'frontend/src/components/dashboard/info/experiencelist-parent'
 
 function App() {
     const { data: session, isPending } = authClient.useSession();

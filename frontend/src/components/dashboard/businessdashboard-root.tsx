@@ -1,7 +1,7 @@
 'use client'
 import { createRoot } from 'react-dom/client'
-import UserProfileCard  from '@components/dashboard/info/usercard'
-import LogoutButton from '@components/auth/logout'
+import UserProfileCard  from 'frontend/src/components/dashboard/info/usercard'
+import LogoutButton from 'frontend/src/components/auth/logout'
 import { authClient } from '@lib/auth-client'; 
 
 

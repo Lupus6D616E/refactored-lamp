@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { authClient } from "@lib/auth-client"; // your BetterAuth client
+import { treaty } from '@elysiajs/eden'
+import type { App } from 'src/index'
+const client = treaty<App>('localhost:3000') 
 
 export function CreateJobForm() {
   const [title, setTitle] = useState("");
@@ -34,6 +36,8 @@ export function CreateJobForm() {
   ];
   const sortedItems = [...cities].sort();
   const employments = ["Full Time", "Part Time", "Internship"];
+
+  
 
   // Calculate the minimum date: today + 7 days
   const today = new Date();

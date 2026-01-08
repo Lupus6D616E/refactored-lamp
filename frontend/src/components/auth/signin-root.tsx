@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { SigninForm } from "@components/auth/signinform";
+import { SigninForm } from "frontend/src/components/auth/signinform";
 
 function App() {
   return (

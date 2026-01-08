@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { CreateJobForm } from "@components/createpost/createjob";
+import { CreateJobForm } from "frontend/src/components/createpost/createjob";
 
 function App() {
   return (
