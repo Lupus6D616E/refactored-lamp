@@ -6,7 +6,8 @@ import { eq } from "drizzle-orm";
 import { betterAuthPlugin } from "backend/src/lib/auth";
 import { staticPlugin } from "@elysiajs/static";
 import { user, userCertification, userWorkExperience } from "backend/src/db/schema";
-import { profilePlugin } from "./modules/profile/controller";
+import { profilePlugin } from "@modules/profile/controller";
+import { postPlugin } from "@modules/post/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -35,22 +36,7 @@ const app = new Elysia()
   }))
   .use(betterAuthPlugin)
   .use(profilePlugin)
-  .post("/api/postjob",({body}) => {
-    return{yes:'no'}
-    },{
-      role:["business"],
-      body: t.Object({
-        title: t.String(),
-        description: t.String(),
-        responsibilities: t.String(),
-        city: t.String(),
-        employmentType: t.String(),
-        minimumSalary: t.Integer(),
-        expireDate: t.Date(),
-        tags: t.Array(t.String())
-      })
-    }
-   )
+  .use(postPlugin)
   .post(
     "/changetype",
     async ({ body }) => {

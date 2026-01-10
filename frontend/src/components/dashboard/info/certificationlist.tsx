@@ -19,7 +19,7 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
     setDeletingId(itemId);
 
     try {
-      const response = await fetch(`/certifications/${itemId}`, {
+      const response = await fetch(`/user/certifications/${itemId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

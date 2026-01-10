@@ -42,18 +42,21 @@ export abstract class Profile {
     return response;
   }
 
-  static async getResumeUrl(userId: string):Promise<string | null>{
-    const item = await db.select({resumeUrl: user.resumeUrl})
-    .from(user)
-    .where(eq(user.id,userId));
-    if( item.length === 0||item[0].resumeUrl === null){
-        return null
-    }
-    else{
-        return item[0].resumeUrl
+  static async getResumeUrl(userId: string): Promise<string | null> {
+    const item = await db
+      .select({ resumeUrl: user.resumeUrl })
+      .from(user)
+      .where(eq(user.id, userId));
+    if (item.length === 0 || item[0].resumeUrl === null) {
+      return null;
+    } else {
+      return item[0].resumeUrl;
     }
   }
-  static async deleteExperience(userSession: AuthUser, id: number) {
+  static async deleteExperience(
+    userSession: AuthUser,
+    id: number,
+  ): Promise<number> {
     const item = await db
       .select()
       .from(userWorkExperience)
@@ -66,7 +69,10 @@ export abstract class Profile {
     return 0;
   }
 
-  static async deleteCertification(userSession: AuthUser, id: number) {
+  static async deleteCertification(
+    userSession: AuthUser,
+    id: number,
+  ): Promise<number> {
     const item = await db
       .select()
       .from(userCertification)
@@ -82,7 +88,7 @@ export abstract class Profile {
   static async insertExperience(
     userSession: AuthUser,
     data: ProfileModel.experienceBody,
-  ) {
+  ): Promise<number> {
     try {
       await db.insert(userWorkExperience).values({
         userId: userSession.id,
@@ -94,10 +100,10 @@ export abstract class Profile {
     }
     return 0;
   }
-   static async insertCertification(
+  static async insertCertification(
     userSession: AuthUser,
     data: ProfileModel.certificationBody,
-  ) {
+  ): Promise<number> {
     try {
       await db.insert(userCertification).values({
         userId: userSession.id,
@@ -116,18 +122,17 @@ export abstract class Profile {
         experience: userWorkExperience.experience,
       })
       .from(userWorkExperience)
-      .where(eq(userWorkExperience.userId, userId))
-      return experience;
+      .where(eq(userWorkExperience.userId, userId));
+    return experience;
   }
-    static async getCertification(userId: string) {
+  static async getCertification(userId: string) {
     const certs = await db
       .select({
         id: userCertification.id,
-        certification: userCertification.certification
+        certification: userCertification.certification,
       })
       .from(userCertification)
-      .where(eq(userCertification.userId, userId))
-      ;
+      .where(eq(userCertification.userId, userId));
     return certs;
   }
 }

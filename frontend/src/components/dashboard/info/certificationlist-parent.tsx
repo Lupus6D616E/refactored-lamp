@@ -12,7 +12,7 @@ const CertificationList = () => {
   React.useEffect(() => {
     const getcerts = async () => {
       try {
-        const res = await fetch("/getcertifications", {
+        const res = await fetch("/user/getcertifications", {
           credentials: "include",
         });
         if (!res.ok) {

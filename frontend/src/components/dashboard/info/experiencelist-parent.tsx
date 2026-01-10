@@ -12,7 +12,7 @@ const ExperienceList = () => {
   React.useEffect(() => {
     const getexperience = async () => {
       try {
-        const res = await fetch("/getexperience", {
+        const res = await fetch("/user/getexperience", {
           credentials: "include",
         });
         if (!res.ok) {

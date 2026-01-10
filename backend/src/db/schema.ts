@@ -1,4 +1,4 @@
-import { varchar } from "drizzle-orm/pg-core";
+import { PgNumericNumber, varchar } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -7,8 +7,7 @@ import {
   boolean,
   index,
   serial,
-  uniqueIndex,
-  check,
+  integer
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -129,15 +128,15 @@ export const jobPosts = pgTable("job_posts", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
-  description: text("requirements").notNull(),
+  description: text("description").notNull(),
+  requirements: text("requirements").notNull(),
   responsibilities: text("responsibilities").notNull(),
   city: text("city").notNull(),
   employmentType: text("employment_type").notNull(),
-  salaryRange: text("salary_range").notNull(),
-  instructions: text("instructions").notNull(),
+  salaryMinimum: integer("salaryMinimum").notNull(),
   postedAt: timestamp("posted_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
-  status: text("status").notNull(),
+  status: text("status").default("active").notNull(),
   tags: text("tags")
     .array()
     .notNull()

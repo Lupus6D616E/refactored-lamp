@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { treaty } from '@elysiajs/eden'
-import type { App } from 'backend/src/index'
-const client = treaty<App>('localhost:3000') 
+import { treaty } from "@elysiajs/eden";
+import type { App } from "backend/src/index";
+const client = treaty<App>("localhost:3000");
 
 export function CreateJobForm() {
   const [title, setTitle] = useState("");
+  const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
+  const [requirements, setRequirements] = useState("");
   const [responsibilities, setResponsibilities] = useState("");
   const [city, setCity] = useState("");
   const [employmentType, setEmploymentType] = useState("");
@@ -37,8 +39,6 @@ export function CreateJobForm() {
   const sortedItems = [...cities].sort();
   const employments = ["Full Time", "Part Time", "Internship"];
 
-  
-
   // Calculate the minimum date: today + 7 days
   const today = new Date();
   today.setDate(today.getDate() + 7);
@@ -67,14 +67,16 @@ export function CreateJobForm() {
     setError(null);
     setLoading(true);
 
-    const response = await fetch("/api/postjob", {
+    const response = await fetch("/post/postjob", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         title: title,
+        email: email,
         description: description,
+        requirements: requirements,
         responsibilities: responsibilities,
         city: city,
         employmentType: employmentType,
@@ -91,7 +93,11 @@ export function CreateJobForm() {
       return;
     } else {
       const message = await response.json();
-      if ((message.yes = "no")) setError("job posted");
+      if (message.message === "no") {
+        setError("job posted");
+      } else {
+        setError("an error occurred");
+      }
     }
   }
 
@@ -107,11 +113,28 @@ export function CreateJobForm() {
         onChange={(e) => setTitle(e.target.value)}
         className="w-full border p-2 rounded"
       />
+      <input
+        type="text"
+        placeholder="contact email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full border p-2 rounded"
+      />
+      
       <textarea
         placeholder="description"
         required
         value={description}
         onChange={(e) => setDescription(e.target.value)}
+        className="w-full border p-2 rounded"
+      ></textarea>
+
+      <textarea
+        placeholder="requirements"
+        required
+        value={requirements}
+        onChange={(e) => setRequirements(e.target.value)}
         className="w-full border p-2 rounded"
       ></textarea>
       <textarea

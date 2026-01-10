@@ -20,7 +20,7 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
     setDeletingId(itemId);
 
     try {
-      const response = await fetch(`/workexperience/${itemId}`, {
+      const response = await fetch(`/user/workexperience/${itemId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -47,8 +47,8 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
         <li key={item.id}>
           <a className="flex justify-between items-center active:opacity-80">
             <div>
-              <span className="text-sm opacity-70 block">Certification: {item.experience}</span>
-              <span className="text-sm opacity-70 block">Certification: {item.position}</span>
+              <span className="text-sm opacity-70 block">Experience: {item.experience}</span>
+              <span className="text-sm opacity-70 block">Position: {item.position}</span>
             </div>
 
             {/* Delete X Button */}

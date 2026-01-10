@@ -13,7 +13,7 @@ const AddCertificationCard: React.FC = () => {
     setMessage('');
 
     try {
-      const response = await fetch('/addcertification', {
+      const response = await fetch('/user/addcertification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,6 +44,7 @@ const AddCertificationCard: React.FC = () => {
           <input
             type="text"
             placeholder="Enter Certification"
+            required={true}
             className="input input-bordered w-full"
             value={certification}
             onChange={(e) => setCertification(e.target.value)}

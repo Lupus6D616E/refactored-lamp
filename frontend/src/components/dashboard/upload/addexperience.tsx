@@ -14,7 +14,7 @@ const AddExperienceCard: React.FC = () => {
     setMessage('');
 
     try {
-      const response = await fetch('/addexperience', {
+      const response = await fetch('/user/addexperience', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,6 +45,7 @@ const AddExperienceCard: React.FC = () => {
           <input
             type="text"
             placeholder="previous work experience"
+            required={true}
             className="input input-bordered w-full"
             value={experience}
             onChange={(e) => setExperience(e.target.value)}
@@ -53,6 +54,7 @@ const AddExperienceCard: React.FC = () => {
           <input
             type="text"
             placeholder="position"
+            required={true}
             className="input input-bordered w-full"
             value={position}
             onChange={(e) => setPosition(e.target.value)}

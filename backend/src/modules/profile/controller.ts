@@ -1,11 +1,8 @@
 import { betterAuthPlugin } from "@lib/auth";
-import { Elysia, t } from "elysia";
-import { db } from "@db/db";
-import { user, userCertification, userWorkExperience } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { Elysia } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
-export const profilePlugin = new Elysia()
+export const profilePlugin = new Elysia({prefix: '/user'})
   .use(betterAuthPlugin)
   .get(
     "/getcertifications",
@@ -41,7 +38,7 @@ export const profilePlugin = new Elysia()
     "/certifications/:id",
     async ({ params, set, currentUser }) => {
       const certificationId = Number(params.id);
-      const response = await Profile.deleteExperience(
+      const response = await Profile.deleteCertification(
         currentUser,
         certificationId,
       );

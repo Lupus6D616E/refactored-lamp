@@ -27,7 +27,7 @@ const ResumeUpload: React.FC = () => {
     formData.append('file', file);
 
     try {
-      const response = await fetch('/uploadpdf', {
+      const response = await fetch('/user/uploadpdf', {
         method: 'POST',
         body: formData,
       });
