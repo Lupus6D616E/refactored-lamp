@@ -41,6 +41,18 @@ export abstract class Profile {
     }
     return response;
   }
+
+  static async getResumeUrl(userId: string):Promise<string | null>{
+    const item = await db.select({resumeUrl: user.resumeUrl})
+    .from(user)
+    .where(eq(user.id,userId));
+    if( item.length === 0||item[0].resumeUrl === null){
+        return null
+    }
+    else{
+        return item[0].resumeUrl
+    }
+  }
   static async deleteExperience(userSession: AuthUser, id: number) {
     const item = await db
       .select()
@@ -97,22 +109,25 @@ export abstract class Profile {
     return 0;
   }
   static async getExperience(userId: string) {
-    await db
+    const experience = await db
       .select({
         id: userWorkExperience.id,
         position: userWorkExperience.position,
         experience: userWorkExperience.experience,
       })
       .from(userWorkExperience)
-      .where(eq(userWorkExperience.userId, userId));
+      .where(eq(userWorkExperience.userId, userId))
+      return experience;
   }
     static async getCertification(userId: string) {
-    await db
+    const certs = await db
       .select({
         id: userCertification.id,
         certification: userCertification.certification
       })
       .from(userCertification)
-      .where(eq(userCertification.userId, userId));
+      .where(eq(userCertification.userId, userId))
+      ;
+    return certs;
   }
 }

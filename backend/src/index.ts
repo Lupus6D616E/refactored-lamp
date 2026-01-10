@@ -10,7 +10,7 @@ import { profilePlugin } from "./modules/profile/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
-      "tailwindcss -i ./src/app.css -o ./public/output.css",
+      "tailwindcss -i backend/src/app.css -o frontend/public/output.css",
       (_error, _stdout, stderr) => {
         console.log(stderr);
         resolve(null);

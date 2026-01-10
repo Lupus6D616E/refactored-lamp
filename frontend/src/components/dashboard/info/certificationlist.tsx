@@ -1,8 +1,5 @@
 import React from 'react';
 
-
-
-
 type Item = {
   id: number;
   certification:string;
@@ -52,10 +49,9 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
               <span className="text-sm opacity-70 block">Certification: {item.certification}</span>
             </div>
 
-            {/* Delete X Button */}
             <button
               onClick={(e) => {
-                e.stopPropagation(); // Prevent menu item click if it's clickable
+                e.stopPropagation();
                 handleDelete(item.id);
               }}
               disabled={deletingId === item.id}

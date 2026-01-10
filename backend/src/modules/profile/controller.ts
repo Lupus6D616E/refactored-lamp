@@ -10,7 +10,7 @@ export const profilePlugin = new Elysia()
   .get(
     "/getcertifications",
     async ({ currentUser }) => {
-      const userCertification = Profile.getCertification(currentUser.id);
+      const userCertification = await Profile.getCertification(currentUser.id);
       return {
         items: userCertification,
       };
@@ -62,7 +62,7 @@ export const profilePlugin = new Elysia()
   .get(
     "/getexperience",
     async ({ currentUser }) => {
-      const workExperience = Profile.getExperience(currentUser.id);
+      const workExperience = await Profile.getExperience(currentUser.id);
       return {
         items: workExperience,
       };
@@ -114,17 +114,17 @@ export const profilePlugin = new Elysia()
   .get(
     "/downloadresume",
     async ({ currentUser, set }) => {
-      if (typeof currentUser.resumeUrl === "string") {
-        const filePath: string = currentUser.resumeUrl; // Adjust path as needed
-        set.headers["Content-Type"] = "application/pdf";
-        set.headers["Content-Disposition"] =
-          `attachment; filename="resume.pdf"`;
-        return Bun.file(filePath);
-      } else {
+        const result = await Profile.getResumeUrl(currentUser.id);
+      if ( result === null) {
         return {
           success: false,
           message: "No resume",
         };
+      } else {
+        set.headers["Content-Type"] = "application/pdf";
+        set.headers["Content-Disposition"] =
+          `attachment; filename="resume.pdf"`;
+        return Bun.file(result);
       }
     },
     {
