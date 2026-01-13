@@ -12,6 +12,7 @@ export namespace PostModel {
     minimumSalary: t.Integer(),
     expireDate: t.Date(),
     tags: t.Array(t.String()),
+    schedule: t.Array(t.String())
   });
 
   export type JobBody = typeof JobBody.static;

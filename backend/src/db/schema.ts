@@ -1,4 +1,4 @@
-import { PgNumericNumber, varchar } from "drizzle-orm/pg-core";
+import { varchar } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -7,7 +7,7 @@ import {
   boolean,
   index,
   serial,
-  integer
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -22,7 +22,6 @@ export const user = pgTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   role: text("role").default("user").notNull(),
-  resumeUrl: text("resume_url"),
   address: text("address"),
   education: text("education"),
 });
@@ -103,6 +102,32 @@ export const userCertification = pgTable("user_certification", {
   certification: varchar("certification", { length: 100 }).notNull(),
 });
 
+export const userResume = pgTable("user_resume", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" })
+    .unique(),
+  resumeUrl: text("resume_url"),
+});
+
+export const seekerProfile = pgTable("seeker_profile", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" })
+    .unique(),
+  description: text("description"),
+  schedule: text("schedule")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  skills: text("skills")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+});
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
@@ -137,6 +162,10 @@ export const jobPosts = pgTable("job_posts", {
   postedAt: timestamp("posted_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   status: text("status").default("active").notNull(),
+  schedule: text("schedule")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
   tags: text("tags")
     .array()
     .notNull()

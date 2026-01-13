@@ -39,6 +39,27 @@ export function CreateJobForm() {
   const sortedItems = [...cities].sort();
   const employments = ["Full Time", "Part Time", "Internship"];
 
+const DAYS_OF_WEEK = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+
+  const toggleDay = (day: string) => {
+    setSelectedDays((prev) =>
+      prev.includes(day)
+        ? prev.filter((d) => d !== day)
+        : [...prev, day]
+    );
+  };
+
+
   // Calculate the minimum date: today + 7 days
   const today = new Date();
   today.setDate(today.getDate() + 7);
@@ -83,6 +104,7 @@ export function CreateJobForm() {
         minimumSalary: minimumSalary,
         expireDate: expireDate,
         tags: tags,
+        schedule: selectedDays,
       }),
     });
 
@@ -230,6 +252,26 @@ export function CreateJobForm() {
           ))
         )}
       </div>
+    <div className="form-control gap-2">
+      <span className="label-text font-semibold">Select days</span>
+
+      {DAYS_OF_WEEK.map((day) => (
+        <label key={day} className="label cursor-pointer justify-start gap-3">
+          <input
+            type="checkbox"
+            className="checkbox checkbox-primary"
+            checked={selectedDays.includes(day)}
+            onChange={() => toggleDay(day)}
+          />
+          <span className="label-text">{day}</span>
+        </label>
+      ))}
+
+      {/* Debug / preview */}
+      <div className="mt-2 text-sm opacity-70">
+        Selected: {selectedDays.join(", ") || "None"}
+      </div>
+    </div>
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <button

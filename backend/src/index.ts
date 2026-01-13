@@ -8,6 +8,7 @@ import { staticPlugin } from "@elysiajs/static";
 import { user, userCertification, userWorkExperience } from "backend/src/db/schema";
 import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
+import { searchPlugin } from "@modules/search/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -37,6 +38,7 @@ const app = new Elysia()
   .use(betterAuthPlugin)
   .use(profilePlugin)
   .use(postPlugin)
+  .use(searchPlugin)
   .post(
     "/changetype",
     async ({ body }) => {

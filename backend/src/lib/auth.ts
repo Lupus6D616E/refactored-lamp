@@ -21,11 +21,6 @@ export const auth = betterAuth({
         defaultValue: "user",
         input: false,
       },
-      resumeUrl: {
-        type: "string",
-        required: false,
-        defaultValue: null,
-      },
       address: {
         type: "string",
         required: false,

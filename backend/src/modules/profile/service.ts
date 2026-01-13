@@ -1,6 +1,6 @@
 import { db } from "@db/db";
 import { eq } from "drizzle-orm";
-import { user, userCertification, userWorkExperience } from "@db/schema";
+import { userResume, userCertification, userWorkExperience } from "@db/schema";
 import { ProfileModel } from "./model";
 import type { AuthUser } from "@lib/auth";
 export abstract class Profile {
@@ -9,23 +9,27 @@ export abstract class Profile {
     pdf: ProfileModel.resumeBody,
   ) {
     const { file } = pdf;
-    const oldResume = userSession.resumeUrl;
-    const uploadDir = "./userdata/resumes";
+    const oldResume = await this.getResumeUrl(userSession.id);
+    const uploadDir = "userdata/resumes";
     await Bun.$`mkdir -p ${uploadDir}`.quiet();
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}.pdf`;
     const filepath = `${uploadDir}/${filename}`;
     await Bun.write(filepath, file);
     console.log("file uploaded");
+    console.log(filepath)
     let response: ProfileModel.resumeResponse = {
       message: "something happened",
       size: 0,
     };
-    await db
-      .update(user)
-      .set({
-        resumeUrl: filepath,
-      })
-      .where(eq(user.id, userSession.id));
+    await db.insert(userResume).values({
+      userId: userSession.id,
+      resumeUrl: filepath,
+    }).onConflictDoUpdate({
+      target: userResume.userId,
+      set: {
+        resumeUrl: filepath
+      }
+    });
     if (oldResume === null) {
       response = {
         message: "PDF uploaded sucessfully",
@@ -44,9 +48,9 @@ export abstract class Profile {
 
   static async getResumeUrl(userId: string): Promise<string | null> {
     const item = await db
-      .select({ resumeUrl: user.resumeUrl })
-      .from(user)
-      .where(eq(user.id, userId));
+      .select({ resumeUrl: userResume.resumeUrl })
+      .from(userResume)
+      .where(eq(userResume.userId, userId));
     if (item.length === 0 || item[0].resumeUrl === null) {
       return null;
     } else {
