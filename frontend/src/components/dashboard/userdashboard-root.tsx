@@ -10,7 +10,7 @@ import AddCertificationCard from 'frontend/src/components/dashboard/upload/addce
 import CertificationList from 'frontend/src/components/dashboard/info/certificationlist-parent'
 import AddExperienceCard from 'frontend/src/components/dashboard/upload/addexperience'
 import ExperienceList from 'frontend/src/components/dashboard/info/experiencelist-parent'
-import { CreateJobForm } from '@components/createpost/createjob'
+import {UpdateProfile} from '@components/dashboard/upload/updateprofile'
 function App() {
     const { data: session, isPending } = authClient.useSession();
     if (!session?.user) {
@@ -30,6 +30,7 @@ function App() {
             <CertificationList />
             <AddExperienceCard />
             <ExperienceList />
+            <UpdateProfile />
         </main>
     )
     }
@@ -40,7 +41,6 @@ function App() {
             <LogoutButton />
              <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
                         <div className="card-body">
-                          <CreateJobForm />
                         </div>
             </div>
         </main>

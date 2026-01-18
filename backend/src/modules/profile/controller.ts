@@ -2,8 +2,9 @@ import { betterAuthPlugin } from "@lib/auth";
 import { Elysia } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
-export const profilePlugin = new Elysia({prefix: '/user'})
+export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
+
   .get(
     "/getcertifications",
     async ({ currentUser }) => {
@@ -19,7 +20,7 @@ export const profilePlugin = new Elysia({prefix: '/user'})
   .post(
     "/addcertification",
     async ({ currentUser, body }) => {
-     const response = await Profile.insertCertification(currentUser, body);
+      const response = await Profile.insertCertification(currentUser, body);
       if (response === 0) {
         return {
           success: true,
@@ -49,7 +50,7 @@ export const profilePlugin = new Elysia({prefix: '/user'})
         };
       }
       return {
-        message: "success", 
+        message: "success",
       };
     },
     {
@@ -111,8 +112,8 @@ export const profilePlugin = new Elysia({prefix: '/user'})
   .get(
     "/downloadresume",
     async ({ currentUser, set }) => {
-        const result = await Profile.getResumeUrl(currentUser.id);
-      if ( result === null) {
+      const result = await Profile.getResumeUrl(currentUser.id);
+      if (result === null) {
         return {
           success: false,
           message: "No resume",
@@ -137,5 +138,17 @@ export const profilePlugin = new Elysia({prefix: '/user'})
     {
       role: ["user"],
       body: ProfileModel.resumeBody,
+    },
+  )
+  .post(
+    "/post/create",
+    ({ currentUser, body }) => {
+      Profile.updateSeekerProfile(currentUser.id, body)
+      console.log("Creating post:", body);
+      return { success: true, message: "123" };
+    },
+    {
+      role: ["user"],
+      body: ProfileModel.profileBody
     },
   );

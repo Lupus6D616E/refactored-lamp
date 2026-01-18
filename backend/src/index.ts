@@ -9,6 +9,7 @@ import { user, userCertification, userWorkExperience } from "backend/src/db/sche
 import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
 import { searchPlugin } from "@modules/search/controller";
+import { aiPlugin } from "@modules/reviewbot/aislop";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -39,6 +40,8 @@ const app = new Elysia()
   .use(profilePlugin)
   .use(postPlugin)
   .use(searchPlugin)
+  .use(aiPlugin)
+   
   .post(
     "/changetype",
     async ({ body }) => {

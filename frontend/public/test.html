@@ -116,6 +116,52 @@
   <div id="responsechange"></div>
 </div>
 
+<div class="container">
+  <h1>Ai test Form</h1>
+  
+  
+  <div class="form-group">
+    <label for="aichat">userId:</label>
+    <input type="text" id="aichat" placeholder="Enter text">
+  </div>
+
+
+  <button onclick="sendChat()">Send POST Request</button>
+  <div id="responseai"></div>
+  <div id="responsechange"></div>
+</div>
+
+
+<script>
+async function sendChat() {
+    const text = document.getElementById('aichat').value.trim();
+    const payload = {
+        text: text,
+    };
+
+  const responseDiv = document.getElementById('responseai');
+  responseDiv.style.display = 'block';
+  responseDiv.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('http://localhost:3000/ai/chat', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    responseDiv.style.background = '#d4edda';
+    responseDiv.textContent = 'Status: ' + res.status + ' ' + res.statusText + '\n\n' + JSON.stringify(data, null, 2);
+  } catch (err) {
+    responseDiv.style.background = '#f8d7da';
+    responseDiv.textContent = 'Error: ' + err.message;
+  }
+}
+</script>
+
 
 
 

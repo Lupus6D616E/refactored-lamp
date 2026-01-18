@@ -10,15 +10,21 @@ export namespace ProfileModel {
   });
   export const resumeResponse = t.Object({
     message: t.String(),
-    size: t.Number()
+    size: t.Number(),
   });
   export const experienceBody = t.Object({
     experience: t.String(),
-    position: t.String()
+    position: t.String(),
   });
-export const certificationBody = t.Object({
+  export const certificationBody = t.Object({
     certification: t.String(),
   });
+  export const profileBody = t.Object({
+    description: t.String({ minLength: 1 }),
+    skills: t.Array(t.String()),
+    selectedDays: t.Array(t.String()),
+  });
+  export type profileBody = typeof profileBody.static
   export type certificationBody = typeof certificationBody.static;
   export type experienceBody = typeof experienceBody.static;
   export type resumeResponse = typeof resumeResponse.static;

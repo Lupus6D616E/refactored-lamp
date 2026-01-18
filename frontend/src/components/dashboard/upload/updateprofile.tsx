@@ -1,0 +1,170 @@
+// src/components/PostCreator.tsx
+import { useState } from "react";
+import { edenApi } from "@lib/eden";
+
+
+
+export function UpdateProfile() {
+  const [description, setdescription] = useState("");
+  const [skills, setskills] = useState<string[]>([]);
+
+  const [skillInput, setskillInput] = useState("");
+
+  const DAYS_OF_WEEK = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+
+  const toggleDay = (day: string) => {
+    setSelectedDays((prev) =>
+      prev.includes(day)
+        ? prev.filter((d) => d !== day)
+        : [...prev, day]
+    );
+  };
+
+
+  const addskill = () => {
+    const trimmed = skillInput.trim();
+    if (trimmed && !skills.includes(trimmed)) {
+      setskills((prev) => [...prev, trimmed]);
+      setskillInput("");
+    }
+  };
+
+
+  const removeskill = (skillToRemove: string) => {
+    setskills((prev) => prev.filter((t) => t !== skillToRemove));
+  };
+
+  const handleSubmit = async () => {
+    if (!description.trim()) return;
+
+    try {
+      const response = await edenApi.user.post.create.post({
+        description,
+        skills,
+        selectedDays
+      });
+
+      if (response.error) {
+        alert("Error: " + response.error.value);
+        return;
+      }
+
+      // Success
+      alert("Post created successfully!");
+      // Reset form
+      setdescription("");
+      setskills([]);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create post");
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body gap-6">
+          <h2 className="card-title">Create Post</h2>
+
+          {/* Textarea */}
+          <div className="form-control">
+            <textarea
+              className="textarea textarea-bordered textarea-lg min-h-[140px]"
+              placeholder="Description..."
+              value={description}
+              onChange={(e) => setdescription(e.target.value)}
+            />
+          </div>
+
+          {/* skills input */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">skills</span>
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                className="input input-bordered flex-1"
+                placeholder="Add skill... (press add or enter)"
+                value={skillInput}
+                onChange={(e) => setskillInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addskill();
+                  }
+                }}
+              />
+              <button
+                className="btn btn-outline btn-primary"
+                onClick={addskill}
+                disabled={!skillInput.trim()}
+              >
+                Add
+              </button>
+            </div>
+
+            {/* skills display */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {skills.map((skill) => (
+                <div key={skill} className="badge badge-outline gap-2">
+                  {skill}
+                  <button
+                    className="btn btn-xs btn-ghost btn-circle"
+                    onClick={() => removeskill(skill)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="form-control gap-2">
+            <span className="label-text font-semibold">Select days</span>
+
+            {DAYS_OF_WEEK.map((day) => (
+              <label
+                key={day}
+                className="label cursor-pointer justify-start gap-3"
+              >
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-primary"
+                  checked={selectedDays.includes(day)}
+                  onChange={() => toggleDay(day)}
+                />
+                <span className="label-text">{day}</span>
+              </label>
+            ))}
+
+            {/* Debug / preview */}
+            <div className="mt-2 text-sm opacity-70">
+              Selected: {selectedDays.join(", ") || "None"}
+            </div>
+          </div>
+
+          {/* Submit */}
+          <div className="card-actions justify-end mt-4">
+            <button
+              className="btn btn-primary"
+              onClick={handleSubmit}
+              disabled={!description.trim()}
+            >
+              Post
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

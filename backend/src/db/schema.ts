@@ -8,6 +8,8 @@ import {
   index,
   serial,
   integer,
+  date,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -172,3 +174,16 @@ export const jobPosts = pgTable("job_posts", {
     .default(sql`'{}'::text[]`),
   contact: text("contact").notNull(),
 });
+
+export const userDailyUsage = pgTable(
+  "user_daily_usage",
+  {
+    userId: text("user_id").notNull().references(() => user.id),
+    date: date("date").notNull(),
+    count: integer("count").notNull().default(0),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.date] }),
+  }),
+);

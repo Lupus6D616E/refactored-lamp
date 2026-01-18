@@ -1,6 +1,6 @@
 import { db } from "@db/db";
 import { eq } from "drizzle-orm";
-import { userResume, userCertification, userWorkExperience } from "@db/schema";
+import { userResume, userCertification, userWorkExperience,seekerProfile } from "@db/schema";
 import { ProfileModel } from "./model";
 import type { AuthUser } from "@lib/auth";
 export abstract class Profile {
@@ -138,5 +138,26 @@ export abstract class Profile {
       .from(userCertification)
       .where(eq(userCertification.userId, userId));
     return certs;
+  }
+  static async updateSeekerProfile(userId: string, data: ProfileModel.profileBody): Promise<number> {
+    try {
+      await db.insert(seekerProfile).values({
+        userId: userId,
+        description: data.description,
+        schedule: data.selectedDays,
+        skills: data.skills
+      }).onConflictDoUpdate({
+      target: seekerProfile.userId,
+      set: {
+        schedule: data.selectedDays,
+        skills: data.skills,
+        description: data.description
+      }
+    });
+    } catch {
+      return 404;
+    }
+    return 0;
+     
   }
 }
