@@ -1,11 +1,39 @@
-'use client';
+"use client";
 
-import { authClient } from 'backend/src/lib/auth-client'; 
+import { authClient } from "backend/src/lib/auth-client";
+import { edenApi } from "@lib/eden";
+import { useEffect, useState } from "react";
+
+const response = await edenApi.user.profile.get();
+
 
 export default function UserProfileCard() {
-    
   const { data: session, isPending } = authClient.useSession();
-
+  const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
+  const [education, setEducation] = useState("");
+  const [skills, setSkills] = useState<string[]>([]);
+  const [schedule, setSchedule] = useState<string[]>([]);
+  useEffect(() => {
+    const getProfileDetails = async () => {
+      const res = await edenApi.user.profile.get();
+      if (res.data){
+        const userprofile = res.data[0]
+        if(userprofile.description !== null){
+        setDescription(userprofile.description)
+        }
+        if(userprofile.address !== null){
+          setAddress(userprofile.address)
+        }
+        if(userprofile.education !== null){
+          setEducation(userprofile.education)
+        }
+        setSkills(userprofile.skills)
+        setSchedule(userprofile.schedule)
+      }
+    };
+    getProfileDetails()
+  },[]);
   if (isPending) {
     return (
       <div className="card w-96 bg-base-100 shadow-xl">
@@ -24,7 +52,7 @@ export default function UserProfileCard() {
   }
 
   if (!session?.user) {
-    return <p> You are not logged in! </p>
+    return <p> You are not logged in! </p>;
   }
 
   const { user } = session;
@@ -45,6 +73,18 @@ export default function UserProfileCard() {
             {user.name && <p className="text-lg font-semibold">{user.name}</p>}
             <p className="text-sm text-base-content/70">{user.email}</p>
             <p className="text-sm text-base-content/70">{user.role}</p>
+            <p className="text-sm text-base-content/70">
+              {description}
+            </p>
+            <p className="text-sm text-base-content/70">
+              {education}
+            </p>
+            <p className="text-sm text-base-content/70">{skills}</p>
+            <p className="text-sm text-base-content/70">{address}</p>
+            
+            <p className="text-sm text-base-content/70">
+              {schedule}
+            </p>
           </div>
         </div>
       </div>

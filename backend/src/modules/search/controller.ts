@@ -1,18 +1,17 @@
 import { Elysia, t } from 'elysia'
 import { searchModel } from './model'
-
+import {Search} from './service'
 export const searchPlugin = new Elysia({ prefix: '/api' }) // optional prefix
   .get(
     '/search',
-    ({ query }) => {
+    async ({ query }) => {
       // query is fully typed!
       console.log('Received filters:', query)
-
-      // Your search logic here...
+      const result = await Search.find(query)
+      console.log(result)
       return {
-        success: true,
-        results: [], // ← your actual results
-        filtersApplied: query
+        results: result, // ← your actual results
+       
       }
     },
     {

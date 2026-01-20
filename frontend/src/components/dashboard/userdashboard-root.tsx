@@ -4,8 +4,7 @@ import  UserProfileCard  from 'frontend/src/components/dashboard/info/usercard'
 import LogoutButton from 'frontend/src/components/auth/logout'
 import ResumeUpload from 'frontend/src/components/dashboard/upload/ResumeUpload'
 import { ResumeDownload } from 'frontend/src/components/dashboard/info/downloadresume'
-import { authClient } from 'backend/src/lib/auth-client'; 
-import UpdateProfileCard from 'frontend/src/components/dashboard/upload/updateinfo'
+import { authClient } from 'backend/src/lib/auth-client'
 import AddCertificationCard from 'frontend/src/components/dashboard/upload/addcertification'
 import CertificationList from 'frontend/src/components/dashboard/info/certificationlist-parent'
 import AddExperienceCard from 'frontend/src/components/dashboard/upload/addexperience'
@@ -25,7 +24,6 @@ function App() {
             <LogoutButton />
             <ResumeUpload />
             <ResumeDownload />
-            <UpdateProfileCard />
             <AddCertificationCard />
             <CertificationList />
             <AddExperienceCard />

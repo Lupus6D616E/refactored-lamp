@@ -145,19 +145,32 @@ export abstract class Profile {
         userId: userId,
         description: data.description,
         schedule: data.selectedDays,
-        skills: data.skills
+        skills: data.skills,
+        address: data.address,
+        education: data.education
       }).onConflictDoUpdate({
       target: seekerProfile.userId,
       set: {
         schedule: data.selectedDays,
         skills: data.skills,
-        description: data.description
+        description: data.description,
+        address: data.address,
+        education: data.education
       }
     });
     } catch {
-      return 404;
+      return 500;
     }
     return 0;
-     
+  }
+  static async getSeekerProfile(userId: string){
+      const result = await db.select({
+        description: seekerProfile.description,
+        schedule: seekerProfile.schedule,
+        skills: seekerProfile.skills,
+        address: seekerProfile.address,
+        education: seekerProfile.education
+      }).from(seekerProfile).where(eq(seekerProfile.userId,userId)).limit(1);
+      return result
   }
 }

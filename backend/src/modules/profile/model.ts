@@ -21,6 +21,8 @@ export namespace ProfileModel {
   });
   export const profileBody = t.Object({
     description: t.String({ minLength: 1 }),
+    address: t.String({ minLength: 1 }),
+    education: t.String({ minLength: 1 }),
     skills: t.Array(t.String()),
     selectedDays: t.Array(t.String()),
   });

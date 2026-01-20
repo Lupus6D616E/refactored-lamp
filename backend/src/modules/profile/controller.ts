@@ -141,14 +141,24 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
     },
   )
   .post(
-    "/post/create",
-    ({ currentUser, body }) => {
-      Profile.updateSeekerProfile(currentUser.id, body)
-      console.log("Creating post:", body);
-      return { success: true, message: "123" };
+    "/updateprofile",
+    async ({ currentUser, body, set }) => {
+      const result = await Profile.updateSeekerProfile(currentUser.id, body)
+      if(result === 0 ){
+      return { success: true, message: "updated profile" };
+      }
+      else{
+        set.status = 500;
+        return { success: false, message: "something happened" }
+      }
     },
     {
       role: ["user"],
       body: ProfileModel.profileBody
     },
-  );
+  ).get("/profile",async ({currentUser}) => {
+    const result = await Profile.getSeekerProfile(currentUser.id)
+    return result
+  },{
+    role:['user']
+  })

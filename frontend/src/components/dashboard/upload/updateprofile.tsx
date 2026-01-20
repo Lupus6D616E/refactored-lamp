@@ -2,56 +2,53 @@
 import { useState } from "react";
 import { edenApi } from "@lib/eden";
 
-
-
 export function UpdateProfile() {
-  const [description, setdescription] = useState("");
-  const [skills, setskills] = useState<string[]>([]);
-
-  const [skillInput, setskillInput] = useState("");
+  const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
+  const [education, setEducation] = useState("");
+  const [skills, setSkills] = useState<string[]>([]);
+  const [skillInput, setSkillInput] = useState("");
 
   const DAYS_OF_WEEK = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
-      prev.includes(day)
-        ? prev.filter((d) => d !== day)
-        : [...prev, day]
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
     );
   };
-
 
   const addskill = () => {
     const trimmed = skillInput.trim();
     if (trimmed && !skills.includes(trimmed)) {
-      setskills((prev) => [...prev, trimmed]);
-      setskillInput("");
+      setSkills((prev) => [...prev, trimmed]);
+      setSkillInput("");
     }
   };
 
-
   const removeskill = (skillToRemove: string) => {
-    setskills((prev) => prev.filter((t) => t !== skillToRemove));
+    setSkills((prev) => prev.filter((t) => t !== skillToRemove));
   };
 
   const handleSubmit = async () => {
     if (!description.trim()) return;
 
     try {
-      const response = await edenApi.user.post.create.post({
+      const response = await edenApi.user.updateprofile.post({
         description,
         skills,
-        selectedDays
+        selectedDays,
+        address,
+        education,
       });
 
       if (response.error) {
@@ -62,8 +59,8 @@ export function UpdateProfile() {
       // Success
       alert("Post created successfully!");
       // Reset form
-      setdescription("");
-      setskills([]);
+      setDescription("");
+      setSkills([]);
     } catch (err) {
       console.error(err);
       alert("Failed to create post");
@@ -82,10 +79,25 @@ export function UpdateProfile() {
               className="textarea textarea-bordered textarea-lg min-h-[140px]"
               placeholder="Description..."
               value={description}
-              onChange={(e) => setdescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-
+        <div className="form-control">
+            <textarea
+              className="textarea textarea-bordered textarea-lg min-h-[140px]"
+              placeholder="address..."
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </div>
+        <div className="form-control">
+            <textarea
+              className="textarea textarea-bordered textarea-lg min-h-[140px]"
+              placeholder="education..."
+              value={education}
+              onChange={(e) => setEducation(e.target.value)}
+            />
+          </div>
           {/* skills input */}
           <div className="form-control">
             <label className="label">
@@ -97,7 +109,7 @@ export function UpdateProfile() {
                 className="input input-bordered flex-1"
                 placeholder="Add skill... (press add or enter)"
                 value={skillInput}
-                onChange={(e) => setskillInput(e.target.value)}
+                onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();

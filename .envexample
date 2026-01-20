@@ -1,3 +1,4 @@
 DATABASE_URL=postgresql://admin:example@localhost:example/example
 BETTER_AUTH_SECRET= go run "openssl rand -base64 32"
 BETTER_AUTH_URL=http://localhost:3000
+OPENROUTER_API_KEY= go get one from openrouter

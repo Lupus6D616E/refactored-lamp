@@ -2,6 +2,7 @@
 
 import { edenApi } from "@lib/eden";
 import { useState, useRef, KeyboardEvent } from "react";
+import { SearchResult } from "./types";
 
 const cities = [
   "Manila",
@@ -35,32 +36,32 @@ const employments = ["Full Time", "Part Time", "Internship"];
 
 interface SearchFilters {
   searchText: string;
-  category: string;
-  sortBy: string;
-  minPrice: number | "";
+  city: string;
+  employments: string;
+  salaryMinimum: number | "";
   tags: string[];
   schedule: string[];
 }
+interface Props {
+  onResults: (results:SearchResult[]) => void;
+}
 
-
-export function AdvancedSearchBar() {
-
+export function AdvancedSearchBar({ onResults }: Props) {
   const [filters, setFilters] = useState<SearchFilters>({
     searchText: "",
-    category: "",
-    sortBy: "",
-    minPrice: "",
+    city: "All",
+    employments: "All",
+    salaryMinimum: "",
     tags: [],
-    schedule: []
+    schedule: [],
   });
+
 
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
-      prev.includes(day)
-        ? prev.filter((d) => d !== day)
-        : [...prev, day]
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
     );
   };
   const toTitleCase = (str: string): string => {
@@ -103,12 +104,12 @@ export function AdvancedSearchBar() {
     // Optional: you can skip empty values or let backend handle them
     const cleanFilters = {
       title: filters.searchText || undefined,
-      city: filters.category || undefined,
-      employmentType: filters.sortBy,
-      salaryMinimum: filters.minPrice || undefined,
+      city: filters.city || undefined,
+      employmentType: filters.employments,
+      salaryMinimum: filters.salaryMinimum || undefined,
       tags: filters.tags.length > 0 ? filters.tags : undefined,
       schedule: filters.schedule || undefined,
-      
+      tagsMode: "any",
     };
 
     try {
@@ -123,6 +124,7 @@ export function AdvancedSearchBar() {
       }
 
       console.log("Search results:", response.data);
+      onResults(response.data.results)
       // Update UI with response.data.results, etc.
     } catch (err) {
       console.error("Network/search failed:", err);
@@ -156,11 +158,12 @@ export function AdvancedSearchBar() {
             </label>
             <select
               className="select select-bordered w-full"
-              value={filters.category}
+              value={filters.city}
               onChange={(e) =>
-                setFilters((prev) => ({ ...prev, category: e.target.value }))
+                setFilters((prev) => ({ ...prev, city: e.target.value }))
               }
             >
+              <option value={"All"}>All</option>
               {sortedCities.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -172,15 +175,16 @@ export function AdvancedSearchBar() {
           {/* 3. Sort select */}
           <div>
             <label className="label">
-              <span className="label-text">Sort by</span>
+              <span className="label-text">Job Type</span>
             </label>
             <select
               className="select select-bordered w-full"
-              value={filters.sortBy}
+              value={filters.employments}
               onChange={(e) =>
-                setFilters((prev) => ({ ...prev, sortBy: e.target.value }))
+                setFilters((prev) => ({ ...prev, employments: e.target.value }))
               }
             >
+              <option value={"All"}>All</option>
               {employments.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -199,11 +203,12 @@ export function AdvancedSearchBar() {
               placeholder="0"
               className="input input-bordered w-full"
               min={0}
-              value={filters.minPrice}
+              value={filters.salaryMinimum}
               onChange={(e) =>
                 setFilters((prev) => ({
                   ...prev,
-                  minPrice: e.target.value === "" ? "" : Number(e.target.value),
+                  salaryMinimum:
+                    e.target.value === "" ? "" : Number(e.target.value),
                 }))
               }
             />
@@ -250,26 +255,29 @@ export function AdvancedSearchBar() {
             </button>
           </div>
         </div>
-    <div className="flex gap-2">
-      <span className="label-text font-semibold">Select days</span>
+        <div className="flex gap-2">
+          <span className="label-text font-semibold">Select days</span>
 
-      {DAYS_OF_WEEK.map((day) => (
-        <label key={day} className="label cursor-pointer justify-start gap-3">
-          <input
-            type="checkbox"
-            className="checkbox checkbox-primary"
-            checked={selectedDays.includes(day)}
-            onChange={() => toggleDay(day)}
-          />
-          <span className="label-text">{day}</span>
-        </label>
-      ))}
+          {DAYS_OF_WEEK.map((day) => (
+            <label
+              key={day}
+              className="label cursor-pointer justify-start gap-3"
+            >
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary"
+                checked={selectedDays.includes(day)}
+                onChange={() => toggleDay(day)}
+              />
+              <span className="label-text">{day}</span>
+            </label>
+          ))}
 
-      {/* Debug / preview */}
-      <div className="mt-2 text-sm opacity-70">
-        Selected: {selectedDays.join(", ") || "None"}
-      </div>
-    </div>
+          {/* Debug / preview */}
+          <div className="mt-2 text-sm opacity-70">
+            Selected: {selectedDays.join(", ") || "None"}
+          </div>
+        </div>
         {/* Search button */}
         <div className="mt-8 flex justify-end">
           <button

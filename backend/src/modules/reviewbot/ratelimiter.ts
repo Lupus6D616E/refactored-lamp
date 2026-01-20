@@ -18,7 +18,6 @@ export abstract class RateLimiter {
         .limit(1);
 
       if (!record[0]) {
-        console.log("wtf")
         await tx.insert(userDailyUsage).values({
           userId: userId,
           date: today,
@@ -35,14 +34,12 @@ export abstract class RateLimiter {
         return 200;
       }
     });
-    if(result === 200){
-        return 200
-    }
-    else if (result === 429){
-        return 429
-    }
-    else{
-        return 404
+    if (result === 200) {
+      return 200;
+    } else if (result === 429) {
+      return 429;
+    } else {
+      return 404;
     }
   }
 }

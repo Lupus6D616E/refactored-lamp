@@ -7,8 +7,9 @@ export namespace searchModel {
     employmentType: t.Optional(t.String()),
     salaryMinimum: t.Optional(t.Numeric()),
     tags: t.Optional(t.Array(t.String())),
+    tagsMode: t.Optional(t.String()),
     schedule: t.Optional(t.Array(t.String())),
   });
 
-export type searchmodel = typeof searchQuery.static;
+export type searchQuery = typeof searchQuery.static;
 }

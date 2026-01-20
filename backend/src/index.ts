@@ -5,11 +5,12 @@ import { db } from "@db/db";
 import { eq } from "drizzle-orm";
 import { betterAuthPlugin } from "backend/src/lib/auth";
 import { staticPlugin } from "@elysiajs/static";
-import { user, userCertification, userWorkExperience } from "backend/src/db/schema";
+import { user } from "backend/src/db/schema";
 import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
 import { searchPlugin } from "@modules/search/controller";
 import { aiPlugin } from "@modules/reviewbot/aislop";
+import { viewPlugin } from "@modules/view/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -41,7 +42,7 @@ const app = new Elysia()
   .use(postPlugin)
   .use(searchPlugin)
   .use(aiPlugin)
-   
+  .use(viewPlugin)
   .post(
     "/changetype",
     async ({ body }) => {
