@@ -99,23 +99,21 @@ export const PostCard: React.FC<CardProps> = ({
               <span className="badge badge-outline badge-sm"></span>
               Details
             </h3>
-            <p className="text-base-content/80 leading-relaxed text-justify whitespace-pre-wrap ">
+            <p className="text-base-content/80 leading-relaxed text-justify whitespace-pre-wrap">
               {description}
             </p>
           </section>
-          
         </div>
         <div className="space-y-6">
           <section className="prose prose-sm max-w-none">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <span className="badge badge-outline badge-sm"></span>
-              Requriements 
+              Requirements
             </h3>
             <p className="text-base-content/80 leading-relaxed text-justify whitespace-pre-wrap ">
               {requirements}
             </p>
           </section>
-          
         </div>
 
         <div className="space-y-6">
@@ -128,7 +126,6 @@ export const PostCard: React.FC<CardProps> = ({
               {responsibilities}
             </p>
           </section>
-          
         </div>
 
         {/* Tag-like Array of Strings */}
@@ -153,9 +150,7 @@ export const PostCard: React.FC<CardProps> = ({
           ))}
         </div>
         <div className="card-actions mt-4">
-          <button className="btn btn-primary btn-block">
-            Download Full Report
-          </button>
+          <button className="btn btn-primary btn-block">Apply</button>
         </div>
       </div>
     </div>

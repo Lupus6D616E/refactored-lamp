@@ -1,6 +1,11 @@
 import { db } from "@db/db";
 import { eq } from "drizzle-orm";
-import { userResume, userCertification, userWorkExperience,seekerProfile } from "@db/schema";
+import {
+  userResume,
+  userCertification,
+  userWorkExperience,
+  seekerProfile,
+} from "@db/schema";
 import { ProfileModel } from "./model";
 import type { AuthUser } from "@lib/auth";
 export abstract class Profile {
@@ -16,20 +21,23 @@ export abstract class Profile {
     const filepath = `${uploadDir}/${filename}`;
     await Bun.write(filepath, file);
     console.log("file uploaded");
-    console.log(filepath)
+    console.log(filepath);
     let response: ProfileModel.resumeResponse = {
       message: "something happened",
       size: 0,
     };
-    await db.insert(userResume).values({
-      userId: userSession.id,
-      resumeUrl: filepath,
-    }).onConflictDoUpdate({
-      target: userResume.userId,
-      set: {
-        resumeUrl: filepath
-      }
-    });
+    await db
+      .insert(seekerProfile)
+      .values({
+        userId: userSession.id,
+        resumeUrl: filepath,
+      })
+      .onConflictDoUpdate({
+        target: userResume.userId,
+        set: {
+          resumeUrl: filepath,
+        },
+      });
     if (oldResume === null) {
       response = {
         message: "PDF uploaded sucessfully",
@@ -48,9 +56,10 @@ export abstract class Profile {
 
   static async getResumeUrl(userId: string): Promise<string | null> {
     const item = await db
-      .select({ resumeUrl: userResume.resumeUrl })
-      .from(userResume)
-      .where(eq(userResume.userId, userId));
+      .select({ resumeUrl: seekerProfile.resumeUrl })
+      .from(seekerProfile)
+      .where(eq(seekerProfile.userId, userId));
+
     if (item.length === 0 || item[0].resumeUrl === null) {
       return null;
     } else {
@@ -139,38 +148,48 @@ export abstract class Profile {
       .where(eq(userCertification.userId, userId));
     return certs;
   }
-  static async updateSeekerProfile(userId: string, data: ProfileModel.profileBody): Promise<number> {
+  static async updateSeekerProfile(
+    userId: string,
+    data: ProfileModel.profileBody,
+  ): Promise<number> {
     try {
-      await db.insert(seekerProfile).values({
-        userId: userId,
-        description: data.description,
-        schedule: data.selectedDays,
-        skills: data.skills,
-        address: data.address,
-        education: data.education
-      }).onConflictDoUpdate({
-      target: seekerProfile.userId,
-      set: {
-        schedule: data.selectedDays,
-        skills: data.skills,
-        description: data.description,
-        address: data.address,
-        education: data.education
-      }
-    });
+      await db
+        .insert(seekerProfile)
+        .values({
+          userId: userId,
+          description: data.description,
+          schedule: data.selectedDays,
+          skills: data.skills,
+          address: data.address,
+          education: data.education,
+        })
+        .onConflictDoUpdate({
+          target: seekerProfile.userId,
+          set: {
+            schedule: data.selectedDays,
+            skills: data.skills,
+            description: data.description,
+            address: data.address,
+            education: data.education,
+          },
+        });
     } catch {
       return 500;
     }
     return 0;
   }
-  static async getSeekerProfile(userId: string){
-      const result = await db.select({
+  static async getSeekerProfile(userId: string) {
+    const result = await db
+      .select({
         description: seekerProfile.description,
         schedule: seekerProfile.schedule,
         skills: seekerProfile.skills,
         address: seekerProfile.address,
-        education: seekerProfile.education
-      }).from(seekerProfile).where(eq(seekerProfile.userId,userId)).limit(1);
-      return result
+        education: seekerProfile.education,
+      })
+      .from(seekerProfile)
+      .where(eq(seekerProfile.userId, userId))
+      .limit(1);
+    return result;
   }
 }

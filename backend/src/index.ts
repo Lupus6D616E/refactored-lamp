@@ -9,7 +9,7 @@ import { user } from "backend/src/db/schema";
 import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
 import { searchPlugin } from "@modules/search/controller";
-import { aiPlugin } from "@modules/reviewbot/aislop";
+import { aiPlugin } from "@modules/reviewbot/controller";
 import { viewPlugin } from "@modules/view/controller";
 const buildCSS = () =>
   new Promise((resolve) =>

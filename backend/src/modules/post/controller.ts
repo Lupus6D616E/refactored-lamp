@@ -18,7 +18,7 @@ export const postPlugin = new Elysia({ prefix: "/post" })
     { role: ["business"], body: PostModel.JobBody },
   )
   .post(
-    "/postticket",
+    "/apply",
     ({ body }) => {
       return "yes";
     },

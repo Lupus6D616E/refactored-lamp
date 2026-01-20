@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { PostCard } from "./viewpost";
 import { edenApi } from "@lib/eden";
 import { useEffect, useState } from "react";
+import { AIComparison } from "./compare";
 
 function App() {
   const [title, setTitle] = useState("");
@@ -41,7 +42,7 @@ function App() {
         if(typeof jobDetails.employmentType === 'string') {
           setEmploymentType(jobDetails.employmentType);
         }
-        if(typeof jobDetails.salaryMinimum === 'string') {
+        if(typeof jobDetails.salaryMinimum === 'number') {
           setSalary(jobDetails.salaryMinimum);
         }
         if(typeof jobDetails.postedAt === 'string') {
@@ -56,10 +57,10 @@ function App() {
         if(typeof jobDetails.status === 'string') {
           setStatus(jobDetails.status);
         }
-        if(typeof jobDetails.schedule === 'string') {
+        if( jobDetails.schedule !== null) {
           setSchedule(jobDetails.schedule);
         }
-        if(typeof jobDetails.tags === 'string') {
+        if( jobDetails.tags) {
           setTags(jobDetails.tags);
         }
         if(typeof jobDetails.contact === 'string') {
@@ -87,6 +88,9 @@ function App() {
           postedDate={postedDate}
           schedule={schedule}
           tags={tags}
+        />
+        <AIComparison
+          id={getPostId()}
         />
       </div>
     </main>

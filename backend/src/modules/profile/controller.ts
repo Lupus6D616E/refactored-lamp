@@ -4,7 +4,6 @@ import { ProfileModel } from "./model";
 import { Profile } from "./service";
 export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
-
   .get(
     "/getcertifications",
     async ({ currentUser }) => {

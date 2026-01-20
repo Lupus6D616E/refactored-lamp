@@ -118,6 +118,7 @@ export const seekerProfile = pgTable("seeker_profile", {
     .references(() => user.id, { onDelete: "cascade" })
     .unique(),
   description: text("description"),
+  resumeUrl: text("resume_url"),
   schedule: text("schedule")
     .array()
     .notNull()
