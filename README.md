@@ -13,4 +13,4 @@ Open http://localhost:3000/ with your browser to see the result.
 ## Requirements
 
 Requires PostgreSQL to be installed
-bun x drizzle-kit push to initialize tables
+bun x drizzle-kit push to initialize tables then bunx drizzle-kit migrate

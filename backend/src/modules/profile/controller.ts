@@ -2,6 +2,7 @@ import { betterAuthPlugin } from "@lib/auth";
 import { Elysia } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
+
 export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
   .get(
@@ -142,22 +143,32 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
   .post(
     "/updateprofile",
     async ({ currentUser, body, set }) => {
-      const result = await Profile.updateSeekerProfile(currentUser.id, body)
-      if(result === 0 ){
-      return { success: true, message: "updated profile" };
-      }
-      else{
+      const result = await Profile.updateSeekerProfile(currentUser.id, body);
+      if (result === 0) {
+        return { success: true, message: "updated profile" };
+      } else {
         set.status = 500;
-        return { success: false, message: "something happened" }
+        return { success: false, message: "something happened" };
       }
     },
     {
       role: ["user"],
-      body: ProfileModel.profileBody
+      body: ProfileModel.profileBody,
     },
-  ).get("/profile",async ({currentUser}) => {
-    const result = await Profile.getSeekerProfile(currentUser.id)
-    return result
-  },{
-    role:['user']
-  })
+  )
+  .get(
+    "/profile",
+    async ({ currentUser }) => {
+      const result = await Profile.getSeekerProfile(currentUser.id);
+      return result;
+    },
+    {
+      role: ["user"],
+    },
+  )
+  .get("/viewapplications", async ({ currentUser }) => {
+    const res = await Profile.getSeekerApplications(currentUser.id);
+    return res
+  }, {
+    role: ["user"],
+  });

@@ -10,7 +10,9 @@ import {
   integer,
   date,
   primaryKey,
+  uuid,
 } from "drizzle-orm/pg-core";
+
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -23,7 +25,10 @@ export const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-  role: text("role").default("user").notNull(),
+  role: text("role", { enum: ["user", "business", "admin"] }).default("user"),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
 });
 
 export const session = pgTable(
@@ -41,9 +46,12 @@ export const session = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by"),
   },
   (table) => [index("session_userId_idx").on(table.userId)],
 );
+
+
 
 export const account = pgTable(
   "account",
@@ -68,6 +76,7 @@ export const account = pgTable(
   },
   (table) => [index("account_userId_idx").on(table.userId)],
 );
+
 
 export const verification = pgTable(
   "verification",
@@ -130,6 +139,20 @@ export const seekerProfile = pgTable("seeker_profile", {
   address: text("address"),
   education: text("education"),
 });
+
+export const businessProfile = pgTable("business_profile", {
+  id: uuid().defaultRandom().primaryKey(),
+  description: text("description"),
+  industry: text("industry"),
+  address: text("address"),
+});
+
+export const businessUser = pgTable("business_user",{
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  businessId: uuid().notNull().references(()=> businessProfile.id,{onDelete: "cascade"})
+})
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
@@ -211,17 +234,20 @@ export const jobApplications = pgTable(
   (t) => [primaryKey({ columns: [t.jobId, t.applicantId] })],
 );
 
-export const jobPostsRelations = relations(jobPosts,({ many }) => ({
-  jobApplications: many(jobApplications)
+export const jobPostsRelations = relations(jobPosts, ({ many }) => ({
+  jobApplications: many(jobApplications),
 }));
 
-export const jobApplicationsRelations = relations(jobApplications, ({ one }) => ({
-  user: one(user, {
-    fields: [jobApplications.applicantId],
-    references: [user.id],
+export const jobApplicationsRelations = relations(
+  jobApplications,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [jobApplications.applicantId],
+      references: [user.id],
+    }),
+    post: one(jobPosts, {
+      fields: [jobApplications.jobId],
+      references: [jobPosts.id],
+    }),
   }),
-  post: one(jobPosts, {
-    fields: [jobApplications.jobId],
-    references: [jobPosts.id],
-  }),
-}));
+);

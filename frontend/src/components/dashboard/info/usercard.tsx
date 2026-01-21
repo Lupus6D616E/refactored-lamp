@@ -4,7 +4,6 @@ import { authClient } from "backend/src/lib/auth-client";
 import { edenApi } from "@lib/eden";
 import { useEffect, useState } from "react";
 
-const response = await edenApi.user.profile.get();
 
 
 export default function UserProfileCard() {

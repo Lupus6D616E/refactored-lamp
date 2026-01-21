@@ -5,6 +5,8 @@ import {
   userCertification,
   userWorkExperience,
   seekerProfile,
+  jobApplications,
+  jobPosts,
 } from "@db/schema";
 import { ProfileModel } from "./model";
 import type { AuthUser } from "@lib/auth";
@@ -190,6 +192,18 @@ export abstract class Profile {
       .from(seekerProfile)
       .where(eq(seekerProfile.userId, userId))
       .limit(1);
+    return result;
+  }
+  static async getSeekerApplications(userId: string) {
+    const result = await db
+      .select({
+        jobId: jobApplications.jobId,
+        title: jobPosts .title,
+        status: jobApplications.status,
+      })
+      .from(jobApplications)
+      .innerJoin(jobPosts, eq(jobApplications.jobId,jobPosts.id))
+      .where(eq(jobApplications.applicantId, userId)); 
     return result;
   }
 }

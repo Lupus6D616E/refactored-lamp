@@ -10,6 +10,9 @@ import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
 import { searchPlugin } from "@modules/search/controller";
 import { aiPlugin } from "@modules/reviewbot/controller";
+import openapi from "@elysiajs/openapi";
+import { OpenAPI } from "@lib/auth";
+import { adminPlugin } from "@modules/admin/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -41,12 +44,17 @@ const app = new Elysia()
   .use(postPlugin)
   .use(searchPlugin)
   .use(aiPlugin)
+  .use(adminPlugin)
+  .use(openapi({documentation: {
+            components: await OpenAPI.components,
+            paths: await OpenAPI.getPaths()
+        }})) 
   .post(
     "/changetype",
     async ({ body }) => {
       const result = await db
         .update(user)
-        .set({ role: body.change })
+        .set({ role: "admin" })
         .where(eq(user.email, body.email));
       return {
         success: "yes",

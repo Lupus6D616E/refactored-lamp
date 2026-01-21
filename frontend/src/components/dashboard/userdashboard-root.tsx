@@ -10,6 +10,7 @@ import CertificationList from 'frontend/src/components/dashboard/info/certificat
 import AddExperienceCard from 'frontend/src/components/dashboard/upload/addexperience'
 import ExperienceList from 'frontend/src/components/dashboard/info/experiencelist-parent'
 import {UpdateProfile} from '@components/dashboard/upload/updateprofile'
+import { ApplicationList } from './info/seekerapplications'
 function App() {
     const { data: session, isPending } = authClient.useSession();
     if (!session?.user) {
@@ -29,6 +30,7 @@ function App() {
             <AddExperienceCard />
             <ExperienceList />
             <UpdateProfile />
+            <ApplicationList />
         </main>
     )
     }

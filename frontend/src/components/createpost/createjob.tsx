@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { treaty } from "@elysiajs/eden";
-import type { App } from "backend/src/index";
-const client = treaty<App>("localhost:3000");
+import { edenApi } from "@lib/eden";
+
+
 
 export function CreateJobForm() {
   const [title, setTitle] = useState("");
@@ -87,7 +87,20 @@ const DAYS_OF_WEEK = [
     e.preventDefault();
     setError(null);
     setLoading(true);
-
+    const data = {
+        title: title,
+        email: email,
+        description: description,
+        requirements: requirements,
+        responsibilities: responsibilities,
+        city: city,
+        employmentType: employmentType,
+        minimumSalary: parseFloat(minimumSalary),
+        expireDate: new Date(expireDate),
+        tags: tags,
+        schedule: selectedDays,
+    }
+    const res = await edenApi.post.postjob.post(data)
     const response = await fetch("/post/postjob", {
       method: "POST",
       headers: {

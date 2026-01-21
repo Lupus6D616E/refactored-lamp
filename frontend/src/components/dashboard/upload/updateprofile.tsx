@@ -71,7 +71,7 @@ export function UpdateProfile() {
     <div className="max-w-2xl mx-auto p-6">
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body gap-6">
-          <h2 className="card-title">Create Post</h2>
+          <h2 className="card-title">Change Profile</h2>
 
           {/* Textarea */}
           <div className="form-control">
