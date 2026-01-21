@@ -1,6 +1,6 @@
 "use client";
 import { edenApi } from "@lib/eden";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 
 interface CardProps {
   id: number;

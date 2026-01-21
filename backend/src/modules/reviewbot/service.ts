@@ -1,7 +1,7 @@
 import { db } from "@db/db";
 import { userDailyUsage } from "@db/schema";
+import { Post } from "@modules/post/service";
 import { Profile } from "@modules/profile/service"
-import { View } from "@modules/view/service"
 import { OpenRouter } from "@openrouter/sdk";
 import { and, eq } from "drizzle-orm";
 const reviewBot = new OpenRouter({
@@ -51,7 +51,7 @@ export abstract class ReviewBot{
         }
       }
     static async compare(userId:string,postId: number ){
-        const postResponse = await View.getPostDetails(postId)
+        const postResponse = await Post.getPostDetails(postId)
               const postDetails = postResponse[0]
               const seekerResponse = await Profile.getSeekerProfile(userId)
               const seekerDetails = seekerResponse[0]

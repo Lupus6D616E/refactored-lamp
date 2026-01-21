@@ -1,4 +1,4 @@
-import { Elysia, Context, t } from "elysia";
+import { Elysia ,t  } from "elysia";
 import { exec } from "child_process";
 import { watch } from "fs";
 import { db } from "@db/db";
@@ -10,7 +10,6 @@ import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
 import { searchPlugin } from "@modules/search/controller";
 import { aiPlugin } from "@modules/reviewbot/controller";
-import { viewPlugin } from "@modules/view/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -42,7 +41,6 @@ const app = new Elysia()
   .use(postPlugin)
   .use(searchPlugin)
   .use(aiPlugin)
-  .use(viewPlugin)
   .post(
     "/changetype",
     async ({ body }) => {

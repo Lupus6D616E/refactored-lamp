@@ -14,6 +14,9 @@ export namespace PostModel {
     tags: t.Array(t.String()),
     schedule: t.Array(t.String())
   });
-
+  export const applicationBody = t.Object({
+    id: t.Number()
+  })
+  export type applicationBody = typeof JobBody.static;
   export type JobBody = typeof JobBody.static;
 }

@@ -1,4 +1,4 @@
-import { varchar } from "drizzle-orm/pg-core";
+import { pgEnum, varchar } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -134,8 +134,8 @@ export const seekerProfile = pgTable("seeker_profile", {
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  jobApplications: many(jobApplications),
 }));
-
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
     fields: [session.userId],
@@ -179,12 +179,49 @@ export const jobPosts = pgTable("job_posts", {
 export const userDailyUsage = pgTable(
   "user_daily_usage",
   {
-    userId: text("user_id").notNull().references(() => user.id),
-    date: date("date").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    date: date("date", { mode: "string" }).notNull(),
     count: integer("count").notNull().default(0),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.userId, t.date] }),
-  }),
+  (t) => [primaryKey({ columns: [t.userId, t.date] })],
 );
+export const applicationStatusEnum = pgEnum("application_status", [
+  "pending",
+  "rejected",
+  "accepted",
+  "expired",
+]);
+export const jobApplications = pgTable(
+  "job_applications",
+  {
+    applicantId: text("applicant_id")
+      .notNull()
+      .references(() => user.id),
+    jobId: integer("job_id")
+      .notNull()
+      .references(() => jobPosts.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    status: applicationStatusEnum("application_status")
+      .notNull()
+      .default("pending"),
+  },
+  (t) => [primaryKey({ columns: [t.jobId, t.applicantId] })],
+);
+
+export const jobPostsRelations = relations(jobPosts,({ many }) => ({
+  jobApplications: many(jobApplications)
+}));
+
+export const jobApplicationsRelations = relations(jobApplications, ({ one }) => ({
+  user: one(user, {
+    fields: [jobApplications.applicantId],
+    references: [user.id],
+  }),
+  post: one(jobPosts, {
+    fields: [jobApplications.jobId],
+    references: [jobPosts.id],
+  }),
+}));

@@ -21,7 +21,7 @@ function App() {
 
   useEffect(() => {
     const getJobDetails = async () => {
-      const res = await edenApi.view.job({ id: getPostId() }).get();
+      const res = await edenApi.post.job({ id: getPostId() }).get();
       if (res.data) {
         const jobDetails = res.data[0];
         if (typeof jobDetails.title === 'string' ) {
@@ -75,6 +75,7 @@ function App() {
     <main>
       <div className="min-h-screen bg-base-200 py-12">
         <PostCard
+          id={getPostId()}
           title={title}
           description={description}
           requirements={requirements}

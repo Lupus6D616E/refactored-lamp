@@ -1,8 +1,9 @@
 "use client";
 import { edenApi } from "@lib/eden";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface CardProps {
+  id: number;
   title: string;
   description: string;
   requirements: string;
@@ -19,6 +20,7 @@ interface CardProps {
 }
 
 export const PostCard: React.FC<CardProps> = ({
+  id,
   title,
   description,
   requirements,
@@ -33,6 +35,35 @@ export const PostCard: React.FC<CardProps> = ({
   schedule,
   tags,
 }) => {
+  const [buttonText, setButtonText] = useState<string>("Apply");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setButtonText("Loading...");
+    try {
+      const response = await edenApi.post.job({ id: id }).apply.post();
+      if (!response.data) {
+        throw new Error(`error! status: ${response.error.value}`);
+      }
+      const data = await response.data;
+      if (data === "Application successful") {
+        setButtonText("Application Success");
+      } else {
+        throw new Error(`something happened`);
+      }
+    } catch (err) {
+      console.error(err);
+      // Show error to user
+      setButtonText(
+        err instanceof Error ? err.message : "Something went wrong 😕",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="card w-full max-w-4xl bg-base-100 shadow-xl border border-primary/20">
       <div className="card-body gap-6">
@@ -150,7 +181,9 @@ export const PostCard: React.FC<CardProps> = ({
           ))}
         </div>
         <div className="card-actions mt-4">
-          <button className="btn btn-primary btn-block">Apply</button>
+          <button onClick={handleClick} className="btn btn-primary btn-block">
+            {buttonText}
+          </button>
         </div>
       </div>
     </div>
