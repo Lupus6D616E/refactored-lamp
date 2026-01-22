@@ -52,19 +52,9 @@ export const OpenAPI = {
   components: getSchema().then(({ components }) => components) as Promise<any>,
 } as const;
 
-export const betterAuthView = (context: Context) => {
-  const BETTER_AUTH_ACCEPT_METHODS = ["POST", "GET"];
-  // validate request method
-  if (BETTER_AUTH_ACCEPT_METHODS.includes(context.request.method)) {
-    return auth.handler(context.request);
-  } else {
-    Error("405");
-  }
-};
 
 export const betterAuthPlugin = new Elysia({ name: "better-auth" })
   .mount("/auth", auth.handler)
-  .all("auth/*", betterAuthView)
   .macro({
     authMacro: {
       async resolve({ status, request: { headers } }) {

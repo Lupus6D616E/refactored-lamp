@@ -1,6 +1,12 @@
 import { db } from "@db/db";
 import { searchModel } from "./model";
-import { jobPosts } from "@db/schema";
+import {
+  businessProfile,
+  businessUser,
+  jobPosts,
+  seekerProfile,
+  user,
+} from "@db/schema";
 import {
   arrayContains,
   and,
@@ -10,9 +16,10 @@ import {
   SQL,
   sql,
 } from "drizzle-orm";
+import { email } from "better-auth/*";
 
 export abstract class Search {
-  static async find(search: searchModel.searchQuery) {
+  static async findjobpost(search: searchModel.searchJobQuery) {
     const filters: SQL[] = [];
     if (search.title !== undefined) {
       filters.push(sql`${jobPosts.title} % ${search.title.trim()}`);
@@ -63,5 +70,71 @@ export abstract class Search {
       .orderBy(sql`levenshtein(${jobPosts.title}, ${search.title})`) // precise ordering
       .limit(20);
     return result;
+  }
+  static async findSeeker(search: searchModel.searchUserQuery) {
+    const filters: SQL[] = [];
+    if (search.name !== undefined) {
+      filters.push(sql`${user.name} % ${search.name.trim()}`);
+    }
+    const result = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        description: seekerProfile.description,
+        distance: sql<number>`levenshtein(${user.name}, ${search.name})`.as(
+          "distance",
+        ),
+        sim: sql<number>`similarity(${user.name}, ${search.name})`.as("sim"),
+      })
+      .from(user)
+      .innerJoin(seekerProfile, eq(user.id, seekerProfile.userId))
+      .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
+      .orderBy(sql`levenshtein(${user.name}, ${search.name})`) // precise ordering
+      .limit(20);
+    return result;
+  }
+  static async findBusinessUser(search: searchModel.searchUserQuery) {
+    const filters: SQL[] = [];
+    if (search.name !== undefined) {
+      filters.push(sql`${user.name} % ${search.name.trim()}`);
+    }
+    console.log("got here")
+    try{
+    const result = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        businessName: sql<
+          string[]
+        >`coalesce(array_agg(${businessProfile.name}), '{}')::text[]`.as(
+          "business_names",
+        ),
+        description: sql<
+          string[]
+        >`coalesce(array_agg(${businessProfile.description}), '{}')::text[]`.as(
+          "business_descriptions",
+        ),
+        distance: sql<number>`levenshtein(${user.name}, ${search.name})`.as(
+          "distance",
+        ),
+        sim: sql<number>`similarity(${user.name}, ${search.name})`.as("sim"),
+      })
+      .from(user)
+      .leftJoin(businessUser, eq(user.id, businessUser.userId))
+      .leftJoin(
+        businessProfile,
+        eq(businessUser.businessId, businessProfile.id),
+      )
+      .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
+      .orderBy(sql`levenshtein(${user.name}, ${search.name})`) // precise ordering
+      .groupBy(user.id, user.name)
+      .limit(20);
+    
+    console.log("got also here")
+    return result;
+  }
+  catch(error){console.log(error)}
   }
 }

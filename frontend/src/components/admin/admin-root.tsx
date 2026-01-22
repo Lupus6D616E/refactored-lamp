@@ -2,6 +2,7 @@
 import { authClient } from '@lib/auth-client';
 import { createRoot } from 'react-dom/client'
 import { BootstrapCard } from './bootstrapcard';
+import { AdminDashboard } from './dashboard';
 
 function App() {
     const { data: session, isPending } = authClient.useSession();
@@ -38,11 +39,19 @@ function App() {
         <main>
              <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
                         <div className="card-body">
+                            return to business dashboard: 
+                                    <button className='btn' onClick={() => window.location.href = '/user-dashboard  '}>Go Home</button>
                         </div>
             </div>
         </main>
     )
     }
+    else if(session.user.role === "admin"){
+        return(
+            <AdminDashboard />
+        )
+    }
+    
 }   
 
 const root = createRoot(document.getElementById('root')!)

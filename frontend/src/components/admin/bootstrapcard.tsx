@@ -67,7 +67,7 @@ export function BootstrapCard() {
         className="w-full border p-2 rounded"
       />
      <input
-        type="password"
+        type="text"
         placeholder="Key"
         required
         value={key}

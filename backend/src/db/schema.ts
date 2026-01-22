@@ -142,6 +142,7 @@ export const seekerProfile = pgTable("seeker_profile", {
 
 export const businessProfile = pgTable("business_profile", {
   id: uuid().defaultRandom().primaryKey(),
+  name: text("name"),
   description: text("description"),
   industry: text("industry"),
   address: text("address"),
@@ -154,10 +155,26 @@ export const businessUser = pgTable("business_user",{
   businessId: uuid().notNull().references(()=> businessProfile.id,{onDelete: "cascade"})
 })
 
+export const businessRelations = relations(businessProfile, ({many}) => ({
+  businessUser: many(businessUser)
+})
+)
+export const businessUserRelations = relations(businessUser, ({ one }) => ({
+  user: one(user, {
+    fields: [businessUser.userId],
+    references: [user.id],
+  }),
+  business: one(businessProfile, {
+    fields: [businessUser.businessId],
+    references: [businessProfile.id],
+  }),
+}));
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   jobApplications: many(jobApplications),
+  businessUser: many(businessUser)
 }));
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {

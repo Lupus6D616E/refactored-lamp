@@ -49,25 +49,7 @@ const app = new Elysia()
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()
         }})) 
-  .post(
-    "/changetype",
-    async ({ body }) => {
-      const result = await db
-        .update(user)
-        .set({ role: "admin" })
-        .where(eq(user.email, body.email));
-      return {
-        success: "yes",
-      };
-    },
-    {
-      role: ["admin"],
-      body: t.Object({
-        email: t.String(),
-        change: t.String(),
-      }),
-    },
-  )
+
   .listen(3000, ({ hostname, port }) => {
     console.log(`Server started http://${hostname}:${port}`);
   });

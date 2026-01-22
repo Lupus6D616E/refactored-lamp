@@ -113,7 +113,7 @@ export function AdvancedSearchBar({ onResults }: Props) {
     };
 
     try {
-      const response = await edenApi.api.search.get({
+      const response = await edenApi.search.jobpost.get({
         query: cleanFilters,
       });
 

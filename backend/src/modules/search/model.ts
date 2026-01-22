@@ -1,7 +1,7 @@
 import { t } from "elysia";
 
 export namespace searchModel {
-  export const searchQuery = t.Object({
+  export const searchJobQuery = t.Object({
     title: t.Optional(t.String()),
     city: t.Optional(t.String()),
     employmentType: t.Optional(t.String()),
@@ -10,6 +10,9 @@ export namespace searchModel {
     tagsMode: t.Optional(t.String()),
     schedule: t.Optional(t.Array(t.String())),
   });
-
-export type searchQuery = typeof searchQuery.static;
+  export const searchUserQuery = t.Object({
+    name: t.String(),
+  })
+export type searchUserQuery = typeof searchUserQuery.static
+export type searchJobQuery = typeof searchJobQuery.static;
 }
