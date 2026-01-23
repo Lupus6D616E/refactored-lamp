@@ -4,6 +4,7 @@ import { edenApi } from "@lib/eden";
 import { useState, useRef, KeyboardEvent } from "react";
 import { SearchResult } from "./types";
 
+
 const cities = [
   "Manila",
   "Caloocan",

@@ -1,3 +1,4 @@
+import { authClient } from "@lib/auth-client";
 import { SearchResult } from "./types";
 
 interface Props {
@@ -5,6 +6,8 @@ interface Props {
 }
 
 export default function ResultsList({ results }: Props) {
+
+    const { data: session, isPending } = authClient.useSession();
   if (!results.length) {
     return (
       <div className="text-center text-gray-500">
@@ -27,6 +30,9 @@ export default function ResultsList({ results }: Props) {
           <div className="card-body">
             <h2 className="card-title">{item.title}</h2>
             <p>{truncateDescription(item.description,300)}</p>
+            {session?.user.role === "admin" && (
+              <p>JOB ID: {item.id}</p>
+            )}
             <p>{item.city}</p>
             <p>{item.employmentType}</p>
             <a  className="btn btn-lg" href={`viewpost.html?id=${item.id}`} > Go to post </a>

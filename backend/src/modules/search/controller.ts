@@ -1,7 +1,9 @@
 import { Elysia, t } from "elysia";
 import { searchModel } from "./model";
 import { Search } from "./service";
+import { betterAuthPlugin } from "@lib/auth";
 export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
+.use(betterAuthPlugin)
   .get(
     "/jobpost",
     async ({ query }) => {
@@ -29,8 +31,8 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
         result: result, // ← your actual results
       };
     },
-    {
-      // Define expected query schema → full type-safety + validation
+    { 
+      role: ['admin'],
       query: searchModel.searchUserQuery,
     },
   )
@@ -46,7 +48,7 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
       };
     },
     {
-      // Define expected query schema → full type-safety + validation
+      role: ['admin'],
       query: searchModel.searchUserQuery,
     },
   );

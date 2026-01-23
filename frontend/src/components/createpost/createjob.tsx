@@ -101,33 +101,14 @@ const DAYS_OF_WEEK = [
         schedule: selectedDays,
     }
     const res = await edenApi.post.postjob.post(data)
-    const response = await fetch("/post/postjob", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: title,
-        email: email,
-        description: description,
-        requirements: requirements,
-        responsibilities: responsibilities,
-        city: city,
-        employmentType: employmentType,
-        minimumSalary: minimumSalary,
-        expireDate: expireDate,
-        tags: tags,
-        schedule: selectedDays,
-      }),
-    });
 
     setLoading(false);
 
-    if (!response.ok) {
-      setError(response.statusText);
+    if (!res.data) {
+      setError("An error occurred idk");
       return;
     } else {
-      const message = await response.json();
+      const message = res.data;
       if (message.message === "no") {
         setError("job posted");
       } else {

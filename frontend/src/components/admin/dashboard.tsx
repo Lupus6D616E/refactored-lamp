@@ -1,46 +1,58 @@
 // components/AdminDashboard.tsx
-import { useEffect, useState } from "react"
-import SearchUserCard from "./searchuser"
+import { useEffect, useState } from "react";
+import SearchUserCard from "./searchuser";
+import { SearchComponent } from "@components/search/search";
+import { edenApi } from "@lib/eden";
 
 export interface AdminStats {
-  users: number
-  orders: number
-  revenue: number
-  uptime: string
+  seekers: number;
+  businesses: number;
+  userTotal: number;
+  jobPosts: number;
+  applicationTotal: number;
+  applicationPending: number;
+  applicationAccepted: number;
+  applicationRejected: number;
+  uptime: string;
 }
 
 export const mockAdminData: AdminStats = {
-  users: 1280,
-  orders: 342,
-  revenue: 45230,
+  seekers: 1280,
+  businesses: 342,
+  userTotal: 21331,
+  jobPosts: 45230,
+  applicationTotal: 1,
+  applicationPending: 2,
+  applicationAccepted: 3,
+  applicationRejected: 4,
   uptime: "99.9%",
-}
+};
 
 export function AdminDashboard() {
-  const [data, setData] = useState<AdminStats>(mockAdminData)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [data, setData] = useState<AdminStats>(mockAdminData);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const res = await fetch("/api/admin")
+        const res = await edenApi.admin.stats.get();
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch admin data")
+        if (!res.data) {
+          throw new Error("Failed to fetch admin data");
         }
 
-        const realData: AdminStats = await res.json()
-        setData(realData)
+        const realData: AdminStats = res.data;
+        setData(realData);
       } catch (err) {
-        setError((err as Error).message)
+        setError((err as Error).message);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchAdminData()
-  }, [])
+    fetchAdminData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-base-200">
@@ -63,24 +75,23 @@ export function AdminDashboard() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Users" value={data.users} />
-          <StatCard title="Orders" value={data.orders} />
-          <StatCard title="Revenue" value={`$${data.revenue.toLocaleString()}`} />
+          <StatCard title="Seekers" value={data.seekers} />
+          <StatCard title="Businesses" value={data.businesses} />
+          <StatCard title="Total Users" value={data.userTotal} />
+          <StatCard title="Total Applications" value={data.applicationTotal} />
+          <StatCard title="Pending Applications" value={data.applicationPending} />
+          <StatCard title="Accepted Applications" value={data.applicationAccepted} />
+          <StatCard title="Rejected Applications" value={data.applicationRejected} />
           <StatCard title="Uptime" value={data.uptime} />
           <SearchUserCard />
+          <SearchComponent />
         </div>
       </main>
     </div>
-  )
+  );
 }
 
-function StatCard({
-  title,
-  value,
-}: {
-  title: string
-  value: string | number
-}) {
+function StatCard({ title, value }: { title: string; value: string | number }) {
   return (
     <div className="card bg-base-100 shadow">
       <div className="card-body">
@@ -88,5 +99,5 @@ function StatCard({
         <p className="text-3xl font-bold">{value}</p>
       </div>
     </div>
-  )
+  );
 }

@@ -1,11 +1,11 @@
 import { Elysia, status, t } from "elysia";
 import { betterAuthPlugin, auth } from "@lib/auth";
 import { db } from "@db/db";
-import { eq } from "drizzle-orm";
-import { user } from "@db/schema";
+import { count, eq } from "drizzle-orm";
+import { jobApplications, jobPosts, user } from "@db/schema";
 export const adminPlugin = new Elysia({ prefix: "/admin" })
   .use(betterAuthPlugin)
-    .post(
+  .post(
     "/changetype",
     async ({ body }) => {
       const result = await db
@@ -63,5 +63,94 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
         password: t.String(),
         secret: t.String(),
       }),
+    },
+  )
+  .get(
+    "/stats",
+    async ({}) => {
+      const [
+        adminCount,
+        businessCount,
+        userCount,
+        jobPostCount,
+        applicationAcceptedCount,
+        applicationPendingCount,
+        applicationRejectedCount,
+      ] = await Promise.all([
+        db
+          .select({ count: count() })
+          .from(user)
+          .where(eq(user.role, "admin"))
+          .then((r) => Number(r[0]?.count ?? 0)),
+
+        db
+          .select({ count: count() })
+          .from(user)
+          .where(eq(user.role, "business"))
+          .then((r) => Number(r[0]?.count ?? 0)),
+
+        db
+          .select({ count: count() })
+          .from(user)
+          .where(eq(user.role, "user"))
+          .then((r) => Number(r[0]?.count ?? 0)),
+
+        db
+          .select({ count: count() })
+          .from(jobPosts)
+          .then((r) => Number(r[0]?.count ?? 0)),
+
+        db
+          .select({ count: count() })
+          .from(jobApplications)
+          .where(eq(jobApplications.status, "accepted"))
+          .then((r) => Number(r[0]?.count ?? 0)),
+        db
+          .select({ count: count() })
+          .from(jobApplications)
+          .where(eq(jobApplications.status, "pending"))
+          .then((r) => Number(r[0]?.count ?? 0)),
+        db
+          .select({ count: count() })
+          .from(jobApplications)
+          .where(eq(jobApplications.status, "rejected"))
+          .then((r) => Number(r[0]?.count ?? 0)),
+      ]);
+      const totalApplications =
+        applicationAcceptedCount +
+        applicationPendingCount +
+        applicationRejectedCount;
+      const totalUsers = adminCount + businessCount + userCount;
+
+        // Bun / process.uptime() returns seconds since process start
+  const totalSeconds = Math.floor(process.uptime());
+
+  const days    = Math.floor(totalSeconds / 86400);
+  const hours   = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const parts: string[] = [];
+
+  if (days > 0)    parts.push(`${days} day${days === 1 ? '' : 's'}`);
+  if (hours > 0)   parts.push(`${hours} hour${hours === 1 ? '' : 's'}`);
+  if (minutes > 0) parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`);
+  if (seconds > 0 || parts.length === 0) 
+    parts.push(`${seconds} second${seconds === 1 ? '' : 's'}`);
+      
+      return {
+        seekers: userCount,
+        businesses: businessCount,
+        userTotal: totalUsers,
+        jobPosts: jobPostCount,
+        applicationTotal: totalApplications,
+        applicationPending: applicationPendingCount,
+        applicationAccepted: applicationAcceptedCount,
+        applicationRejected: applicationRejectedCount,
+        uptime:parts.join(', ')
+      };
+    },
+    {
+      role: ["admin"],
     },
   );

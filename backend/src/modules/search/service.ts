@@ -16,8 +16,6 @@ import {
   SQL,
   sql,
 } from "drizzle-orm";
-import { email } from "better-auth/*";
-
 export abstract class Search {
   static async findjobpost(search: searchModel.searchJobQuery) {
     const filters: SQL[] = [];
@@ -75,20 +73,26 @@ export abstract class Search {
     const filters: SQL[] = [];
     if (search.name !== undefined) {
       filters.push(sql`${user.name} % ${search.name.trim()}`);
+      filters.push(eq(user.role,"user"));
     }
     const result = await db
       .select({
         id: user.id,
         name: user.name,
         email: user.email,
-        description: seekerProfile.description,
+        description:  sql<string>`
+      COALESCE(
+        ${seekerProfile.description},
+        'user has not set up profile yet'
+      )
+    `,
         distance: sql<number>`levenshtein(${user.name}, ${search.name})`.as(
           "distance",
         ),
         sim: sql<number>`similarity(${user.name}, ${search.name})`.as("sim"),
       })
       .from(user)
-      .innerJoin(seekerProfile, eq(user.id, seekerProfile.userId))
+      .leftJoin(seekerProfile, eq(user.id, seekerProfile.userId))
       .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
       .orderBy(sql`levenshtein(${user.name}, ${search.name})`) // precise ordering
       .limit(20);
@@ -98,6 +102,7 @@ export abstract class Search {
     const filters: SQL[] = [];
     if (search.name !== undefined) {
       filters.push(sql`${user.name} % ${search.name.trim()}`);
+      filters.push(eq(user.role,"business"));
     }
     console.log("got here")
     try{
