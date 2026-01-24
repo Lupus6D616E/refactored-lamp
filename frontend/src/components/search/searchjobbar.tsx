@@ -256,7 +256,7 @@ export function AdvancedSearchBar({ onResults }: Props) {
             </button>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <span className="label-text font-semibold">Select days</span>
 
           {DAYS_OF_WEEK.map((day) => (

@@ -157,7 +157,7 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
     },
   )
   .get(
-    "/profile",
+    "/myprofile",
     async ({ currentUser }) => {
       const result = await Profile.getSeekerProfile(currentUser.id);
       return result;
@@ -171,4 +171,26 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
     return res
   }, {
     role: ["user"],
-  });
+  })
+  .get("/userprofile/:id",async ({params})=> {
+    const seekerProfile = await Profile.getSeekerProfile(params.id);
+    const userCertification = await Profile.getCertification(params.id);
+    const userExperience = await Profile.getExperience(params.id);
+    const userProfile = await Profile.getUserProfile(params.id)
+    return{
+      name: userProfile.name,
+      email: userProfile.email,
+      address: seekerProfile.address,
+      education: seekerProfile.education,
+      role: userProfile.role,
+      description: seekerProfile.description,
+      certificateArray: userCertification,
+      experienceArray: userExperience,
+      skills: seekerProfile.skills,
+      schedule: seekerProfile.schedule,
+    }
+  },{
+    role: ["business","admin"]
+  })
+
+

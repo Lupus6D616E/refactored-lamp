@@ -134,6 +134,7 @@ export default function SearchUserCard() {
                 <p className="font-medium">{user.name}</p>
                 <p className="text-sm opacity-70">{user.email}</p>
                 <p className="text-sm opacity-70">{user.description}</p>
+                <a className="btn btn-secondary" href={`userprofile.html?id=${user.id}`}> visit profile </a>
               </div>
             ))}
           </div>
@@ -144,6 +145,7 @@ export default function SearchUserCard() {
               <div key={idx} className="p-3">
                 <p className="font-medium">{user.name}</p>
                 <p className="text-sm opacity-70">{user.email}</p>
+                <a className=" btn btn-secondary"> </a>
                 {user.businessName.map((business, index) => (
                 <div key={index}>
                   <p className="font-medium"> business name: {index}:{user.businessName[index]} </p>

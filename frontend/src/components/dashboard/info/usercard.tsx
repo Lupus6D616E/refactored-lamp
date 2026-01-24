@@ -15,9 +15,9 @@ export default function UserProfileCard() {
   const [schedule, setSchedule] = useState<string[]>([]);
   useEffect(() => {
     const getProfileDetails = async () => {
-      const res = await edenApi.user.profile.get();
+      const res = await edenApi.user.myprofile.get();
       if (res.data){
-        const userprofile = res.data[0]
+        const userprofile = res.data
         if(userprofile.description !== null){
         setDescription(userprofile.description)
         }
