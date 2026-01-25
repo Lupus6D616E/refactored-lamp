@@ -142,10 +142,10 @@ export const seekerProfile = pgTable("seeker_profile", {
 
 export const businessProfile = pgTable("business_profile", {
   id: uuid().defaultRandom().primaryKey(),
-  name: text("name"),
-  description: text("description"),
-  industry: text("industry"),
-  address: text("address"),
+  name: text("name").unique().notNull(),
+  description: text("description").notNull(),
+  industry: text("industry").notNull(),
+  address: text("address").notNull(),
 });
 
 export const businessUser = pgTable("business_user",{

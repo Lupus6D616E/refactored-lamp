@@ -1,6 +1,6 @@
 "use client";
 
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import { useState, useRef, KeyboardEvent } from "react";
 import { SearchResult } from "./types";
 
@@ -114,7 +114,7 @@ export function AdvancedSearchBar({ onResults }: Props) {
     };
 
     try {
-      const response = await edenApi.search.jobpost.get({
+      const response = await edenTreatyApi.search.jobpost.get({
         query: cleanFilters,
       });
 

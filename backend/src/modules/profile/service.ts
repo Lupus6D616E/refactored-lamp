@@ -62,7 +62,7 @@ export abstract class Profile {
       .select({ resumeUrl: seekerProfile.resumeUrl })
       .from(seekerProfile)
       .where(eq(seekerProfile.userId, userId));
-
+      
     if (item.length === 0 || item[0].resumeUrl === null) {
       return null;
     } else {

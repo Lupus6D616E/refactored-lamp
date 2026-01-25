@@ -1,6 +1,6 @@
 // src/components/PostCreator.tsx
 import { useState } from "react";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 
 export function UpdateProfile() {
   const [description, setDescription] = useState("");
@@ -43,7 +43,7 @@ export function UpdateProfile() {
     if (!description.trim()) return;
 
     try {
-      const response = await edenApi.user.updateprofile.post({
+      const response = await edenTreatyApi.user.updateprofile.post({
         description,
         skills,
         selectedDays,

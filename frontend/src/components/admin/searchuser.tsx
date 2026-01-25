@@ -17,10 +17,10 @@ interface SearchBusinessResult {
   sim: number;
 }
 
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import { useState } from "react";
 
-export default function SearchUserCard() {
+export function SearchUserCard() {
   const [fullName, setFullName] = useState("");
   const [userType, setUserType] = useState("Seeker");
   const [seekerResults, setSeekerResults] = useState<SearchSeekerResult[]>([]);
@@ -40,7 +40,7 @@ export default function SearchUserCard() {
     setBusinessResults([]);
     if (userType === "Seeker") {
       try {
-        const res = await edenApi.search.seeker.get({
+        const res = await edenTreatyApi.search.seeker.get({
           query: {
             name: fullName,
           },
@@ -59,7 +59,7 @@ export default function SearchUserCard() {
     }
     if (userType === "Business") {
       try {
-        const res = await edenApi.search.businessuser.get({
+        const res = await edenTreatyApi.search.businessuser.get({
           query: {
             name: fullName,
           },

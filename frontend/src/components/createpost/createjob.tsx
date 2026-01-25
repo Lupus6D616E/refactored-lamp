@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 
 
 
@@ -100,7 +100,7 @@ const DAYS_OF_WEEK = [
         tags: tags,
         schedule: selectedDays,
     }
-    const res = await edenApi.post.postjob.post(data)
+    const res = await edenTreatyApi.post.postjob.post(data)
 
     setLoading(false);
 

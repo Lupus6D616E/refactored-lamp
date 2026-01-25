@@ -1,6 +1,6 @@
 import { authClient } from "@lib/auth-client";
 import { useState } from "react";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 
 export function BootstrapCard() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ export function BootstrapCard() {
     setError(null);
     setLoading(true);
 
-    const res = await edenApi.admin.bootstrap.post({
+    const res = await edenTreatyApi.admin.bootstrap.post({
         email: email,
         name: name,
         password: password,

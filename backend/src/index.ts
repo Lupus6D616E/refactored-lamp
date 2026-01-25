@@ -1,11 +1,8 @@
-import { Elysia ,t  } from "elysia";
+import { Elysia  } from "elysia";
 import { exec } from "child_process";
 import { watch } from "fs";
-import { db } from "@db/db";
-import { eq } from "drizzle-orm";
 import { betterAuthPlugin } from "backend/src/lib/auth";
 import { staticPlugin } from "@elysiajs/static";
-import { user } from "backend/src/db/schema";
 import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
 import { searchPlugin } from "@modules/search/controller";
@@ -13,6 +10,7 @@ import { aiPlugin } from "@modules/reviewbot/controller";
 import openapi from "@elysiajs/openapi";
 import { OpenAPI } from "@lib/auth";
 import { adminPlugin } from "@modules/admin/controller";
+import { businessPlugin } from "@modules/business/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -45,6 +43,7 @@ const app = new Elysia()
   .use(searchPlugin)
   .use(aiPlugin)
   .use(adminPlugin)
+  .use(businessPlugin)
   .use(openapi({documentation: {
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()

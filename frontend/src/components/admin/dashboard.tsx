@@ -1,8 +1,10 @@
 // components/AdminDashboard.tsx
 import { useEffect, useState } from "react";
-import SearchUserCard from "./searchuser";
+import { SearchUserCard } from "./searchuser";
 import { SearchComponent } from "@components/search/search";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
+import { AddBusinessCard } from "./addbusiness";
+import { SearchBusinessCard } from "./searchbusiness";
 
 export interface AdminStats {
   seekers: number;
@@ -36,7 +38,7 @@ export function AdminDashboard() {
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
-        const res = await edenApi.admin.stats.get();
+        const res = await edenTreatyApi.admin.stats.get();
 
         if (!res.data) {
           throw new Error("Failed to fetch admin data");
@@ -74,17 +76,28 @@ export function AdminDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
           <StatCard title="Seekers" value={data.seekers} />
           <StatCard title="Businesses" value={data.businesses} />
           <StatCard title="Total Users" value={data.userTotal} />
           <StatCard title="Total Applications" value={data.applicationTotal} />
-          <StatCard title="Pending Applications" value={data.applicationPending} />
-          <StatCard title="Accepted Applications" value={data.applicationAccepted} />
-          <StatCard title="Rejected Applications" value={data.applicationRejected} />
+          <StatCard
+            title="Pending Applications"
+            value={data.applicationPending}
+          />
+          <StatCard
+            title="Accepted Applications"
+            value={data.applicationAccepted}
+          />
+          <StatCard
+            title="Rejected Applications"
+            value={data.applicationRejected}
+          />
           <StatCard title="Uptime" value={data.uptime} />
           <SearchUserCard />
           <SearchComponent />
+          <AddBusinessCard />
+          <SearchBusinessCard />
         </div>
       </main>
     </div>

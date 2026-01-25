@@ -1,5 +1,5 @@
 import { betterAuthPlugin } from "@lib/auth";
-import { Elysia } from "elysia";
+import { Elysia, status } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
 
@@ -110,7 +110,7 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
     },
   )
   .get(
-    "/downloadresume",
+    "/downloadmyresume",
     async ({ currentUser, set }) => {
       const result = await Profile.getResumeUrl(currentUser.id);
       if (result === null) {
@@ -192,5 +192,20 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
   },{
     role: ["business","admin"]
   })
-
-
+    .get(
+    "/downloaduserresume/:id",
+    async ({ params, set }) => {
+      const result = await Profile.getResumeUrl(params.id);
+      if (result === null) {
+        return status(404,"No resume found");
+      } else {
+        set.headers["Content-Type"] = "application/octet-stream";
+        set.headers["Content-Disposition"] =
+          `attachment; filename="resume.pdf"`;
+        return Bun.file(result);
+      }
+    },
+    {
+      role: ["business","admin"],
+    },
+  )

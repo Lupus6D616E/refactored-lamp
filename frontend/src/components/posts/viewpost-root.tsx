@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { PostCard } from "./viewpost";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import { useEffect, useState } from "react";
 import { AIComparison } from "./compare";
 
@@ -21,7 +21,7 @@ function App() {
 
   useEffect(() => {
     const getJobDetails = async () => {
-      const res = await edenApi.post.job({ id: getPostId() }).get();
+      const res = await edenTreatyApi.post.job({ id: getPostId() }).get();
       if (res.data) {
         const jobDetails = res.data[0];
         if (typeof jobDetails.title === 'string' ) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "backend/src/lib/auth-client";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import { useEffect, useState } from "react";
 
 
@@ -15,7 +15,7 @@ export default function UserProfileCard() {
   const [schedule, setSchedule] = useState<string[]>([]);
   useEffect(() => {
     const getProfileDetails = async () => {
-      const res = await edenApi.user.myprofile.get();
+      const res = await edenTreatyApi.user.myprofile.get();
       if (res.data){
         const userprofile = res.data
         if(userprofile.description !== null){

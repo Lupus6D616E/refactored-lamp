@@ -1,5 +1,5 @@
 import { db } from "@db/db";
-import { jobApplications, jobPosts, user } from "@db/schema";
+import { businessProfile, jobApplications, jobPosts, user } from "@db/schema";
 import { auth } from "@lib/auth";
 import { count, eq } from "drizzle-orm";
 import { AdminModel } from "./model";
@@ -14,7 +14,7 @@ export abstract class Admin {
       return true;
     } catch (e) {
       console.log(e);
-      return false
+      return false;
     }
   }
   static async bootstrapAdminAccount(
@@ -43,6 +43,36 @@ export abstract class Admin {
     } else {
       return false;
     }
+  }
+  static async createbusiness(
+    name: string,
+    description: string,
+    industry: string,
+    address: string,
+  ) {
+    try {
+      const result = await db
+        .insert(businessProfile)
+        .values({
+          name,
+          description,
+          industry,
+          address,
+        })
+        .onConflictDoNothing({ target: businessProfile.name })
+        .returning({
+          id: businessProfile.id,
+          name: businessProfile.name,
+        });
+      if (result.length === 0) {
+        return 409;
+      }
+      return 201;
+    
+    } catch (e) {
+      console.log(e);
+    } 
+     
   }
   static async statistics() {
     const [

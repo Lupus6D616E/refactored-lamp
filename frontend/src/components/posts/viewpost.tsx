@@ -1,5 +1,5 @@
 "use client";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import { useState } from "react";
 
 interface CardProps {
@@ -43,7 +43,7 @@ export const PostCard: React.FC<CardProps> = ({
     setIsLoading(true);
     setButtonText("Loading...");
     try {
-      const response = await edenApi.post.job({ id: id }).apply.post();
+      const response = await edenTreatyApi.post.job({ id: id }).apply.post();
       if (!response.data) {
         throw new Error(`error! status: ${response.error.value}`);
       }

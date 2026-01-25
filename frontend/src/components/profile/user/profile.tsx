@@ -1,4 +1,4 @@
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import React, { useEffect, useState } from "react";
 
 type ExperienceItem = {
@@ -53,10 +53,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
   const [profile, setProfile] = useState<Profile>(mockProfile);
   const [loading, setLoading] = useState<boolean>(true);
 
+  
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await edenApi.user.userprofile({id: id}).get();
+        const res = await edenTreatyApi.user.userprofile({id: id}).get();
         if (!res.data) throw new Error("Failed to fetch profile");
         const data: Profile = res.data;
         setProfile(data);
@@ -69,6 +71,22 @@ const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
 
     fetchProfile();
   }, [id]);
+  const fetchResume = async() => {
+     const { data, error } = await edenTreatyApi.user.downloaduserresume({id:id}).get(); 
+      if (error) {
+        console.error('Download failed:', error);
+        return;
+      }
+      const blob = data instanceof Blob ? data : new Blob([data], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'resume.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
@@ -80,7 +98,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
             <p className="text-sm opacity-70">{profile.email}</p>
             <div className="badge badge-primary mt-2">{profile.role}</div>
           </div>
-          <a className="btn btn-outline btn-primary">Download resume</a>
+          <button onClick={fetchResume} className="btn btn-outline btn-primary">Download resume</button>
         </div>
       </div>
 

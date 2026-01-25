@@ -98,6 +98,29 @@ export abstract class Search {
       .limit(20);
     return result;
   }
+    static async findBusiness(search: searchModel.searchBusinessQuery) {
+    const filters: SQL[] = [];
+    if (search.name !== undefined) {
+      filters.push(sql`${businessProfile.name} % ${search.name.trim()}`);
+    }
+    const result = await db
+      .select({
+        id: businessProfile.id,
+        name: businessProfile.name,
+        description: businessProfile.description,
+        address: businessProfile.address,
+        industry: businessProfile.industry,
+        distance: sql<number>`levenshtein(${businessProfile.name}, ${search.name})`.as(
+          "distance",
+        ),
+        sim: sql<number>`similarity(${businessProfile.name}, ${search.name})`.as("sim"),
+      })
+      .from(businessProfile)
+      .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
+      .orderBy(sql`levenshtein(${businessProfile.name}, ${search.name})`) // precise ordering
+      .limit(20);
+    return result;
+  }
   static async findBusinessUser(search: searchModel.searchUserQuery) {
     const filters: SQL[] = [];
     if (search.name !== undefined) {
@@ -136,8 +159,7 @@ export abstract class Search {
       .orderBy(sql`levenshtein(${user.name}, ${search.name})`) // precise ordering
       .groupBy(user.id, user.name)
       .limit(20);
-    
-    console.log("got also here")
+  
     return result;
   }
   catch(error){console.log(error)}

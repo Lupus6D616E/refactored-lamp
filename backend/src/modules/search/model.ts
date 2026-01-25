@@ -13,6 +13,11 @@ export namespace searchModel {
   export const searchUserQuery = t.Object({
     name: t.String(),
   })
-export type searchUserQuery = typeof searchUserQuery.static
+
+  export const searchBusinessQuery = t.Object({
+    name: t.String(),
+  })
+export type searchBusinessQuery = typeof searchBusinessQuery.static;
+export type searchUserQuery = typeof searchUserQuery.static;
 export type searchJobQuery = typeof searchJobQuery.static;
 }

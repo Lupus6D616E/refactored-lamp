@@ -1,5 +1,5 @@
 "use client";
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import {  useState } from "react";
 
 interface CardProps {
@@ -20,7 +20,7 @@ export const AIComparison: React.FC<CardProps> = ({ id }) => {
     setIsLoading(true);
     setStatusText("Loading...");
     try {
-      const response = await edenApi.ai.compare.post({postId: id});
+      const response = await edenTreatyApi.ai.compare.post({postId: id});
       if (!response.data) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

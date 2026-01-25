@@ -1,4 +1,4 @@
-import { edenApi } from "@lib/eden";
+import { edenTreatyApi } from "@lib/eden";
 import { useEffect, useState } from "react";
 
 type CardStatus = "pending" | "rejected" | "accepted" | "expired";
@@ -17,7 +17,7 @@ export function ApplicationList() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await edenApi.user.viewapplications.get(); // backend not important
+        const res = await edenTreatyApi.user.viewapplications.get(); // backend not important
         if (!res.data) throw new Error("Failed to fetch");
         const data: Item[] = res.data
         setItems(data);

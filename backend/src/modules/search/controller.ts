@@ -36,6 +36,21 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
       query: searchModel.searchUserQuery,
     },
   )
+    .get(
+    "/business",
+    async ({ query }) => {
+      // query is fully typed!
+      console.log("Received filters:", query);
+      const result = await Search.findBusiness(query);
+      console.log(result);
+      return {
+        result: result, // ← your actual results
+      };
+    },
+    { 
+      query: searchModel.searchBusinessQuery,
+    },
+  )
   .get(
     "/businessuser",
     async ({ query }) => {
@@ -44,7 +59,7 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
       const result = await Search.findBusinessUser(query);
       console.log(result);
       return {
-        result: result, // ← your actual results
+        result: result, 
       };
     },
     {

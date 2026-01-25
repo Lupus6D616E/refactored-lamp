@@ -1,4 +1,4 @@
-import { Elysia, status, t } from "elysia";
+import { Elysia, status} from "elysia";
 import { PostModel } from "./model";
 import { betterAuthPlugin } from "@lib/auth";
 import { Post } from "@modules/post/service";
@@ -49,4 +49,4 @@ export const postPlugin = new Elysia({ prefix: "/post" })
       }
     },
     { role: ["user"], params: PostModel.applicationBody },
-  )
+  );

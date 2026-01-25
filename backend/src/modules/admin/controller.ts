@@ -1,4 +1,4 @@
-import { Elysia, status } from "elysia";
+import { Elysia, status, t } from "elysia";
 import { betterAuthPlugin } from "@lib/auth";
 import { Admin } from "./service";
 import { AdminModel } from "./model";
@@ -33,6 +33,25 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     {
       body:AdminModel.bootStrapAdminAccountBody
       })
+  .post("/createbusiness",async ({ body }) => {
+    const res = await Admin.createbusiness(body.name,body.description,body.industry,body.address)
+    if( res === 409){
+      return status(409,"Business Already Exists")
+    }else if( res === 201){
+      return status(201, "Business Created")
+    }
+    else{
+      return status(500)
+    }
+  },{
+    role:["admin"],
+    body: t.Object({
+      name: t.String(),
+      description: t.String(),
+      industry: t.String(),
+      address: t.String()
+    })
+  })
   .get(
     "/stats",
     async ({}) => {
