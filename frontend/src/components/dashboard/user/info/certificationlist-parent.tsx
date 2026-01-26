@@ -1,5 +1,5 @@
 import React from "react";
-import ItemsList from "frontend/src/components/dashboard/info/certificationlist";
+import ItemsList from "@components/dashboard/user/info/certificationlist";
 
 const CertificationList = () => {
   type Item = {
