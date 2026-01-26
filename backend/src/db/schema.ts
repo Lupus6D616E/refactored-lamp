@@ -13,7 +13,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -25,7 +24,9 @@ export const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-  role: text("role", { enum: ["user", "business", "admin"] }).default("user").notNull(),
+  role: text("role", { enum: ["user", "business", "admin"] })
+    .default("user")
+    .notNull(),
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
@@ -51,8 +52,6 @@ export const session = pgTable(
   (table) => [index("session_userId_idx").on(table.userId)],
 );
 
-
-
 export const account = pgTable(
   "account",
   {
@@ -76,7 +75,6 @@ export const account = pgTable(
   },
   (table) => [index("account_userId_idx").on(table.userId)],
 );
-
 
 export const verification = pgTable(
   "verification",
@@ -148,17 +146,18 @@ export const businessProfile = pgTable("business_profile", {
   address: text("address").notNull(),
 });
 
-export const businessUser = pgTable("business_user",{
+export const businessUser = pgTable("business_user", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  businessId: uuid().notNull().references(()=> businessProfile.id,{onDelete: "cascade"})
-})
+  businessId: uuid()
+    .notNull()
+    .references(() => businessProfile.id, { onDelete: "cascade" }),
+});
 
-export const businessRelations = relations(businessProfile, ({many}) => ({
-  businessUser: many(businessUser)
-})
-)
+export const businessRelations = relations(businessProfile, ({ many }) => ({
+  businessUser: many(businessUser),
+}));
 export const businessUserRelations = relations(businessUser, ({ one }) => ({
   user: one(user, {
     fields: [businessUser.userId],
@@ -174,7 +173,7 @@ export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   jobApplications: many(jobApplications),
-  businessUser: many(businessUser)
+  businessUser: many(businessUser),
 }));
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
@@ -192,9 +191,12 @@ export const accountRelations = relations(account, ({ one }) => ({
 
 export const jobPosts = pgTable("job_posts", {
   id: serial("id").primaryKey(),
-  businessId: text("business_id")
+  creatorId: text("creator_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  businessId: uuid("business_id")
+    .notNull()
+    .references(() => businessProfile.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description").notNull(),
   requirements: text("requirements").notNull(),

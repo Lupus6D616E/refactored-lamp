@@ -20,6 +20,36 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
       body: AdminModel.changeAccountRoleBody
     },
   )
+    .post(
+    "/addtobusiness",
+    async ({ body }) => {
+      const res = await Admin.addUserToBusiness(body.email, body.business.toLowerCase())
+      if(res.success === true){
+        return {
+          success: true,
+          message: "user added to business"
+        }
+      }
+      else if(res.success === false){
+        if(res.message === `User not found`){
+          return status(404,"User Not Found")
+        }
+        else if(res.message === `Organization not found`){
+          return status(404,"Organization Not Found")
+        }
+        else{
+          return status(500)
+        }
+      }
+      else{
+        return status(500)
+      }
+    },
+    {
+      role: ["admin"],
+      body: AdminModel.addUserToBusinessModel
+    },
+  )
   .post(
     "/bootstrap",
     async ({ body }) => {
@@ -34,7 +64,7 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
       body:AdminModel.bootStrapAdminAccountBody
       })
   .post("/createbusiness",async ({ body }) => {
-    const res = await Admin.createbusiness(body.name,body.description,body.industry,body.address)
+    const res = await Admin.createBusiness(body.name.toLowerCase(),body.description,body.industry,body.address)
     if( res === 409){
       return status(409,"Business Already Exists")
     }else if( res === 201){

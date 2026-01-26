@@ -4,6 +4,7 @@ export namespace PostModel {
   export const JobBody = t.Object({
     title: t.String(),
     email: t.String(),
+    businessId: t.String(),
     description: t.String(),
     requirements: t.String(),
     responsibilities: t.String(),

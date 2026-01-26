@@ -22,6 +22,7 @@ export const postPlugin = new Elysia({ prefix: "/post" })
   .post(
     "/postjob",
     async ({ currentUser, body }) => {
+      
       const res = await Post.postJob(body, currentUser.id);
       if (res === false) {
         return { message: "error" };

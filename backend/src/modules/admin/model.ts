@@ -15,8 +15,13 @@ export namespace AdminModel {
       t.Literal("business"),
     ]),
   });
+    export const addUserToBusinessModel = t.Object({
+    email: t.String(),
+    business: t.String()
+  });
   export type role = "user" | "admin" | "business";
   export type bootStrapAdminAccountBody =
     typeof bootStrapAdminAccountBody.static;
+  export type addUserToBusinessModel = typeof addUserToBusinessModel.static
   export type changeAccountRoleBody = typeof changeAccountRoleBody.static;
 }

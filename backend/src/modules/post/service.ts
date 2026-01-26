@@ -6,10 +6,11 @@ import { eq, and } from "drizzle-orm";
 export abstract class Post {
   static async postJob(
     job: PostModel.JobBody,
-    businessId: string,
+    userId: string,
   ): Promise<boolean> {
     await db.insert(jobPosts).values({
-      businessId: businessId,
+      creatorId: userId,
+      businessId: job.businessId,
       title: capitalizeWords(job.title),
       description: job.description,
       requirements: job.requirements,

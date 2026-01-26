@@ -1,5 +1,11 @@
 import { db } from "@db/db";
-import { businessProfile, jobApplications, jobPosts, user } from "@db/schema";
+import {
+  businessProfile,
+  businessUser,
+  jobApplications,
+  jobPosts,
+  user,
+} from "@db/schema";
 import { auth } from "@lib/auth";
 import { count, eq } from "drizzle-orm";
 import { AdminModel } from "./model";
@@ -44,7 +50,42 @@ export abstract class Admin {
       return false;
     }
   }
-  static async createbusiness(
+  static async addUserToBusiness(email: string, businessName: string) {
+    return db
+      .transaction(async (tx) => {
+        const userObtained = await tx
+          .select({ userId: user.id })
+          .from(user)
+          .where(eq(user.email, email))
+          .limit(1);
+
+        if (!userObtained[0]) throw new Error(`User not found`);
+
+        const businessObtained = await tx
+          .select({ businessId: businessProfile.id })
+          .from(businessProfile)
+          .where(eq(businessProfile.name, businessName))
+          .limit(1);
+
+        if (!businessObtained[0]) throw new Error(`Organization not found`);
+
+        const userId = userObtained[0].userId;
+        const businessId = businessObtained[0].businessId;
+
+        // UPSERT-style prevention (works even without DB unique constraint)
+        await tx
+          .insert(businessUser)
+          .values({ userId, businessId })
+          .onConflictDoNothing(); // ← PostgreSQL / SQLite (modern)
+        // For MySQL you can use: .onDuplicateKeyUpdate({ userId: userId }) but better to check first
+        return { success: true, message: "user added" };
+      })
+      .catch((err) => {
+        return { success: false, message: err };
+      });
+  }
+
+  static async createBusiness(
     name: string,
     description: string,
     industry: string,
@@ -68,11 +109,9 @@ export abstract class Admin {
         return 409;
       }
       return 201;
-    
     } catch (e) {
       console.log(e);
-    } 
-     
+    }
   }
   static async statistics() {
     const [

@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { edenTreatyApi } from "@lib/eden";
-
-
+type business = {
+  id: string;
+  name: string | null;
+}
 
 export function CreateJobForm() {
   const [title, setTitle] = useState("");
   const [email, setEmail] = useState("");
+  const [businesses, setBusinesses] = useState<business[]>([]);
+  const [selectedBusiness, setSelectedBusiness] = useState("");
   const [description, setDescription] = useState("");
   const [requirements, setRequirements] = useState("");
   const [responsibilities, setResponsibilities] = useState("");
@@ -39,26 +43,40 @@ export function CreateJobForm() {
   const sortedItems = [...cities].sort();
   const employments = ["Full Time", "Part Time", "Internship"];
 
-const DAYS_OF_WEEK = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+  const DAYS_OF_WEEK = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+
+  useEffect(() => {
+    const fetchUserBusinesses = async () => {
+      try {
+        const res = await edenTreatyApi.user.mybusinesses.get();
+        console.log(res);
+        if(res.data !== null){
+        setBusinesses(res.data)
+        }
+      } catch(e){
+        console.log(e);
+        setError("error");
+      }
+    };
+    fetchUserBusinesses();
+  }, []);
 
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
-      prev.includes(day)
-        ? prev.filter((d) => d !== day)
-        : [...prev, day]
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
     );
   };
-
 
   // Calculate the minimum date: today + 7 days
   const today = new Date();
@@ -88,19 +106,20 @@ const DAYS_OF_WEEK = [
     setError(null);
     setLoading(true);
     const data = {
-        title: title,
-        email: email,
-        description: description,
-        requirements: requirements,
-        responsibilities: responsibilities,
-        city: city,
-        employmentType: employmentType,
-        minimumSalary: parseFloat(minimumSalary),
-        expireDate: new Date(expireDate),
-        tags: tags,
-        schedule: selectedDays,
-    }
-    const res = await edenTreatyApi.post.postjob.post(data)
+      title: title,
+      email: email,
+      businessId: selectedBusiness,
+      description: description,
+      requirements: requirements,
+      responsibilities: responsibilities,
+      city: city,
+      employmentType: employmentType,
+      minimumSalary: parseFloat(minimumSalary),
+      expireDate: new Date(expireDate),
+      tags: tags,
+      schedule: selectedDays,
+    };
+    const res = await edenTreatyApi.post.postjob.post(data);
 
     setLoading(false);
 
@@ -120,6 +139,20 @@ const DAYS_OF_WEEK = [
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
       <h1 className="text-xl font-semibold">Create a post</h1>
+      <select
+        required={true}
+        value={selectedBusiness}
+        onChange={(e) => setSelectedBusiness(e.target.value)}
+      >
+        <option disabled={true} value="">
+          -- Select a business --
+        </option>
+        {businesses.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.name}
+          </option>
+        ))}
+      </select>
 
       <input
         type="text"
@@ -137,7 +170,7 @@ const DAYS_OF_WEEK = [
         onChange={(e) => setEmail(e.target.value)}
         className="w-full border p-2 rounded"
       />
-      
+
       <textarea
         placeholder="description"
         required
@@ -246,26 +279,26 @@ const DAYS_OF_WEEK = [
           ))
         )}
       </div>
-    <div className="form-control gap-2">
-      <span className="label-text font-semibold">Select days</span>
+      <div className="form-control gap-2">
+        <span className="label-text font-semibold">Select days</span>
 
-      {DAYS_OF_WEEK.map((day) => (
-        <label key={day} className="label cursor-pointer justify-start gap-3">
-          <input
-            type="checkbox"
-            className="checkbox checkbox-primary"
-            checked={selectedDays.includes(day)}
-            onChange={() => toggleDay(day)}
-          />
-          <span className="label-text">{day}</span>
-        </label>
-      ))}
+        {DAYS_OF_WEEK.map((day) => (
+          <label key={day} className="label cursor-pointer justify-start gap-3">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-primary"
+              checked={selectedDays.includes(day)}
+              onChange={() => toggleDay(day)}
+            />
+            <span className="label-text">{day}</span>
+          </label>
+        ))}
 
-      {/* Debug / preview */}
-      <div className="mt-2 text-sm opacity-70">
-        Selected: {selectedDays.join(", ") || "None"}
+        {/* Debug / preview */}
+        <div className="mt-2 text-sm opacity-70">
+          Selected: {selectedDays.join(", ") || "None"}
+        </div>
       </div>
-    </div>
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <button

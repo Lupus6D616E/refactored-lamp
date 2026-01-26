@@ -10,6 +10,7 @@ type FormDataType = {
 
 export function AddBusinessCard() {
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,16 +45,18 @@ export function AddBusinessCard() {
 
       const result = res.data;
       console.log("Success:", result);
+      setMessage(`Success ${result}`)
     } catch (err) {
       console.error(err);
+      setMessage(`Business already exists, or an error has occurred`)
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="card w-full max-w-md bg-base-100 shadow-xl">
-      <div className="card-body">
+    <div className="card w-full bg-base-100 shadow">
+      <div className="card-body gapp 4">
         <h2 className="card-title text-2xl mb-6">Add Business</h2>
 
         {/* space-y controls vertical spacing */}
@@ -116,8 +119,8 @@ export function AddBusinessCard() {
               required
             />
           </div>
-
           <div className="card-actions justify-end pt-4">
+            <p>{message}</p>
             <button
               type="submit"
               className={`btn btn-primary ${loading ? "btn-disabled" : ""}`}

@@ -2,6 +2,9 @@ import { betterAuthPlugin } from "@lib/auth";
 import { Elysia, status } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
+import { db } from "@db/db";
+import { eq } from "drizzle-orm";
+import { businessProfile, businessUser } from "@db/schema";
 
 export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
@@ -166,38 +169,46 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
       role: ["user"],
     },
   )
-  .get("/viewapplications", async ({ currentUser }) => {
-    const res = await Profile.getSeekerApplications(currentUser.id);
-    return res
-  }, {
-    role: ["user"],
-  })
-  .get("/userprofile/:id",async ({params})=> {
-    const seekerProfile = await Profile.getSeekerProfile(params.id);
-    const userCertification = await Profile.getCertification(params.id);
-    const userExperience = await Profile.getExperience(params.id);
-    const userProfile = await Profile.getUserProfile(params.id)
-    return{
-      name: userProfile.name,
-      email: userProfile.email,
-      address: seekerProfile.address,
-      education: seekerProfile.education,
-      role: userProfile.role,
-      description: seekerProfile.description,
-      certificateArray: userCertification,
-      experienceArray: userExperience,
-      skills: seekerProfile.skills,
-      schedule: seekerProfile.schedule,
-    }
-  },{
-    role: ["business","admin"]
-  })
-    .get(
+  .get(
+    "/viewapplications",
+    async ({ currentUser }) => {
+      const res = await Profile.getSeekerApplications(currentUser.id);
+      return res;
+    },
+    {
+      role: ["user"],
+    },
+  )
+  .get(
+    "/userprofile/:id",
+    async ({ params }) => {
+      const seekerProfile = await Profile.getSeekerProfile(params.id);
+      const userCertification = await Profile.getCertification(params.id);
+      const userExperience = await Profile.getExperience(params.id);
+      const userProfile = await Profile.getUserProfile(params.id);
+      return {
+        name: userProfile.name,
+        email: userProfile.email,
+        address: seekerProfile.address,
+        education: seekerProfile.education,
+        role: userProfile.role,
+        description: seekerProfile.description,
+        certificateArray: userCertification,
+        experienceArray: userExperience,
+        skills: seekerProfile.skills,
+        schedule: seekerProfile.schedule,
+      };
+    },
+    {
+      role: ["business", "admin"],
+    },
+  )
+  .get(
     "/downloaduserresume/:id",
     async ({ params, set }) => {
       const result = await Profile.getResumeUrl(params.id);
       if (result === null) {
-        return status(404,"No resume found");
+        return status(404, "No resume found");
       } else {
         set.headers["Content-Type"] = "application/octet-stream";
         set.headers["Content-Disposition"] =
@@ -206,6 +217,24 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
       }
     },
     {
-      role: ["business","admin"],
+      role: ["business", "admin"],
     },
   )
+  .get(
+    "/mybusinesses",
+    async ({ currentUser }) => {
+      const result = await db
+        .select({
+          id: businessUser.businessId,
+          name: businessProfile.name,
+        })
+        .from(businessUser)
+        .leftJoin(businessProfile, eq(businessUser.businessId, businessProfile.id))
+        .where(eq(businessUser.userId, currentUser.id));
+        console.log(result)
+        return result
+    },
+    {
+      role: ["business"],
+    },
+  );

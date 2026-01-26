@@ -5,6 +5,7 @@ import { SearchComponent } from "@components/search/search";
 import { edenTreatyApi } from "@lib/eden";
 import { AddBusinessCard } from "./addbusiness";
 import { SearchBusinessCard } from "./searchbusiness";
+import { AddUserCard } from "./addusertobusiness";
 
 export interface AdminStats {
   seekers: number;
@@ -98,6 +99,7 @@ export function AdminDashboard() {
           <SearchComponent />
           <AddBusinessCard />
           <SearchBusinessCard />
+          <AddUserCard />
         </div>
       </main>
     </div>
