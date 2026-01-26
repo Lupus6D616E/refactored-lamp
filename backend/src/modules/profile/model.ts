@@ -1,3 +1,4 @@
+import { role } from "better-auth/plugins";
 import { t } from "elysia";
 
 export namespace ProfileModel {
@@ -26,7 +27,19 @@ export namespace ProfileModel {
     skills: t.Array(t.String()),
     selectedDays: t.Array(t.String()),
   });
-  export type profileBody = typeof profileBody.static
+  export const roleType = t.Union([
+          t.Literal("user"),
+          t.Literal("business"),
+        ]);
+  export const createUserBody = t.Object({
+    name: t.String(),
+    email: t.String(),
+    password: t.String(),
+    type: roleType
+  });
+  export type roleType = typeof roleType.static;
+  export type createUserBody = typeof createUserBody.static;
+  export type profileBody = typeof profileBody.static;
   export type certificationBody = typeof certificationBody.static;
   export type experienceBody = typeof experienceBody.static;
   export type resumeResponse = typeof resumeResponse.static;

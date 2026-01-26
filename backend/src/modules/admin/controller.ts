@@ -75,12 +75,7 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     }
   },{
     role:["admin"],
-    body: t.Object({
-      name: t.String(),
-      description: t.String(),
-      industry: t.String(),
-      address: t.String()
-    })
+    body: AdminModel.createBusinessBody
   })
   .get(
     "/stats",

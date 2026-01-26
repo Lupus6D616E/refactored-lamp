@@ -25,7 +25,7 @@ export function SigninForm() {
     }
 
     // Redirect after successful sign in
-    window.location.href = "/public/user-dashboard.html";
+    window.location.href = "/public/dashboard.html";
   }
 
   return (

@@ -2,9 +2,7 @@ import { betterAuthPlugin } from "@lib/auth";
 import { Elysia, status } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
-import { db } from "@db/db";
-import { eq } from "drizzle-orm";
-import { businessProfile, businessUser } from "@db/schema";
+
 
 export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
@@ -223,18 +221,15 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
   .get(
     "/mybusinesses",
     async ({ currentUser }) => {
-      const result = await db
-        .select({
-          id: businessUser.businessId,
-          name: businessProfile.name,
-        })
-        .from(businessUser)
-        .leftJoin(businessProfile, eq(businessUser.businessId, businessProfile.id))
-        .where(eq(businessUser.userId, currentUser.id));
-        console.log(result)
-        return result
+      const result = await Profile.getUserBusinesses(currentUser.id)
+      return result
     },
     {
       role: ["business"],
     },
-  );
+  ).post("/createuser", async ({body})=> {
+    const result = await Profile.createUser(body.name, body.email, body.type, body.password)
+    return {success: result}
+  },{
+    body: ProfileModel.createUserBody
+  })

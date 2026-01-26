@@ -1,75 +1,209 @@
-import { useState } from "react";
-import { authClient } from "backend/src/lib/auth-client"; // your BetterAuth client
 
-export function SignupForm() {
+import { edenTreatyApi } from "@lib/eden";
+import { useState } from "react";
+
+type userType = "user" | "business"
+
+interface ApiResponse {
+  success: boolean,
+  message?: string;
+};
+interface UserPayload {
+        name: string
+        email: string
+        password: string
+        type: userType
+}
+export function SignupCard() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [userType, setUserType] = useState("user");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
- 
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setSuccess(false);
 
-    const { error } = await authClient.signUp.email({
-      email,
-      password,
-      name,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setError(error.message!);
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
+    let selectedType: userType = "user"
+    if(userType === "business"){
+      selectedType = "business"
+    }
+    try {
+      setLoading(true);
+      const payload:UserPayload = {
+        name: name,
+        email: email,
+        password: password,
+        type: selectedType
+    }
+      const res = await edenTreatyApi.user.createuser.post(payload)
 
-    // Optionally redirect after signup
-    //window.location.href = "/dashboard";
+      if (!res.data) {
+        throw new Error("Server error");
+      }
+
+      const data: ApiResponse = await res.data;
+
+      if (data.success) {
+        setSuccess(true);
+        setName("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setUserType("user");
+      } else {
+        setError(data.message ?? "Signup failed");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
-      <h1 className="text-xl font-semibold">Create an account</h1>
+    <div className="flex justify-center items-center ">
+      <div className="card w-full max-w-md bg-base-100 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title">Create an account</h2>
 
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full border p-2 rounded"
-      />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Name</span>
+              </label>
+              <input
+                type="text"
+                className="input input-bordered"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
 
-      <input
-        type="email"
-        placeholder="Email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full border p-2 rounded"
-      />
+            {/* Email */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Email</span>
+              </label>
+              <input
+                type="email"
+                className="input input-bordered"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full border p-2 rounded"
-      />
+            {/* User Type */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">User type</span>
+              </label>
+              <select
+                className="select select-bordered"
+                value={userType}
+                onChange={(e) => setUserType(e.target.value)}
+              >
+                <option value="user">Seeker</option>
+                <option value="business">business</option>
+              </select>
+            </div>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+            {/* Password */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Password</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="input input-bordered w-full pr-12"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn btn-sm  absolute right-2 top-1/2 -translate-y-1/2"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "hide Password" : "show Password"}
+                </button>
+              </div>
+            </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-black text-white p-2 rounded"
-      >
-        {loading ? "Creating account..." : "Sign up"}
-      </button>
-    </form>
+            {/* Confirm Password */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Confirm password</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  className="input input-bordered w-full pr-12"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn btn-sm absolute right-2 top-1/2 -translate-y-1/2"
+                  onClick={() =>
+                    setShowConfirmPassword((v) => !v)
+                  }
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide confirm password"
+                      : "Show confirm password"
+                  }
+                >
+                  {showConfirmPassword ? "hide password" : "show password"}
+                </button>
+              </div>
+            </div>
+
+            {/* Feedback */}
+            {error && (
+              <div className="alert alert-error text-sm">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="alert alert-success text-sm">
+                Account created successfully!
+              </div>
+            )}
+
+            {/* Submit */}
+            <div className="form-control">
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Creating account..." : "Sign up"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

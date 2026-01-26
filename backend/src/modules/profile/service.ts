@@ -8,9 +8,11 @@ import {
   jobApplications,
   jobPosts,
   user,
+  businessUser,
+  businessProfile,
 } from "@db/schema";
 import { ProfileModel } from "./model";
-import type { AuthUser } from "@lib/auth";
+import { auth, type AuthUser } from "@lib/auth";
 export abstract class Profile {
   static async uploadResume(
     userSession: AuthUser,
@@ -62,7 +64,7 @@ export abstract class Profile {
       .select({ resumeUrl: seekerProfile.resumeUrl })
       .from(seekerProfile)
       .where(eq(seekerProfile.userId, userId));
-      
+
     if (item.length === 0 || item[0].resumeUrl === null) {
       return null;
     } else {
@@ -217,5 +219,47 @@ export abstract class Profile {
       .from(user)
       .where(eq(user.id, userId));
     return result[0];
+  }
+  static async getUserBusinesses(userId: string) {
+    const result = await db
+      .select({
+        id: businessUser.businessId,
+        name: businessProfile.name,
+      })
+      .from(businessUser)
+      .leftJoin(
+        businessProfile,
+        eq(businessUser.businessId, businessProfile.id),
+      )
+      .where(eq(businessUser.userId, userId));
+    console.log(result);
+    return result;
+  }
+  static async createUser(
+    name: string,
+    email: string,
+    type: ProfileModel.roleType,
+    password: string,
+  ) {
+    try {
+      const result = await auth.api.createUser({
+        body: {
+          email: email,
+          password: password,
+          name: name,
+        },
+        asResponse: false, // get data directly instead of Response object
+        // returnHeaders: true,     // if you want Set-Cookie headers
+      });
+      console.log(result);
+      const newAdmin = await db
+        .update(user)
+        .set({ role: type })
+        .where(eq(user.email, email));
+      console.log(newAdmin);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
