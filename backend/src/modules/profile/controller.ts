@@ -3,7 +3,6 @@ import { Elysia, status } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
 
-
 export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
   .get(
@@ -218,18 +217,18 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
       role: ["business", "admin"],
     },
   )
-  .get(
-    "/mybusinesses",
-    async ({ currentUser }) => {
-      const result = await Profile.getUserBusinesses(currentUser.id)
-      return result
+  .post(
+    "/createuser",
+    async ({ body }) => {
+      const result = await Profile.createUser(
+        body.name,
+        body.email,
+        body.type,
+        body.password,
+      );
+      return { success: result };
     },
     {
-      role: ["business"],
+      body: ProfileModel.createUserBody,
     },
-  ).post("/createuser", async ({body})=> {
-    const result = await Profile.createUser(body.name, body.email, body.type, body.password)
-    return {success: result}
-  },{
-    body: ProfileModel.createUserBody
-  })
+  );

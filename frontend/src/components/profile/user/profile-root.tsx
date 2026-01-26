@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import UserProfile from "../profile";
+import UserProfile from "./profile";
 
 function App() {
   return (

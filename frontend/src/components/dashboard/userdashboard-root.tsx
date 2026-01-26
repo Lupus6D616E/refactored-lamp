@@ -11,6 +11,7 @@ import AddExperienceCard from '@components/dashboard/user/upload/addexperience'
 import ExperienceList from '@components/dashboard/user/info/experiencelist-parent'
 import {UpdateProfile} from '@components/dashboard/user/upload/updateprofile'
 import { ApplicationList } from './user/info/seekerapplications'
+import { DashboardPage } from './business/dashboard'
 function App() {
     const { data: session, isPending } = authClient.useSession();
     if (!session?.user) {
@@ -37,12 +38,7 @@ function App() {
     else if(session.user.role === "business"){
     return (
         <main>
-            <UserProfileCard />
-            <LogoutButton />
-             <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
-                        <div className="card-body">
-                        </div>
-            </div>
+            <DashboardPage />
         </main>
     )
     }
