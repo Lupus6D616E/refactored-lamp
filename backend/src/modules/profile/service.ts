@@ -1,7 +1,6 @@
 import { db } from "@db/db";
 import { eq } from "drizzle-orm";
 import {
-  userResume,
   userCertification,
   userWorkExperience,
   seekerProfile,
@@ -38,7 +37,7 @@ export abstract class Profile {
         resumeUrl: filepath,
       })
       .onConflictDoUpdate({
-        target: userResume.userId,
+        target: seekerProfile.userId,
         set: {
           resumeUrl: filepath,
         },

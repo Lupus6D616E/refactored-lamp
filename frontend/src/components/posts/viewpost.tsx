@@ -1,9 +1,12 @@
 "use client";
+import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
 import { useState } from "react";
 
 interface CardProps {
   id: number;
+  businessId: string;
+  businessName: string;
   title: string;
   description: string;
   requirements: string;
@@ -22,6 +25,8 @@ interface CardProps {
 export const PostCard: React.FC<CardProps> = ({
   id,
   title,
+  businessId,
+  businessName,
   description,
   requirements,
   responsibilities,
@@ -37,7 +42,7 @@ export const PostCard: React.FC<CardProps> = ({
 }) => {
   const [buttonText, setButtonText] = useState<string>("Apply");
   const [isLoading, setIsLoading] = useState(false);
-
+  const { data: session, isPending } = authClient.useSession();
   const handleClick = async () => {
     if (isLoading) return;
     setIsLoading(true);
@@ -71,7 +76,7 @@ export const PostCard: React.FC<CardProps> = ({
         <h2 className="card-title text-3xl font-black italic tracking-tighter text-secondary uppercase italic">
           {title}
           <div className="badge badge-secondary ml-2 animate-pulse text-xs">
-            Job Title
+            {status}
           </div>
         </h2>
 
@@ -95,12 +100,6 @@ export const PostCard: React.FC<CardProps> = ({
               {contact}
             </span>
             <span className="text-[10px] uppercase font-bold text-primary block">
-              status
-            </span>
-            <span className="text-sm font-semibold truncate block">
-              {status}
-            </span>
-            <span className="text-[10px] uppercase font-bold text-primary block">
               expires at
             </span>
             <span className="text-sm font-semibold truncate block">
@@ -118,6 +117,20 @@ export const PostCard: React.FC<CardProps> = ({
             <span className="text-sm font-semibold truncate block">
               Php {minimumSalary}
             </span>
+            <span className="text-[10px] uppercase font-bold text-primary block">
+              Posted by
+            </span>
+            <span className="text-sm font-semibold truncate block">
+              {businessName}
+            </span>
+
+            <a
+              className="btn btn-secondary"
+              href={`businessprofile.html?id=${businessId}`}
+            >
+              {" "}
+              View Business{" "}
+            </a>
           </div>
         </div>
 
@@ -180,11 +193,13 @@ export const PostCard: React.FC<CardProps> = ({
             </div>
           ))}
         </div>
-        <div className="card-actions mt-4">
-          <button onClick={handleClick} className="btn btn-primary btn-block">
-            {buttonText}
-          </button>
-        </div>
+        {session?.user.role === "user" && (
+          <div className="card-actions mt-4">
+            <button onClick={handleClick} className="btn btn-primary btn-block">
+              {buttonText}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

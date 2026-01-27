@@ -55,7 +55,12 @@ export function DashboardPage() {
       />
 
       <main className="p-6">
-        <DashboardCards data={data} loading={loadingData} />
+        <div className="card w-min-screen bg-base-300 card-sm shadow-sm">
+          <div className="card-body">
+            <h2 className="card-title">Job Posts</h2>
+            <DashboardCards data={data} loading={loadingData} />
+          </div>
+        </div>
       </main>
     </div>
   );

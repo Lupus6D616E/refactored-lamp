@@ -8,5 +8,6 @@ export interface DashboardData {
     id: number
     title: string
     status: string | number
+    applications: number
   }[]
 }

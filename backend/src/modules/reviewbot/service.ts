@@ -54,7 +54,7 @@ export abstract class ReviewBot{
         const postResponse = await Post.getPostDetails(postId)
               const postDetails = postResponse[0]
               const seekerResponse = await Profile.getSeekerProfile(userId)
-              const seekerDetails = seekerResponse[0]
+              const seekerDetails = seekerResponse
               const prompt = `You are a Job Matching Consultant.
               You are to compare this Job Request:{
               title:${postDetails.title}

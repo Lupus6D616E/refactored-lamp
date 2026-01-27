@@ -1,9 +1,16 @@
 import { Elysia, status, t } from "elysia";
 import { betterAuthPlugin } from "@lib/auth";
-import { businessProfile, businessUser, jobPosts } from "@db/schema";
+import {
+  businessProfile,
+  businessUser,
+  jobApplications,
+  jobPosts,
+  seekerProfile,
+  user,
+} from "@db/schema";
 import { db } from "@db/db";
 import { Business } from "./service";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, count } from "drizzle-orm";
 
 export const businessPlugin = new Elysia({ prefix: "/business" })
   .use(betterAuthPlugin)
@@ -11,7 +18,7 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
     "/profile/:id",
     async ({ params: { id } }) => {
       // query is fully typed!
-      console.log("Viewed post:", id);
+      console.log("Viewed profile:", id);
       const result = await db
         .select({
           name: businessProfile.name,
@@ -40,33 +47,55 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
   .get(
     "/jobposts/:id",
     async ({ currentUser, params: { id } }) => {
-      const userBusiness = await db
-        .select({
-          exists: businessUser.userId,
-        })
-        .from(businessUser)
-        .where(
-          and(
-            eq(businessUser.userId, currentUser.id),
-            eq(businessUser.businessId, id),
-          ),
-        ).limit(1)
-      const isMember = userBusiness.length > 0;
-      if(isMember){
-        const myjobposts = await db.select({
-          id: jobPosts.id,
-          title: jobPosts.title,
-          status: jobPosts.status,
-        }).from(jobPosts).where(eq(jobPosts.businessId, id))
-        return myjobposts
-      }else{
-        return status(403)
+      const isMember =
+        await Business.getUserBusinesses(currentUser.id);
+      if (isMember.length > 0) {
+        const myjobposts = await db
+          .select({
+            id: jobPosts.id,
+            title: jobPosts.title,
+            status: jobPosts.status,
+            applications: count(jobApplications.jobId).as("repliesCount"),
+          })
+          .from(jobPosts)
+          .leftJoin(jobApplications, eq(jobApplications.jobId, jobPosts.id))
+          .groupBy(jobPosts.id /* + other selected columns if needed */)
+          .where(eq(jobPosts.businessId, id));
+        return myjobposts;
+      } else {
+        return status(403);
       }
     },
     {
       role: ["business"],
       params: t.Object({
         id: t.String(),
+      }),
+    },
+  )
+   .get(
+    "/viewapplications/:id",
+    async ({ currentUser, params: { id } }) => {
+      const isMember = await Business.getUserBusinesses(currentUser.id)
+      if (isMember.length > 0) {
+        const applications = await db
+          .select({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          })
+          .from(jobApplications)
+          .leftJoin(user, eq(user.id, jobApplications.applicantId))
+          .where(eq(jobApplications.jobId, id));
+        return applications;
+      } else {
+        return status(403);
+      }
+    },
+    {
+      role: ["business"],
+      params: t.Object({
+        id: t.Number(),
       }),
     },
   );

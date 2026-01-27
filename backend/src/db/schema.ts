@@ -109,15 +109,6 @@ export const userCertification = pgTable("user_certification", {
   certification: varchar("certification", { length: 100 }).notNull(),
 });
 
-export const userResume = pgTable("user_resume", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" })
-    .unique(),
-  resumeUrl: text("resume_url"),
-});
-
 export const seekerProfile = pgTable("seeker_profile", {
   id: serial("id").primaryKey(),
   userId: text("user_id")

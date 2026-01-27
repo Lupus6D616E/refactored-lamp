@@ -3,6 +3,7 @@ import { PostCard } from "./viewpost";
 import { edenTreatyApi } from "@lib/eden";
 import { useEffect, useState } from "react";
 import { AIComparison } from "./compare";
+import { authClient } from "@lib/auth-client";
 
 function App() {
   const [title, setTitle] = useState("");
@@ -13,11 +14,14 @@ function App() {
   const [city, setCity] = useState("");
   const [status, setStatus] = useState("");
   const [employmentType, setEmploymentType] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [businessId, setBusinessId] = useState("");
   const [minimumSalary, setSalary] = useState(0);
   const [postedDate, setPostedDate] = useState(new Date());
   const [expireDate, setExpireDate] = useState(new Date());
   const [tags, setTags] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<string[]>([]);
+    const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
     const getJobDetails = async () => {
@@ -45,14 +49,11 @@ function App() {
         if(typeof jobDetails.salaryMinimum === 'number') {
           setSalary(jobDetails.salaryMinimum);
         }
-        if(typeof jobDetails.postedAt === 'string') {
+        if(jobDetails.postedAt instanceof Date) {
           setPostedDate(jobDetails.postedAt);
         }
-        if(typeof jobDetails.expiresAt === 'string') {
+        if(jobDetails.expiresAt instanceof Date) {
           setExpireDate(jobDetails.expiresAt);
-        }
-        if(typeof jobDetails.postedAt === 'string') {
-          setPostedDate(jobDetails.postedAt);
         }
         if(typeof jobDetails.status === 'string') {
           setStatus(jobDetails.status);
@@ -66,6 +67,19 @@ function App() {
         if(typeof jobDetails.contact === 'string') {
           setContact(jobDetails.contact);
         }
+
+        if(typeof jobDetails.businessid === 'string') {
+          setBusinessId(jobDetails.businessid);
+          const res = await edenTreatyApi.business.profile({id:jobDetails.businessid}).get()
+          if(res.error){
+            console.log(res.error)
+          }
+          if(res.data){
+            console.log("world")
+            setBusinessName(res.data.name)
+          }
+        }
+
       }
     };
     getJobDetails();
@@ -81,6 +95,8 @@ function App() {
           requirements={requirements}
           responsibilities={responsibilities}
           city={city}
+          businessId={businessId}
+          businessName={businessName}
           status={status}
           employmentType={employmentType}
           contact={contact}
@@ -89,10 +105,11 @@ function App() {
           postedDate={postedDate}
           schedule={schedule}
           tags={tags}
-        />
+        />{
+        session?.user.role === "user" &&
         <AIComparison
           id={getPostId()}
-        />
+        />}
       </div>
     </main>
   );

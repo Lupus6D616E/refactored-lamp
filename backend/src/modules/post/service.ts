@@ -40,6 +40,7 @@ export abstract class Post {
         status: jobPosts.status,
         schedule: jobPosts.schedule,
         tags: jobPosts.tags,
+        businessid: jobPosts.businessId,
         contact: jobPosts.contact,
       })
       .from(jobPosts)

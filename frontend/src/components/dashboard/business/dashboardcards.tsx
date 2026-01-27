@@ -30,10 +30,14 @@ export const DashboardCards = ({ data, loading }: Props) => {
             <h2 className="badge badge-secondary">
               {stat.status}
             </h2>
+            <h2 className="badge badge-secondary">
+              Applications: {stat.applications}
+            </h2>
             <p className="text-3xl font-bold">
               {stat.title}
             </p>
             <a  className="btn btn-lg" href={`viewpost.html?id=${stat.id}`} > Go to post </a>
+            <a  className="btn btn-lg" href={`viewapplications.html?id=${stat.id}`} > Go to Applications </a>
           </div>
         </div>
       ))}
