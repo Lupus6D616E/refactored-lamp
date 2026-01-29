@@ -14,7 +14,7 @@ export default function Map() {
     >
       <TileLayer
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url='http://localhost:8080/tile/{z}/{x}/{y}.png'
+        url='http://localhost:7755/tile/{z}/{x}/{y}.png'
       />
 
       <Marker position={position}>
