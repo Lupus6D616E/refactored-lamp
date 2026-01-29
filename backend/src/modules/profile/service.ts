@@ -202,6 +202,7 @@ export abstract class Profile {
         jobId: jobApplications.jobId,
         title: jobPosts.title,
         status: jobApplications.status,
+        message: jobApplications.message
       })
       .from(jobApplications)
       .innerJoin(jobPosts, eq(jobApplications.jobId, jobPosts.id))

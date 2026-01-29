@@ -7,6 +7,7 @@ interface Item {
   jobId: number;
   title: string;
   status: CardStatus;
+  message: string |null
 }
 
 export function ApplicationList() {
@@ -73,6 +74,8 @@ export function ApplicationList() {
                      <a  className="btn btn-primary btn-lg" href={`viewpost.html?id=${item.jobId}`} > Go to post </a>
                   </span>
                 </div>
+
+                  <p>message: {item.message ?? "No message yet"}</p>
               </div>
             </div>
           ))}

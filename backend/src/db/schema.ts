@@ -240,6 +240,7 @@ export const jobApplications = pgTable(
     status: applicationStatusEnum("application_status")
       .notNull()
       .default("pending"),
+    message: text("message")
   },
   (t) => [primaryKey({ columns: [t.jobId, t.applicantId] })],
 );

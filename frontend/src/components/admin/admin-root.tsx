@@ -40,7 +40,7 @@ function App() {
              <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
                         <div className="card-body">
                             return to business dashboard: 
-                                    <button className='btn' onClick={() => window.location.href = '/user-dashboard  '}>Go Home</button>
+                                    <button className='btn' onClick={() => window.location.href = 'dashboard.html'}>Go Home</button>
                         </div>
             </div>
         </main>

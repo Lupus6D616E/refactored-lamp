@@ -47,8 +47,7 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
   .get(
     "/jobposts/:id",
     async ({ currentUser, params: { id } }) => {
-      const isMember =
-        await Business.getUserBusinesses(currentUser.id);
+      const isMember = await Business.getUserBusinesses(currentUser.id);
       if (isMember.length > 0) {
         const myjobposts = await db
           .select({
@@ -73,21 +72,32 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
       }),
     },
   )
-   .get(
+  .get(
     "/viewapplications/:id",
     async ({ currentUser, params: { id } }) => {
-      const isMember = await Business.getUserBusinesses(currentUser.id)
+      const isMember = await Business.getUserBusinesses(currentUser.id);
       if (isMember.length > 0) {
         const applications = await db
           .select({
             id: user.id,
             name: user.name,
             email: user.email,
+            status: jobApplications.status
           })
           .from(jobApplications)
           .leftJoin(user, eq(user.id, jobApplications.applicantId))
           .where(eq(jobApplications.jobId, id));
-        return applications;
+        const name = await db
+          .select({
+            title: jobPosts.title,
+          })
+          .from(jobPosts)
+          .where(eq(jobPosts.id, id))
+          .limit(1);
+        return {
+          title: name[0].title,
+          applications: applications,
+        };
       } else {
         return status(403);
       }
@@ -96,6 +106,43 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
       role: ["business"],
       params: t.Object({
         id: t.Number(),
+      }),
+    },
+  )
+  .post(
+    "/decideapplication",
+    async ({ currentUser, body }) => {
+      const isMember = await Business.getUserBusinesses(currentUser.id);
+      if (isMember.length > 0) {
+        try {
+          const result = await db
+            .update(jobApplications)
+            .set({
+              status: body.decision,
+              message: body.message,
+            })
+            .where(
+              and(
+                eq(jobApplications.applicantId, body.userId),
+                eq(jobApplications.jobId, body.jobId),
+              ),
+            );
+          return true;
+        } catch (e) {
+          console.log(e);
+          return status(500);
+        }
+      } else {
+        return status(403);
+      }
+    },
+    {
+      role: ["business"],
+      body: t.Object({
+        jobId: t.Number(),
+        userId: t.String(),
+        decision: t.Union([t.Literal("accepted"), t.Literal("rejected")]),
+        message: t.String(),
       }),
     },
   );
