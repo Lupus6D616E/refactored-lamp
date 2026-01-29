@@ -1,3 +1,5 @@
+
+import { edenTreatyApi } from '@lib/eden';
 import React from 'react';
 
 type Item = {
@@ -19,12 +21,9 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
     setDeletingId(itemId);
 
     try {
-      const response = await fetch(`/user/certifications/${itemId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
+      const res = await edenTreatyApi.user.certifications({id: itemId}).delete()
 
-      if (!response.ok) {
+      if (res.status !== 200) {
         throw new Error('Failed to delete');
       }
       onDelete?.(itemId);

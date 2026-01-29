@@ -180,6 +180,12 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
+export const jobpostStatusEnum = pgEnum("job_post_status", [
+  "active",
+  "filled",
+  "expired",
+]);
+
 export const jobPosts = pgTable("job_posts", {
   id: serial("id").primaryKey(),
   creatorId: text("creator_id")
@@ -197,7 +203,7 @@ export const jobPosts = pgTable("job_posts", {
   salaryMinimum: integer("salaryMinimum").notNull(),
   postedAt: timestamp("posted_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
-  status: text("status").default("active").notNull(),
+  status: jobpostStatusEnum().default("active").notNull(),
   schedule: text("schedule")
     .array()
     .notNull()

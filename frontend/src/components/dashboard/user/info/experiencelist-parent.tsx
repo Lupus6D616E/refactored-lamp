@@ -1,5 +1,6 @@
 import React from "react";
 import ItemsList from "@components/dashboard/user/info/experiencelist";
+import { edenTreatyApi } from "@lib/eden";
 const ExperienceList = () => {
   type Item = {
     id: number;
@@ -12,13 +13,12 @@ const ExperienceList = () => {
   React.useEffect(() => {
     const getexperience = async () => {
       try {
-        const res = await fetch("/user/getexperience", {
-          credentials: "include",
-        });
-        if (!res.ok) {
-          throw new Error(`something happened ${res.status}`);
+        const response = await edenTreatyApi.user.getexperience.get()
+
+        if (!response.data) {
+          throw new Error(`something happened ${response.status}`);
         }
-        const data = await res.json();
+        const data = response.data;
         setItems(data.items);
       } catch (error) {
         console.error("Failed to fetch items:", error);

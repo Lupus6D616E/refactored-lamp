@@ -1,5 +1,7 @@
 // DashboardCards.tsx
+import { useState } from "react"
 import { DashboardData } from "./types"
+import { edenTreatyApi } from "@lib/eden"
 
 interface Props {
   data?: DashboardData
@@ -7,6 +9,27 @@ interface Props {
 }
 
 export const DashboardCards = ({ data, loading }: Props) => {
+
+     const [message, setMessage] = useState('')
+      const [error, setError] = useState('')
+      const [isSubmitting, setSubmitting] = useState(false)
+        const handleDecision = async (jobId:number) => {
+          setSubmitting(true)
+
+        setError('')
+        const payload = {
+            id: jobId
+        }
+        try {
+          await edenTreatyApi.business.markfilled.post(payload)
+          setMessage('') // reset after success
+          setSubmitting(false)
+        } catch (err) {
+          setError('Failed to send decision. Try again.')
+          console.error(err)
+          setSubmitting(false)
+        }
+      }
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -38,6 +61,10 @@ export const DashboardCards = ({ data, loading }: Props) => {
             </p>
             <a  className="btn btn-lg" href={`viewpost.html?id=${stat.id}`} > Go to post </a>
             <a  className="btn btn-lg" href={`viewapplications.html?id=${stat.id}`} > Go to Applications </a>
+            <button onClick={() => handleDecision(stat.id!)} className="btn btn-lg">
+              Mark Filled
+            </button>
+            {isSubmitting && <p>Marking.....</p>}
           </div>
         </div>
       ))}
