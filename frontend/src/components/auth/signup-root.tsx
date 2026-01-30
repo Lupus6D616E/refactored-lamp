@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { SignupCard } from "frontend/src/components/auth/signupform";
-import Map from "./map";
+
 function App() {
   return (
     <main>
@@ -13,7 +13,6 @@ function App() {
           <SignupCard />
         </div>
       </div>
-     <Map />
     </main>
   );
 }

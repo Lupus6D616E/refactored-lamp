@@ -1,4 +1,4 @@
-import { pgEnum, varchar } from "drizzle-orm/pg-core";
+import { pgEnum, point, varchar } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -126,6 +126,7 @@ export const seekerProfile = pgTable("seeker_profile", {
     .notNull()
     .default(sql`'{}'::text[]`),
   address: text("address"),
+  location: point('location', { mode: 'xy' }),
   education: text("education"),
 });
 

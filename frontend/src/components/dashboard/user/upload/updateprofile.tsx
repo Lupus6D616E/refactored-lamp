@@ -1,6 +1,8 @@
 // src/components/PostCreator.tsx
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { edenTreatyApi } from "@lib/eden";
+import { Map } from "@components/map/map";
+import { LatLngLiteral } from "leaflet";
 
 export function UpdateProfile() {
   const [description, setDescription] = useState("");
@@ -8,7 +10,10 @@ export function UpdateProfile() {
   const [education, setEducation] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
-
+  const [position, setPosition] = useState<LatLngLiteral>({
+    lat: 0,
+    lng: 0,
+  });
   const DAYS_OF_WEEK = [
     "Monday",
     "Tuesday",
@@ -18,6 +23,10 @@ export function UpdateProfile() {
     "Saturday",
     "Sunday",
   ];
+  const handleAddressUpdate = (address: string, point:LatLngLiteral) => {
+    setAddress(address)
+    setPosition(point)
+  };
 
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
@@ -49,6 +58,7 @@ export function UpdateProfile() {
         selectedDays,
         address,
         education,
+        location:position
       });
 
       if (response.error) {
@@ -57,7 +67,7 @@ export function UpdateProfile() {
       }
 
       // Success
-      alert("Post created successfully!");
+      alert("Profile created successfully!");
       // Reset form
       setDescription("");
       setSkills([]);
@@ -82,15 +92,7 @@ export function UpdateProfile() {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-        <div className="form-control">
-            <textarea
-              className="textarea textarea-bordered textarea-lg min-h-[140px]"
-              placeholder="address..."
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-          </div>
-        <div className="form-control">
+          <div className="form-control">
             <textarea
               className="textarea textarea-bordered textarea-lg min-h-[140px]"
               placeholder="education..."
@@ -164,13 +166,21 @@ export function UpdateProfile() {
               Selected: {selectedDays.join(", ") || "None"}
             </div>
           </div>
-
+          <Map onAddressSelect={handleAddressUpdate} />
+          <input
+            type="text"
+            className="input input-bordered flex-1"
+            placeholder="Click on Search button to find Address"
+            value={address}
+            disabled={true}
+          ></input>
+          <p>lat{position.lat} lng:{position.lng}</p>
           {/* Submit */}
           <div className="card-actions justify-end mt-4">
             <button
               className="btn btn-primary"
               onClick={handleSubmit}
-              disabled={!description.trim()}
+              disabled={!description.trim() || !address.trim()}
             >
               Post
             </button>

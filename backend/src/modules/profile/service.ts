@@ -166,6 +166,7 @@ export abstract class Profile {
           skills: data.skills,
           address: data.address,
           education: data.education,
+          location: {x: data.location.lng, y: data.location.lat}
         })
         .onConflictDoUpdate({
           target: seekerProfile.userId,
@@ -175,6 +176,7 @@ export abstract class Profile {
             description: data.description,
             address: data.address,
             education: data.education,
+          location: {x: data.location.lng, y: data.location.lat}
           },
         });
     } catch {
