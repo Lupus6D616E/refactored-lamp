@@ -136,6 +136,7 @@ export const businessProfile = pgTable("business_profile", {
   description: text("description").notNull(),
   industry: text("industry").notNull(),
   address: text("address").notNull(),
+  location: point('location', { mode: 'xy' }),
 });
 
 export const businessUser = pgTable("business_user", {
@@ -214,6 +215,8 @@ export const jobPosts = pgTable("job_posts", {
     .notNull()
     .default(sql`'{}'::text[]`),
   contact: text("contact").notNull(),
+  address: text("address"),
+  location: point('location', { mode: 'xy' }),
 });
 
 export const userDailyUsage = pgTable(

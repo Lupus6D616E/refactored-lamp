@@ -1,6 +1,5 @@
 import { Marker } from "react-leaflet";
 import { LatLngLiteral, LeafletEvent } from "leaflet";
-import { useState } from "react";
 import L from "leaflet";
 
 interface DraggableMarkerProps {

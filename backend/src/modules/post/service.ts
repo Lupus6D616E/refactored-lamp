@@ -8,7 +8,7 @@ export abstract class Post {
     job: PostModel.JobBody,
     userId: string,
   ): Promise<boolean> {
-    await db.insert(jobPosts).values({
+    try{await db.insert(jobPosts).values({
       creatorId: userId,
       businessId: job.businessId,
       title: capitalizeWords(job.title),
@@ -22,8 +22,13 @@ export abstract class Post {
       tags: normalize(job.tags),
       contact: job.email,
       schedule: job.schedule,
+      address: job.address,
+      location: {x: job.location.lng, y: job.location.lat}
     });
-    return true;
+    return true;}catch(e){
+      console.log(e)
+      return false
+    }
   }
   static async getPostDetails(id: number) {
     const result = await db
@@ -42,6 +47,8 @@ export abstract class Post {
         tags: jobPosts.tags,
         businessid: jobPosts.businessId,
         contact: jobPosts.contact,
+        address: jobPosts.address,
+        location: jobPosts.location
       })
       .from(jobPosts)
       .where(eq(jobPosts.id, id));

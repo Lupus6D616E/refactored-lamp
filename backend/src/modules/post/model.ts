@@ -13,11 +13,16 @@ export namespace PostModel {
     minimumSalary: t.Integer(),
     expireDate: t.Date(),
     tags: t.Array(t.String()),
-    schedule: t.Array(t.String())
+    schedule: t.Array(t.String()),
+    address: t.String({ minLength: 1 }),
+    location: t.Object({
+      lat: t.Number({ minimum: -90, maximum: 90 }),
+      lng: t.Number({ minimum: -180, maximum: 180 }),
+    }),
   });
   export const applicationBody = t.Object({
-    id: t.Number()
-  })
+    id: t.Number(),
+  });
   export type applicationBody = typeof JobBody.static;
   export type JobBody = typeof JobBody.static;
 }

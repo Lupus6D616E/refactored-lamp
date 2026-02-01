@@ -1,7 +1,7 @@
 import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import GeocoderControl from "./mapcontrol";
+import GeocoderControl from "../mapcontrol";
 import { DraggableMarker } from "./marker";
 import { LatLngLiteral } from "leaflet";
 import { useState } from "react";
@@ -50,6 +50,7 @@ setAddress(address)
         />
       </MapContainer>
       <button
+      type="button"
         className="btn"
         onClick={confirmLocation}
         disabled={loading}
@@ -57,7 +58,6 @@ setAddress(address)
       >
         {loading ? "Saving..." : "Confirm location"}
       </button>
-      <p>position: lat: {position.lat} lng: {position.lng} address:{address}</p>
     </div>
   );
 }

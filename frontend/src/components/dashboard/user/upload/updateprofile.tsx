@@ -1,7 +1,7 @@
 // src/components/PostCreator.tsx
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { edenTreatyApi } from "@lib/eden";
-import { Map } from "@components/map/map";
+import { Map } from "@components/map/mappicker/map";
 import { LatLngLiteral } from "leaflet";
 
 export function UpdateProfile() {

@@ -1,6 +1,8 @@
 "use client";
+import { StaticMap } from "@components/map/mapstatic/map";
 import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
+import { LatLngLiteral } from "leaflet";
 import { useState } from "react";
 
 interface CardProps {
@@ -20,6 +22,8 @@ interface CardProps {
   expireDate: Date;
   schedule: string[];
   tags: string[];
+  address: string;
+  location: LatLngLiteral;
 }
 
 export const PostCard: React.FC<CardProps> = ({
@@ -38,7 +42,7 @@ export const PostCard: React.FC<CardProps> = ({
   expireDate,
   postedDate,
   schedule,
-  tags,
+  tags,address,location
 }) => {
   const [buttonText, setButtonText] = useState<string>("Apply");
   const [isLoading, setIsLoading] = useState(false);
@@ -123,6 +127,12 @@ export const PostCard: React.FC<CardProps> = ({
             <span className="text-sm font-semibold truncate block">
               {businessName}
             </span>
+                        <span className="text-[10px] uppercase font-bold text-primary block">
+              Address
+            </span>
+            <span className="text-sm font-semibold  block">
+              {address}
+            </span>
 
             <a
               className="btn btn-secondary"
@@ -169,6 +179,16 @@ export const PostCard: React.FC<CardProps> = ({
             <p className="text-base-content/80 leading-relaxed text-justify whitespace-pre-wrap">
               {responsibilities}
             </p>
+          </section>
+        </div>
+
+                <div className="space-y-6">
+          <section className="prose prose-sm max-w-none">
+            <h3 className="text-lg font-bold flex items-center gap-2">
+              <span className="badge badge-outline badge-sm"></span>
+              Location
+            </h3>
+            <StaticMap center={[location.lat,location.lng]} popupContent={address} />
           </section>
         </div>
 

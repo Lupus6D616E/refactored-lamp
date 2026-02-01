@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { edenTreatyApi } from "@lib/eden";
+import { Map } from "@components/map/mappicker/map";
+import { LatLngLiteral } from "leaflet";
 type business = {
   id: string;
   name: string | null;
-}
+};
 
 export function CreateJobForm() {
   const [title, setTitle] = useState("");
@@ -21,7 +23,15 @@ export function CreateJobForm() {
   const [inputTag, setInputTag] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const [address, setAddress] = useState("");
+  const [position, setPosition] = useState<LatLngLiteral>({
+    lat: 0,
+    lng: 0,
+  });
+  const handleAddressUpdate = (address: string, point: LatLngLiteral) => {
+    setAddress(address);
+    setPosition(point);
+  };
   const cities = [
     "Manila",
     "Caloocan",
@@ -53,16 +63,15 @@ export function CreateJobForm() {
     "Sunday",
   ];
 
-
   useEffect(() => {
     const fetchUserBusinesses = async () => {
       try {
-        const res = await edenTreatyApi.user.mybusinesses.get();
+        const res = await edenTreatyApi.business.mybusinesses.get();
         console.log(res);
-        if(res.data !== null){
-        setBusinesses(res.data)
+        if (res.data !== null) {
+          setBusinesses(res.data);
         }
-      } catch(e){
+      } catch (e) {
         console.log(e);
         setError("error");
       }
@@ -118,6 +127,8 @@ export function CreateJobForm() {
       expireDate: new Date(expireDate),
       tags: tags,
       schedule: selectedDays,
+      address: address,
+      location: position,
     };
     const res = await edenTreatyApi.post.postjob.post(data);
 
@@ -139,6 +150,15 @@ export function CreateJobForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
       <h1 className="text-xl font-semibold">Create a post</h1>
+      <Map onAddressSelect={handleAddressUpdate} />
+      <p>
+        lat{position.lat} lng:{position.lng}
+      </p>
+      {address ? (
+        <p>Address:{address}</p>
+      ) : (
+        <p>Click on Search button to find Address</p>
+      )}
       <select
         required={true}
         value={selectedBusiness}
@@ -254,6 +274,7 @@ export function CreateJobForm() {
           disabled={loading}
         />
         <button
+          type="button"
           onClick={handleAddTag}
           className="btn btn-primary"
           disabled={!inputTag.trim() || loading}
