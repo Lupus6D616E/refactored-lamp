@@ -56,7 +56,7 @@ export function StaticMap({
     >
       <TileLayer
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="http://localhost:7755/tile/{z}/{x}/{y}.png"
       />
 
       {/* This component moves the view when props change */}

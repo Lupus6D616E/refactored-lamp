@@ -192,6 +192,7 @@ export abstract class Profile {
         skills: seekerProfile.skills,
         address: seekerProfile.address,
         education: seekerProfile.education,
+        location: seekerProfile.location
       })
       .from(seekerProfile)
       .where(eq(seekerProfile.userId, userId))
@@ -254,11 +255,11 @@ export abstract class Profile {
         // returnHeaders: true,     // if you want Set-Cookie headers
       });
       console.log(result);
-      const newAdmin = await db
+      const newUser = await db
         .update(user)
         .set({ role: type })
         .where(eq(user.email, email));
-      console.log(newAdmin);
+      console.log(newUser);
       return true;
     } catch (e) {
       return false;

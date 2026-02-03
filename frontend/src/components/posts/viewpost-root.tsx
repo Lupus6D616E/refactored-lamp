@@ -28,10 +28,29 @@ function App() {
     lat: 0,
     lng: 0,
   });
+  const [myPosition, setMyPosition] = useState<LatLngLiteral>({
+    lat: 0,
+    lng: 0,
+  });
 
   useEffect(() => {
     const getJobDetails = async () => {
       const res = await edenTreatyApi.post.job({ id: getPostId() }).get();
+      const mine = await edenTreatyApi.user.myprofile.get();
+      if (mine.data) {
+        if (mine.data.location?.y != null && mine.data.location?.x != null) {
+          setMyPosition({
+            lat: mine.data.location.y,
+            lng: mine.data.location.x
+          })
+        }
+        else{
+             setMyPosition({
+            lat:0,
+            lng:0
+          })
+        }
+      }
       if (res.data) {
         const jobDetails = res.data[0];
         if (typeof jobDetails.title === "string") {
@@ -73,10 +92,10 @@ function App() {
         if (typeof jobDetails.contact === "string") {
           setContact(jobDetails.contact);
         }
-          if (typeof jobDetails.address === "string") {
+        if (typeof jobDetails.address === "string") {
           setAddress(jobDetails.address);
         }
-        if(jobDetails.location){
+        if (jobDetails.location) {
           setPosition({
             lat: jobDetails.location.y,
             lng: jobDetails.location.x
@@ -122,6 +141,7 @@ function App() {
           tags={tags}
           address={address}
           location={position}
+          myLocation={myPosition}
         />
         {session?.user.role === "user" && <AIComparison id={getPostId()} />}
       </div>

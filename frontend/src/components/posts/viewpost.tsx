@@ -4,6 +4,7 @@ import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
 import { LatLngLiteral } from "leaflet";
 import { useState } from "react";
+import haversineDistance from "haversine-distance";
 
 interface CardProps {
   id: number;
@@ -24,6 +25,7 @@ interface CardProps {
   tags: string[];
   address: string;
   location: LatLngLiteral;
+  myLocation: LatLngLiteral;
 }
 
 export const PostCard: React.FC<CardProps> = ({
@@ -42,10 +44,11 @@ export const PostCard: React.FC<CardProps> = ({
   expireDate,
   postedDate,
   schedule,
-  tags,address,location
+  tags, address, location, myLocation
 }) => {
   const [buttonText, setButtonText] = useState<string>("Apply");
   const [isLoading, setIsLoading] = useState(false);
+  const distanceKm = (haversineDistance(location, myLocation)) / 1000;
   const { data: session, isPending } = authClient.useSession();
   const handleClick = async () => {
     if (isLoading) return;
@@ -127,13 +130,22 @@ export const PostCard: React.FC<CardProps> = ({
             <span className="text-sm font-semibold truncate block">
               {businessName}
             </span>
-                        <span className="text-[10px] uppercase font-bold text-primary block">
+            <span className="text-[10px] uppercase font-bold text-primary block">
               Address
             </span>
             <span className="text-sm font-semibold  block">
               {address}
             </span>
-
+            {session?.user.role === "user" && (
+              <div>
+                <span className="text-[10px] uppercase font-bold text-primary block">
+                  distnace
+                </span>
+                <span className="text-sm font-semibold  block">
+                  {distanceKm.toFixed(2)} kilometers
+                </span>
+              </div>
+            )}
             <a
               className="btn btn-secondary"
               href={`businessprofile.html?id=${businessId}`}
@@ -182,16 +194,15 @@ export const PostCard: React.FC<CardProps> = ({
           </section>
         </div>
 
-                <div className="space-y-6">
+        <div className="space-y-6">
           <section className="prose prose-sm max-w-none">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <span className="badge badge-outline badge-sm"></span>
               Location
             </h3>
-            <StaticMap center={[location.lat,location.lng]} popupContent={address} />
+            <StaticMap center={[location.lat, location.lng]} popupContent={address} />
           </section>
         </div>
-
         {/* Tag-like Array of Strings */}
         <div className="card-actions justify-end mt-4 pt-4 border-t border-base-300">
           {tags.map((tag, idx) => (
