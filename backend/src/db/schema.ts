@@ -281,10 +281,11 @@ export const mail = pgTable("mail", {
     .references(() => user.id, { onDelete: 'cascade' }), // assuming users table
   receiverId: text('receiver_id')
     .references(() => user.id, { onDelete: 'cascade' }), // nullable if guild broadcast
-  senderRole: text('sender_role').notNull().default('user'),
+  senderRole: text('sender_role', { enum: ["user", "business", "admin"] }).notNull().default('user'),
   businessId: uuid('guild_id')
     .references(() => businessProfile.id, { onDelete: 'cascade' }), // null for direct messages
   dateSent: timestamp('date_sent').notNull().defaultNow(),
+  subject: text('subject').notNull(),
   message: text('message').notNull(),
 })
 
