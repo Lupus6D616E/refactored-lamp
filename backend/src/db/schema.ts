@@ -12,6 +12,7 @@ import {
   primaryKey,
   uuid,
 } from "drizzle-orm/pg-core";
+import { string } from "better-auth/*";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -272,3 +273,18 @@ export const jobApplicationsRelations = relations(
     }),
   }),
 );
+
+export const mail = pgTable("mail", {
+  id: serial('id').primaryKey(),
+  senderId: text('sender_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }), // assuming users table
+  receiverId: text('receiver_id')
+    .references(() => user.id, { onDelete: 'cascade' }), // nullable if guild broadcast
+  senderRole: text('sender_role').notNull().default('user'),
+  businessId: uuid('guild_id')
+    .references(() => businessProfile.id, { onDelete: 'cascade' }), // null for direct messages
+  dateSent: timestamp('date_sent').notNull().defaultNow(),
+  message: text('message').notNull(),
+})
+

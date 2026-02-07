@@ -1,16 +1,8 @@
 import { Elysia, status, t } from "elysia";
 import { betterAuthPlugin } from "@lib/auth";
-import {
-  businessProfile,
-  businessUser,
-  jobApplications,
-  jobPosts,
-  seekerProfile,
-  user,
-} from "@db/schema";
-import { db } from "@db/db";
 import { Business } from "./service";
-import { eq, and, desc, count } from "drizzle-orm";
+import { Post } from "@modules/post/service";
+import { businessModel } from "./model";
 
 export const businessPlugin = new Elysia({ prefix: "/business" })
   .use(betterAuthPlugin)
@@ -18,20 +10,11 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
     "/profile/:id",
     async ({ params: { id } }) => {
       // query is fully typed!
-      console.log("Viewed profile:", id);
-      const result = await db
-        .select({
-          name: businessProfile.name,
-          description: businessProfile.description,
-          industry: businessProfile.industry,
-          address: businessProfile.address,
-        })
-        .from(businessProfile);
-      console.log(result);
-      return result[0];
+      const result = await Business.getBusinessProfile(id)
+      return result;
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: businessModel.businessIdType
     },
   )
   .get(
@@ -49,27 +32,15 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
     async ({ currentUser, params: { id } }) => {
       const isMember = await Business.checkMembership(currentUser.id, id);
       if (isMember) {
-        const myjobposts = await db
-          .select({
-            id: jobPosts.id,
-            title: jobPosts.title,
-            status: jobPosts.status,
-            applications: count(jobApplications.jobId).as("repliesCount"),
-          })
-          .from(jobPosts)
-          .leftJoin(jobApplications, eq(jobApplications.jobId, jobPosts.id))
-          .groupBy(jobPosts.id /* + other selected columns if needed */)
-          .where(eq(jobPosts.businessId, id));
-        return myjobposts;
+        const res = await Business.getJobPosts(id)
+        return res;
       } else {
         return status(403);
       }
     },
     {
       role: ["business"],
-      params: t.Object({
-        id: t.String(),
-      }),
+      params: businessModel.businessIdType,
     },
   )
   .get(
@@ -81,23 +52,8 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
         businessid,
       );
       if (isMember) {
-        const applications = await db
-          .select({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            status: jobApplications.status,
-          })
-          .from(jobApplications)
-          .leftJoin(user, eq(user.id, jobApplications.applicantId))
-          .where(eq(jobApplications.jobId, id));
-        const name = await db
-          .select({
-            title: jobPosts.title,
-          })
-          .from(jobPosts)
-          .where(eq(jobPosts.id, id))
-          .limit(1);
+        const applications = await Business.getJobApplications(id)
+        const name = await Post.getPostDetails(id)
         return {
           title: name[0].title,
           applications: applications,
@@ -108,9 +64,7 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
     },
     {
       role: ["business"],
-      params: t.Object({
-        id: t.Number(),
-      }),
+      params: businessModel.applicationIdType,
     },
   )
   .post(
@@ -123,18 +77,7 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
       );
       if (isMember) {
         try {
-          const result = await db
-            .update(jobApplications)
-            .set({
-              status: body.decision,
-              message: body.message,
-            })
-            .where(
-              and(
-                eq(jobApplications.applicantId, body.userId),
-                eq(jobApplications.jobId, body.jobId),
-              ),
-            );
+          const result = await Business.decideApplication(body.userId, body.jobId, body.message, body.decision)
           return true;
         } catch (e) {
           console.log(e);
@@ -146,12 +89,7 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
     },
     {
       role: ["business"],
-      body: t.Object({
-        jobId: t.Number(),
-        userId: t.String(),
-        decision: t.Union([t.Literal("accepted"), t.Literal("rejected")]),
-        message: t.String(),
-      }),
+      body: businessModel.applicationDecision
     },
   )
   .post(
@@ -164,12 +102,7 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
       );
       if (isMember) {
         try {
-          const res = await db
-            .update(jobPosts)
-            .set({
-              status: "filled",
-            })
-            .where(eq(jobPosts.id, body.id));
+          await Business.markJobFilled(body.id)
           return status(200);
         } catch (e) {
           console.log(e);
@@ -180,8 +113,6 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
     },
     {
       role: ["business"],
-      body: t.Object({
-        id: t.Number(),
-      }),
+      body: businessModel.applicationIdType,
     },
   );
