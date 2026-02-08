@@ -1,4 +1,4 @@
-import { pgEnum, point, varchar } from "drizzle-orm/pg-core";
+import { foreignKey, pgEnum, point, varchar } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -12,7 +12,6 @@ import {
   primaryKey,
   uuid,
 } from "drizzle-orm/pg-core";
-import { string } from "better-auth/*";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -31,7 +30,7 @@ export const user = pgTable("user", {
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
-});
+}).enableRLS()
 
 export const session = pgTable(
   "session",
@@ -51,7 +50,7 @@ export const session = pgTable(
     impersonatedBy: text("impersonated_by"),
   },
   (table) => [index("session_userId_idx").on(table.userId)],
-);
+).enableRLS()
 
 export const account = pgTable(
   "account",
@@ -75,7 +74,7 @@ export const account = pgTable(
       .notNull(),
   },
   (table) => [index("account_userId_idx").on(table.userId)],
-);
+).enableRLS()
 
 export const verification = pgTable(
   "verification",
@@ -91,8 +90,7 @@ export const verification = pgTable(
       .notNull(),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
-);
-
+).enableRLS()
 export const userWorkExperience = pgTable("user_work_experience", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
@@ -100,7 +98,7 @@ export const userWorkExperience = pgTable("user_work_experience", {
     .references(() => user.id, { onDelete: "cascade" }),
   experience: varchar("experience", { length: 100 }).notNull(),
   position: varchar("position", { length: 100 }).notNull(),
-});
+}).enableRLS()
 
 export const userCertification = pgTable("user_certification", {
   id: serial("id").primaryKey(),
@@ -108,7 +106,7 @@ export const userCertification = pgTable("user_certification", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   certification: varchar("certification", { length: 100 }).notNull(),
-});
+}).enableRLS()
 
 export const seekerProfile = pgTable("seeker_profile", {
   id: serial("id").primaryKey(),
@@ -129,7 +127,7 @@ export const seekerProfile = pgTable("seeker_profile", {
   address: text("address"),
   location: point('location', { mode: 'xy' }),
   education: text("education"),
-});
+}).enableRLS()
 
 export const businessProfile = pgTable("business_profile", {
   id: uuid().defaultRandom().primaryKey(),
@@ -138,7 +136,7 @@ export const businessProfile = pgTable("business_profile", {
   industry: text("industry").notNull(),
   address: text("address").notNull(),
   location: point('location', { mode: 'xy' }),
-});
+}).enableRLS()
 
 export const businessUser = pgTable("business_user", {
   userId: text("user_id")
@@ -147,7 +145,7 @@ export const businessUser = pgTable("business_user", {
   businessId: uuid()
     .notNull()
     .references(() => businessProfile.id, { onDelete: "cascade" }),
-});
+}).enableRLS()
 
 export const businessRelations = relations(businessProfile, ({ many }) => ({
   businessUser: many(businessUser),
@@ -161,7 +159,7 @@ export const businessUserRelations = relations(businessUser, ({ one }) => ({
     fields: [businessUser.businessId],
     references: [businessProfile.id],
   }),
-}));
+}))
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
@@ -218,7 +216,7 @@ export const jobPosts = pgTable("job_posts", {
   contact: text("contact").notNull(),
   address: text("address"),
   location: point('location', { mode: 'xy' }),
-});
+}).enableRLS()
 
 export const userDailyUsage = pgTable(
   "user_daily_usage",
@@ -231,7 +229,7 @@ export const userDailyUsage = pgTable(
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.date] })],
-);
+).enableRLS()
 export const applicationStatusEnum = pgEnum("application_status", [
   "pending",
   "rejected",
@@ -254,7 +252,7 @@ export const jobApplications = pgTable(
     message: text("message")
   },
   (t) => [primaryKey({ columns: [t.jobId, t.applicantId] })],
-);
+).enableRLS()
 
 export const jobPostsRelations = relations(jobPosts, ({ many }) => ({
   jobApplications: many(jobApplications),
@@ -276,16 +274,51 @@ export const jobApplicationsRelations = relations(
 
 export const mail = pgTable("mail", {
   id: serial('id').primaryKey(),
+  replyToId: integer("reply_to_id"), // null = top-level message
   senderId: text('sender_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }), // assuming users table
-  receiverId: text('receiver_id')
-    .references(() => user.id, { onDelete: 'cascade' }), // nullable if guild broadcast
+    .notNull(),
+  receiverId: text('receiver_id'),
   senderRole: text('sender_role', { enum: ["user", "business", "admin"] }).notNull().default('user'),
-  businessId: uuid('guild_id')
+  recieverRole:  text('reciever_role', { enum: ["user", "business", "admin"] }).notNull().default('user'),
+  businessId: uuid('business_id')
     .references(() => businessProfile.id, { onDelete: 'cascade' }), // null for direct messages
   dateSent: timestamp('date_sent').notNull().defaultNow(),
   subject: text('subject').notNull(),
   message: text('message').notNull(),
-})
+},
+  (table) => {
+    const constraints = [];
+   constraints.push(
+      foreignKey({
+        columns: [table.senderId],
+        foreignColumns: [user.id],
+        name: "messages_sender_fk",
+      }).onDelete("restrict"),
+      foreignKey({
+        columns: [table.receiverId],
+        foreignColumns: [user.id],
+        name: "messages_receiver_fk",
+      }).onDelete("restrict"),
+    );
+
+    // Self-reference (reply → original message)
+    if (table.replyToId) {
+      constraints.push(
+        foreignKey({
+          columns: [table.replyToId],
+          foreignColumns: [table.id],
+          name: "messages_reply_to_fk",
+        })
+          .onDelete("set null")     // or "cascade" / "restrict"
+          .onUpdate("cascade"),
+      );
+    }
+    constraints.push(
+      index("idx_messages_sender").on(table.senderId),
+      index("idx_messages_receiver").on(table.receiverId),
+      index("idx_messages_reply_to").on(table.replyToId),
+      index("idx_messages_created_at").on(table.dateSent),
+    );
+    return constraints;
+  },).enableRLS()
 

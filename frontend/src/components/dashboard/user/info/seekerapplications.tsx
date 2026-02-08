@@ -18,7 +18,7 @@ export function ApplicationList() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await edenTreatyApi.user.viewapplications.get(); // backend not important
+        const res = await edenTreatyApi.user.viewapplications.get();
         if (!res.data) throw new Error("Failed to fetch");
         const data: Item[] = res.data
         setItems(data);

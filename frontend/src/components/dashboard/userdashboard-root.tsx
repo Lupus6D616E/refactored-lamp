@@ -10,8 +10,9 @@ import CertificationList from '@components/dashboard/user/info/certificationlist
 import AddExperienceCard from '@components/dashboard/user/upload/addexperience'
 import ExperienceList from '@components/dashboard/user/info/experiencelist-parent'
 import {UpdateProfile} from '@components/dashboard/user/upload/updateprofile'
-import { ApplicationList } from './user/info/seekerapplications'
-import { DashboardPage } from './business/dashboard'
+import { ApplicationList } from '@components/dashboard/user/info/seekerapplications'
+import { DashboardPage } from '@components/dashboard/business/dashboard'
+import { MessageList } from '@components/dashboard/user/info/messages'
 function App() {
     const { data: session, isPending } = authClient.useSession();
     if (!session?.user) {
@@ -32,6 +33,7 @@ function App() {
             <ExperienceList />
             <UpdateProfile />
             <ApplicationList />
+            <MessageList />
         </main>
     )
     }
