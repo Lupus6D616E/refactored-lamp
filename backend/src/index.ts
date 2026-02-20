@@ -35,8 +35,9 @@ process.on("SIGINT", () => {
 });
 
 const app = new Elysia()
+  .get("/hello","geto")
   .use(await staticPlugin({
-    assets: 'frontend/public'
+    assets: 'frontend/public/'
   }))
   .use(betterAuthPlugin)
   .use(profilePlugin)

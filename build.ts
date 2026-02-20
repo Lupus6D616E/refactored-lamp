@@ -24,7 +24,7 @@ await Bun.build({
   entrypoints,
   outdir: './dist', 
    naming: {
-    entry: "[name].[hash].[ext]", // For your entry points
+    entry: "[name].[ext]", // For your entry points
     chunk: "chunks/[name]-[hash].[ext]", // For shared code chunks
     asset: "assets/[name]-[hash].[ext]", // For CSS, images, etc.
   },
