@@ -34,10 +34,11 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
+const isProd = process.env.NODE_ENV === 'production'
 const app = new Elysia()
   .get("/hello","geto")
   .use(await staticPlugin({
-    assets: './dist'
+    assets: isProd ? './dist' : 'frontend/public'
   }))
   .use(betterAuthPlugin)
   .use(profilePlugin)
