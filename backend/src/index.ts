@@ -34,7 +34,7 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-const app = new Elysia()
+export const app = new Elysia()
   .get("/hello","geto")
   .use(await staticPlugin({
     assets: 'frontend/public/'
@@ -50,10 +50,5 @@ const app = new Elysia()
   .use(openapi({documentation: {
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()
-        }})) 
-
-  .listen(3000, ({ hostname, port }) => {
-    console.log(`Server started http://${hostname}:${port}`);
-  });
-
+        }})) ;
   export type App = typeof app 
