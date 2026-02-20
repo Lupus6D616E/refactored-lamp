@@ -11,6 +11,9 @@ const app = new Elysia()
         })
     })
 
-export default async function handler(req: Request) {
-  return app.fetch(req)
+
+export const config = {
+  runtime: 'edge'
 }
+
+export default app.fetch
