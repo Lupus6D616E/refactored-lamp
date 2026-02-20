@@ -34,10 +34,10 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-export const app = new Elysia()
+const app = new Elysia()
   .get("/hello","geto")
   .use(await staticPlugin({
-    assets: 'frontend/public/'
+    assets: './dist'
   }))
   .use(betterAuthPlugin)
   .use(profilePlugin)
@@ -50,5 +50,9 @@ export const app = new Elysia()
   .use(openapi({documentation: {
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()
-        }})) ;
+        }})) 
+  .listen(3000, ({ hostname, port }) => {
+    console.log(`Server started http://${hostname}:${port}`);
+  });
+
   export type App = typeof app 
