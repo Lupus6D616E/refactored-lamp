@@ -47,3 +47,4 @@ frontend/public/images/
 frontend/public/output.css
 userdata/
 dist
+.env*.local

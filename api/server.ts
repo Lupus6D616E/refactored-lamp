@@ -12,6 +12,7 @@ import { OpenAPI } from "@lib/auth";
 import { adminPlugin } from "@modules/admin/controller";
 import { businessPlugin } from "@modules/business/controller";
 import { messagePlugin } from "@modules/mail/controller";
+import { app } from "backend/src";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -34,21 +35,6 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-export const app = new Elysia()
-  .get("/hello","geto")
-  .use(await staticPlugin({
-    assets: 'frontend/public/'
-  }))
-  .use(betterAuthPlugin)
-  .use(profilePlugin)
-  .use(postPlugin)
-  .use(searchPlugin)
-  .use(aiPlugin)
-  .use(adminPlugin)
-  .use(businessPlugin)
-  .use(messagePlugin)
-  .use(openapi({documentation: {
-            components: await OpenAPI.components,
-            paths: await OpenAPI.getPaths()
-        }})) ;
-  export type App = typeof app 
+export default new Elysia()
+  .get("/hewing","geto")
+  .use(app)
