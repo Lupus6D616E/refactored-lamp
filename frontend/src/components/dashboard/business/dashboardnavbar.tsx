@@ -1,8 +1,8 @@
 // DashboardNavbar.tsx
-import { DashboardInfo } from "./types"
+import { BusinessSelect } from "./types"
 
 interface Props {
-  dashboards: DashboardInfo[]
+  dashboards: BusinessSelect[]
   selectedId?: string
   onChange: (id: string) => void
   loading: boolean

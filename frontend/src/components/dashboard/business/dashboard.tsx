@@ -1,14 +1,16 @@
 // DashboardPage.tsx
 import { useEffect, useState } from "react";
 import { DashboardNavbar } from "./dashboardnavbar";
-import { DashboardCards } from "./dashboardcards";
-import { DashboardData, DashboardInfo } from "./types";
+import { JobPostCards } from "./JobPostCards";
+import { JobPostData, BusinessSelect, MessageData } from "./types";
 import { edenTreatyApi } from "@lib/eden";
+import { MessageCards } from "./messageCards";
 
 export function DashboardPage() {
-  const [dashboards, setDashboards] = useState<DashboardInfo[]>([]);
+  const [dashboards, setDashboards] = useState<BusinessSelect[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
-  const [data, setData] = useState<DashboardData>();
+  const [jobPostData, setJobPostData] = useState<JobPostData>();
+  const [messageData, setMessageData] = useState<MessageData>();
   const [loadingDashboards, setLoadingDashboards] = useState(true);
   const [loadingData, setLoadingData] = useState(false);
 
@@ -38,11 +40,22 @@ export function DashboardPage() {
         const data = {
           info: res.data,
         };
-        setData(data);
+        setJobPostData(data);
       }
       setLoadingData(false);
     };
+    const fetchMessages = async () => {
+      const res = await edenTreatyApi.message.businessmymessages({id:selectedId}).get()
+       if (res.data) {
+        const data = {
+          info: res.data,
+        };
+        setMessageData(data);
+      }
+      setLoadingData(false);
+    }
     fetchJobPosts();
+    fetchMessages()
   }, [selectedId]);
 
   return (
@@ -58,7 +71,15 @@ export function DashboardPage() {
         <div className="card w-min-screen bg-base-300 card-sm shadow-sm">
           <div className="card-body">
             <h2 className="card-title">Job Posts</h2>
-            <DashboardCards data={data} loading={loadingData} />
+            <JobPostCards data={jobPostData} loading={loadingData} />
+          </div>
+        </div>
+      </main>
+      <main className="p-6">
+        <div className="card w-min-screen bg-base-300 card-sm shadow-sm">
+          <div className="card-body">
+            <h2 className="card-title">Messages </h2>
+            <MessageCards data={messageData} businessId={selectedId} loading={loadingData} />
           </div>
         </div>
       </main>

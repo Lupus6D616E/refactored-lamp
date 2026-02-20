@@ -1,14 +1,14 @@
 // DashboardCards.tsx
 import { useState } from "react"
-import { DashboardData } from "./types"
+import { JobPostData } from "./types"
 import { edenTreatyApi } from "@lib/eden"
 
 interface Props {
-  data?: DashboardData
+  data?: JobPostData
   loading: boolean
 }
 
-export const DashboardCards = ({ data, loading }: Props) => {
+export const JobPostCards = ({ data, loading }: Props) => {
 
      const [message, setMessage] = useState('')
       const [error, setError] = useState('')

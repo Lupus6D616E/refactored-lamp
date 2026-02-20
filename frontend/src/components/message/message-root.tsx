@@ -4,7 +4,7 @@ import {Message} from "./message";
 function App() {
   return (
     <main>
-        <Message id={getPostId()} /> 
+        <Message recursionDepth={0} id={getPostId()} businessId={getBusinessId()} /> 
     </main>
   );
 }
@@ -14,5 +14,10 @@ function getPostId() {
     return params.get("id")!;
 }
 
+
+function getBusinessId() {
+  const params = new URLSearchParams(window.location.search);
+    return params.get("businessId")!;
+}
 const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
