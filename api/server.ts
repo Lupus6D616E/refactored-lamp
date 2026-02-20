@@ -2,7 +2,7 @@
 
 import { Elysia, t } from 'elysia'
 
-export default new Elysia() 
+const app = new Elysia() 
     .get('/', () => 'Hello Vercel Function')
     .get('/bingus', () => 'Hello Vercel!')
     .post('/', ({ body }) => body, {
@@ -10,3 +10,10 @@ export default new Elysia()
             name: t.String()
         })
     })
+
+
+export const config = {
+  runtime: 'edge'
+}
+
+export default app.fetch
