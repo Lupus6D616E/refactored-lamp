@@ -46,3 +46,4 @@ package-lock.json
 frontend/public/images/
 frontend/public/output.css
 userdata/
+dist
