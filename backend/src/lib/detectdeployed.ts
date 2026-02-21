@@ -6,8 +6,8 @@ export function getBaseUrl() {
 
   // 2. Server/build time fallback (e.g. SSR, static rendering)
   // Vercel provides VERCEL_URL = "my-app-abc123.vercel.app" (no protocol)
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    return `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
   }
 
   // 3. Local development fallback
