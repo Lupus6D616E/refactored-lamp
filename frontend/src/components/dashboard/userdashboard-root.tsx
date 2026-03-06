@@ -13,7 +13,13 @@ import {UpdateProfile} from '@components/dashboard/user/upload/updateprofile'
 import { ApplicationList } from '@components/dashboard/user/info/seekerapplications'
 import { DashboardPage } from '@components/dashboard/business/dashboard'
 import { MessageList } from '@components/dashboard/user/info/messages'
+import { useEffect } from 'react'
+import { themeChange } from 'theme-change'
+import ThemeSwitcherCard from '@components/auxilliary/ThemesSwitcherCard'
 function App() {
+    useEffect(() => {
+  themeChange(false)
+}, [])   // ← only run once
     const { data: session, isPending } = authClient.useSession();
     if (!session?.user) {
         return (
@@ -23,6 +29,7 @@ function App() {
     else if(session.user.role === "user"){
     return (
         <main>
+            <ThemeSwitcherCard />
             <UserProfileCard />
             <LogoutButton />
             <ResumeUpload />

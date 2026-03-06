@@ -285,6 +285,7 @@ export const mail = pgTable("mail", {
   dateSent: timestamp('date_sent').notNull().defaultNow(),
   subject: text('subject').notNull(),
   message: text('message').notNull(),
+  alreadyReplied: boolean("already_replied").notNull().default(false),
 },
   (table) => {
     const constraints = [];
