@@ -5,6 +5,7 @@ import { AdvancedSearchBar } from "@components/search/searchjobbar";
 import { useState } from "react";
 import { SearchResult } from "./types";
 import ResultsList from "./results";
+import { ApplyTheme } from "@components/auxilliary/ApplyTheme";
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
   }
   return (
     <main>
+      <ApplyTheme />
       <div className="min-h-screen bg-base-200 py-12">
         <AdvancedSearchBar onResults={setResults} />
         <ResultsList results={results} />

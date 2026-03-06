@@ -19,7 +19,7 @@ import ThemeSwitcherCard from '@components/auxilliary/ThemesSwitcherCard'
 function App() {
     useEffect(() => {
   themeChange(false)
-}, [])   // ← only run once
+}, []) 
     const { data: session, isPending } = authClient.useSession();
     if (!session?.user) {
         return (

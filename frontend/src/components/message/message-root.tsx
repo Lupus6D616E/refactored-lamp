@@ -1,9 +1,11 @@
 import { createRoot } from "react-dom/client";
 import {Message} from "./message";
+import { ApplyTheme } from "@components/auxilliary/ApplyTheme";
 
 function App() {
   return (
     <main>
+        <ApplyTheme />
         <Message recursionDepth={0} id={getPostId()} businessId={getBusinessId()} /> 
     </main>
   );
