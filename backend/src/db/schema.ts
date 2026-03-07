@@ -13,6 +13,10 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+export const publicTest = pgTable("public_test",{
+  name: text("name").primaryKey()
+})
+
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
