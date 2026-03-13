@@ -1,5 +1,6 @@
 import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
+import { number } from "better-auth/*";
 import React, { useEffect, useState } from "react";
 
 
@@ -14,10 +15,13 @@ type Message = {
   replyToId: number | null
   senderRole: string;
   date: Date;
+  alreadyReplied: boolean;
+  nextId: number | null;
 };
 
 // Mock data shown before fetch completes
 const mockProfile: Message = {
+  nextId: null,
   messageId: 0,
   businessName: "Loading business...",
   businessId: "none",
@@ -27,8 +31,8 @@ const mockProfile: Message = {
   senderName: "Loading name",
   senderRole: "Dummy",
   replyToId: null,
-  date: new Date()
-
+  date: new Date(),
+alreadyReplied: false
 };
 
 interface MessageProps {
@@ -40,6 +44,7 @@ interface MessageProps {
 export const Message: React.FC<MessageProps> = ({ id, recursionDepth, businessId }) => {
   const { data: session, isPending } = authClient.useSession();
   const [message, setMessage] = useState<Message>(mockProfile);
+  const [prevMessageId, setPrevMessageId] = useState<number>()
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [sentMessage, setSentMessage] = useState("");
@@ -63,6 +68,16 @@ export const Message: React.FC<MessageProps> = ({ id, recursionDepth, businessId
     }
     if (session?.user.role === "business") {
 
+      const sentId = parseInt(id)
+      const res = await edenTreatyApi.message.business.reply.post({ message: sentMessage, subject: subject, id: sentId })
+      if (res.error) {
+        setError("something happened bruh")
+        setLoading(false)
+        return;
+      } else {
+        setLoading(false)
+        return;
+      }
     }
     setLoading(false);
 
@@ -86,7 +101,7 @@ export const Message: React.FC<MessageProps> = ({ id, recursionDepth, businessId
         }
         else if (session?.user.role === "business") {
           try {
-            const res = await edenTreatyApi.message.business.viewmessage({id:id}).business({businessId : businessId}).get();
+            const res = await edenTreatyApi.message.business.viewmessage({id:id}).get();
             if (!res.data) throw new Error("Failed to fetch message");
             const data: Message = res.data;
             setMessage(data);
@@ -111,10 +126,14 @@ export const Message: React.FC<MessageProps> = ({ id, recursionDepth, businessId
           <div>
             {message.senderRole === "business" ? <div>
               <h2 className ="card-title text-2xl">{message.businessName}</h2> 
-              <h3 className="card-title text-2x1">sender:{message.senderName}</h3>
+              {message.senderId !== session?.user.id && <h3 className="card-title text-2x1">sender:{message.senderName} </h3>}
+              {message.senderId === session?.user.id && <h3 className="card-title text-2x1">sender:{message.senderName} (you) </h3>}
               </div>
               :
-              <h2 className="card-title text-2xl">{message.senderName}</h2>}
+              <div>
+              {message.senderId !== session?.user.id && <h3 className="card-title text-2x1">sender:{message.senderName} </h3>}
+              {message.senderId === session?.user.id && <h3 className="card-title text-2x1">sender:{message.senderName} (you) </h3>}
+              </div>}
             <p className="leading-relaxed">subject: {message.subject}</p>
           </div>
         </div>
@@ -125,13 +144,13 @@ export const Message: React.FC<MessageProps> = ({ id, recursionDepth, businessId
         <div className="card-body">
           <h3 className="card-title">message</h3>
           <p className="leading-relaxed">{message.message}</p>
-          {message.replyToId !== null && <div>
+          {message.replyToId !== null && recursionDepth === 0 && <div>
             <h3>in reply to: </h3>
             <Message recursionDepth={1} businessId={businessId} id={message.replyToId.toString()} /> </div>}
         </div>
       </div>
 
-      {recursionDepth !== 1 && message.senderId !== session?.user.id && <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
+      {recursionDepth !== 1 && message.senderId !== session?.user.id && message.alreadyReplied !== true &&<form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
         <h1 className="text-xl font-semibold">Reply</h1>
         <input
           type="text"
@@ -163,8 +182,12 @@ export const Message: React.FC<MessageProps> = ({ id, recursionDepth, businessId
         </button>
       </form>
       }
-      {businessId && recursionDepth !== 0 && <a className="btn btn-lg" href={`viewmail.html?id=${id}&businessId=${businessId}`} > Go to post </a> }
-      {businessId === null && recursionDepth !== 0 && <a className="btn btn-lg" href={`viewmail.html?id=${id}`} > Go to post </a> }
+      {businessId && recursionDepth !== 0 && <a className="btn btn-lg" href={`viewmail.html?id=${id}&businessId=${businessId}`} > Go to previous post </a> }
+      {businessId === null && recursionDepth !== 0 && <a className="btn btn-lg" href={`viewmail.html?id=${id}`} > Go to previous post </a> }
+
+      {businessId && message.alreadyReplied && recursionDepth === 0 && <div><p>a reply exists</p><a className="btn btn-lg" href={`viewmail.html?id=${message.nextId}&businessId=${businessId}`} > Go to reply </a> </div>}
+      {businessId === null  && message.alreadyReplied && recursionDepth === 0 && <a className="btn btn-lg" href={`viewmail.html?id=${message.nextId}`} > Go to Reply </a> }
+
     </div>
 
   );

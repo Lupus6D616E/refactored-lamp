@@ -60,25 +60,36 @@ export const messagePlugin = new Elysia({ prefix: "/message" })
   .get(
     "/businessmymessages/:id",
     async ({ currentUser, params }) => {
-      const check = await Business.checkMembership(currentUser.id,params.id)
-      if(check){
-      const res = await Message.getBusinessMessages(params.id)
-      return res
+      const check = await Business.checkMembership(currentUser.id, params.id)
+      if (check) {
+        const res = await Message.getBusinessMessages(params.id)
+        return res
       }
-      else{
-      return status(403)}
+      else {
+        return status(403)
+      }
     },
-    { role: ["business"],params: t.Object({
-      id: t.String()
-    }) },
+    {
+      role: ["business"], params: t.Object({
+        id: t.String()
+      })
+    },
   )
   .get(
     "/user/viewmessage/:id",
     async ({ currentUser, params }) => {
-      const check = await Message.checkUserAllowedToViewMessage(currentUser.id, params.id,"user")
+      const check = await Message.checkUserAllowedToViewMessage(currentUser.id, params.id, "user")
       if (check) {
         const res = await Message.getMessage(params.id)
-        return res
+        if(res.alreadyReplied){
+          const alreadyRepliedId = await Message.getRepliedId(res.messageId)
+          const response = {...res, nextId: alreadyRepliedId.messageId}
+          return response
+        }
+        else{
+          const response = {...res, nextId: null}
+          return response
+        }
       }
       return status(403)
     },
@@ -88,20 +99,27 @@ export const messagePlugin = new Elysia({ prefix: "/message" })
       })
     },
   )
-   .get(
-    "/business/viewmessage/:id/business/:businessId",
+  .get(
+    "/business/viewmessage/:id",
     async ({ currentUser, params }) => {
-      const check = await Message.checkBusinessUserAllowedToViewMessage(params.businessId, params.id, currentUser.id)
+      const check = await Message.checkBusinessAllowedToViewMessage(params.id, currentUser.id)
       if (check) {
         const res = await Message.getMessage(params.id)
-        return res
+        if(res.alreadyReplied){
+          const alreadyRepliedId = await Message.getRepliedId(res.messageId)
+          const response = {...res, nextId: alreadyRepliedId.messageId}
+          return response
+        }
+        else{
+          const response = {...res, nextId: null}
+          return response
+        }
       }
       return status(403)
     },
     {
       role: ["business"], params: t.Object({
         id: t.Number(),
-        businessId: t.String()
       })
     },
   )
@@ -121,7 +139,7 @@ export const messagePlugin = new Elysia({ prefix: "/message" })
           })
         }
         if (prevRole === "business") {
-          const res = await db.insert(mail).values({
+          await db.insert(mail).values({
             senderId: currentUser.id,
             senderRole: currentUser.role!,
             recieverRole: prevRole,
@@ -130,6 +148,9 @@ export const messagePlugin = new Elysia({ prefix: "/message" })
             message: body.message,
             subject: body.subject,
           })
+          await db.update(mail).set({
+            alreadyReplied: true
+          }).where(eq(mail.id,body.id))
         }
         return status(201)
       } catch (e) {
@@ -140,6 +161,56 @@ export const messagePlugin = new Elysia({ prefix: "/message" })
     return status(403)
   }, {
     role: ["user"], body: t.Object({
+      id: t.Number(),
+      message: t.String(),
+      subject: t.String(),
+    })
+  }
+  )
+    .post("/business/reply", async ({ currentUser, body }) => {
+    const check = await Message.checkBusinessAllowedToViewMessage (body.id, currentUser.id)
+    if (check) {
+      try {
+        const { senderRole: prevRole, businessId: prevBusinessId, senderId: prevSenderId } = await Message.getMessage(body.id)
+        if (prevRole === "admin") {
+          const res = await db.insert(mail).values({
+            senderId: currentUser.id,
+            senderRole: currentUser.role!,
+            recieverRole: prevRole,
+            replyToId: body.id,
+            businessId: prevBusinessId,
+            message: body.message,
+            subject: body.subject,
+          })
+           await db.update(mail).set({
+            alreadyReplied: true
+          }).where(eq(mail.id,body.id)) 
+        }
+        if (prevRole === "user") {
+          console.log("attempting send")
+          await db.insert(mail).values({
+            senderId: currentUser.id,
+            senderRole: currentUser.role!,
+            recieverRole: prevRole,
+            receiverId: prevSenderId,
+            businessId: prevBusinessId,
+            replyToId: body.id,
+            message: body.message,
+            subject: body.subject,
+          })
+          await db.update(mail).set({
+            alreadyReplied: true
+          }).where(eq(mail.id,body.id))
+        }
+        return status(201)
+      } catch (e) {
+        console.log(e)
+        return status(500)
+      }
+    }
+    return status(403)
+  }, {
+    role: ["business"], body: t.Object({
       id: t.Number(),
       message: t.String(),
       subject: t.String(),

@@ -1,6 +1,5 @@
 import { db } from "@db/db";
 import { businessProfile, mail, user } from "@db/schema";
-import { businessPlugin } from "@modules/business/controller";
 import { Business } from "@modules/business/service";
 import { eq, and, isNull, or } from "drizzle-orm";
 export abstract class Message {
@@ -20,23 +19,16 @@ export abstract class Message {
             }
         }
     }
-    static async checkBusinessUserAllowedToViewMessage(businessId: string, messageId: number, userId: string) {
-        const check = await Business.checkMembership(userId,businessId)
-        console.log("user checked")
-        if(check){
 
-        const receivedIds = (await this.getBusinessMessagesRecievedId(businessId)).map(({ id }) => id);
-        const sentIds = (await this.getBusinessMessagesSentId(businessId)).map(({ id }) => id)
-        if (receivedIds.includes(messageId)) {
-            return true;
-        } else if (sentIds.includes(messageId)) {
-            return true
+    static async checkBusinessAllowedToViewMessage(messageId: number, userId: string){
+        const message = await this.getMessage(messageId)
+        if(message.businessId === null){
+            console.log("no business ID??")
+            return false
         }
-        else {
-            return false;
-        }
-    }
-        return false;
+        const check = await Business.checkMembership(userId,message.businessId)
+        console.log(check)
+        return check
     }
     static async getUserMessagesRecievedId(userId: string) {
         const result = await db
@@ -118,10 +110,17 @@ export abstract class Message {
             senderRole: mail.senderRole,
             senderId: mail.senderId,
             date: mail.dateSent,
+            alreadyReplied: mail.alreadyReplied
         }).from(mail)
             .leftJoin(businessProfile, eq(mail.businessId, businessProfile.id))
             .leftJoin(user, eq(mail.senderId, user.id))
             .where(eq(mail.id, mailId))
+        return res[0]
+    }
+    static async getRepliedId(mailId: number){
+        const res = await db.select({
+            messageId: mail.id
+        }).from(mail).where(eq(mail.replyToId, mailId))
         return res[0]
     }
 }
