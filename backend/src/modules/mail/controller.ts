@@ -1,9 +1,9 @@
 import { Elysia, status, t } from "elysia";
 import { betterAuthPlugin } from "@lib/auth";
 import { db } from "@db/db";
-import { businessProfile, mail } from "@db/schema";
+import { mail } from "@db/schema";
 import { Business } from "@modules/business/service";
-import { eq, param } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { Message } from "./service";
 export const messagePlugin = new Elysia({ prefix: "/message" })
   .use(betterAuthPlugin)

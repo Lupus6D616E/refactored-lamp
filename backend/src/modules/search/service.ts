@@ -3,8 +3,10 @@ import { searchModel } from "./model";
 import {
   businessProfile,
   businessUser,
+  jobPostEmbedding,
   jobPosts,
   seekerProfile,
+  seekerProfileEmbedding,
   user,
 } from "@db/schema";
 import {
@@ -15,6 +17,8 @@ import {
   gte,
   SQL,
   sql,
+  cosineDistance,
+  inArray,
 } from "drizzle-orm";
 export abstract class Search {
   static async findjobpost(search: searchModel.searchJobQuery) {
@@ -55,13 +59,6 @@ export abstract class Search {
         employmentType: jobPosts.employmentType,
         tags: jobPosts.tags,
         schedule: jobPosts.schedule,
-        distance:
-          sql<number>`levenshtein(${jobPosts.title}, ${search.title})`.as(
-            "distance",
-          ),
-        sim: sql<number>`similarity(${jobPosts.title}, ${search.title})`.as(
-          "sim",
-        ),
       })
       .from(jobPosts)
       .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
@@ -69,18 +66,47 @@ export abstract class Search {
       .limit(20);
     return result;
   }
+  static async smartJobSearch(userID: string) {
+    const profileEmbedding = await getUserEmbedding(userID)
+    console.log(`getting embeddings for ${userID}`)
+    const similarPosts = await db
+      .select({
+        id: jobPostEmbedding.id,
+        postId: jobPostEmbedding.postid
+      })
+      .from(jobPostEmbedding)
+      .orderBy(cosineDistance(jobPostEmbedding.postEmbedding,profileEmbedding.embedding))
+      .limit(5);
+    console.log(`got embeddings, ${similarPosts}`)
+    const postIds = similarPosts.map(({postId}) => postId)
+    const result = await db
+    .select({
+        id: jobPosts.id,
+        title: jobPosts.title,
+        city: jobPosts.city,
+        description: jobPosts.description,
+        salaryMinimum: jobPosts.salaryMinimum,
+        employmentType: jobPosts.employmentType,
+        tags: jobPosts.tags,
+        schedule: jobPosts.schedule,
+      })
+      .from(jobPosts)
+      .where(inArray(jobPosts.id,postIds))
+      .limit(5)
+    return result
+  }
   static async findSeeker(search: searchModel.searchUserQuery) {
     const filters: SQL[] = [];
     if (search.name !== undefined) {
       filters.push(sql`${user.name} % ${search.name.trim()}`);
-      filters.push(eq(user.role,"user"));
+      filters.push(eq(user.role, "user"));
     }
     const result = await db
       .select({
         id: user.id,
         name: user.name,
         email: user.email,
-        description:  sql<string>`
+        description: sql<string>`
       COALESCE(
         ${seekerProfile.description},
         'user has not set up profile yet'
@@ -98,7 +124,7 @@ export abstract class Search {
       .limit(20);
     return result;
   }
-    static async findBusiness(search: searchModel.searchBusinessQuery) {
+  static async findBusiness(search: searchModel.searchBusinessQuery) {
     const filters: SQL[] = [];
     if (search.name !== undefined) {
       filters.push(sql`${businessProfile.name} % ${search.name.trim()}`);
@@ -125,43 +151,51 @@ export abstract class Search {
     const filters: SQL[] = [];
     if (search.name !== undefined) {
       filters.push(sql`${user.name} % ${search.name.trim()}`);
-      filters.push(eq(user.role,"business"));
+      filters.push(eq(user.role, "business"));
     }
     console.log("got here")
-    try{
-    const result = await db
-      .select({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        businessName: sql<
-          string[]
-        >`coalesce(array_agg(${businessProfile.name}), '{}')::text[]`.as(
-          "business_names",
-        ),
-        description: sql<
-          string[]
-        >`coalesce(array_agg(${businessProfile.description}), '{}')::text[]`.as(
-          "business_descriptions",
-        ),
-        distance: sql<number>`levenshtein(${user.name}, ${search.name})`.as(
-          "distance",
-        ),
-        sim: sql<number>`similarity(${user.name}, ${search.name})`.as("sim"),
-      })
-      .from(user)
-      .leftJoin(businessUser, eq(user.id, businessUser.userId))
-      .leftJoin(
-        businessProfile,
-        eq(businessUser.businessId, businessProfile.id),
-      )
-      .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
-      .orderBy(sql`levenshtein(${user.name}, ${search.name})`) // precise ordering
-      .groupBy(user.id, user.name)
-      .limit(20);
-  
-    return result;
+    try {
+      const result = await db
+        .select({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          businessName: sql<
+            string[]
+          >`coalesce(array_agg(${businessProfile.name}), '{}')::text[]`.as(
+            "business_names",
+          ),
+          description: sql<
+            string[]
+          >`coalesce(array_agg(${businessProfile.description}), '{}')::text[]`.as(
+            "business_descriptions",
+          ),
+          distance: sql<number>`levenshtein(${user.name}, ${search.name})`.as(
+            "distance",
+          ),
+          sim: sql<number>`similarity(${user.name}, ${search.name})`.as("sim"),
+        })
+        .from(user)
+        .leftJoin(businessUser, eq(user.id, businessUser.userId))
+        .leftJoin(
+          businessProfile,
+          eq(businessUser.businessId, businessProfile.id),
+        )
+        .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
+        .orderBy(sql`levenshtein(${user.name}, ${search.name})`) // precise ordering
+        .groupBy(user.id, user.name)
+        .limit(20);
+
+      return result;
+    }
+    catch (error) { console.log(error) }
   }
-  catch(error){console.log(error)}
-  }
+}
+
+async function getUserEmbedding(userID: string) {
+  const res = await db.select({
+    embedding: seekerProfileEmbedding.profileEmbedding
+  }).from(seekerProfileEmbedding)
+    .where(eq(seekerProfileEmbedding.userid, userID))
+  return res[0]
 }

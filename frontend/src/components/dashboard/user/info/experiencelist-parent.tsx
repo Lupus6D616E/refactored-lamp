@@ -6,6 +6,7 @@ const ExperienceList = () => {
     id: number;
     position: string;
     experience: string;
+    duration: string;
   };
   const [items, setItems] = React.useState<Item[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -19,7 +20,7 @@ const ExperienceList = () => {
           throw new Error(`something happened ${response.status}`);
         }
         const data = response.data;
-        setItems(data.items);
+        setItems(data.items); 
       } catch (error) {
         console.error("Failed to fetch items:", error);
       } finally {

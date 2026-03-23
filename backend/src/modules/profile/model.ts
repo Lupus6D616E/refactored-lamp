@@ -16,6 +16,7 @@ export namespace ProfileModel {
   export const experienceBody = t.Object({
     experience: t.String(),
     position: t.String(),
+    duration: t.String(),
   });
   export const certificationBody = t.Object({
     certification: t.String(),

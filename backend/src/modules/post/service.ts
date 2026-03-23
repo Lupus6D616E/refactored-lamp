@@ -1,31 +1,35 @@
 import { db } from "@db/db";
 import { PostModel } from "./model";
-import { jobApplications, jobPosts } from "@db/schema";
+import { jobApplications, jobPostEmbedding, jobPosts } from "@db/schema";
 import { eq, and } from "drizzle-orm";
+import { getEmbedding } from "@lib/embeddings";
 
 export abstract class Post {
   static async postJob(
     job: PostModel.JobBody,
     userId: string,
   ): Promise<boolean> {
-    try{await db.insert(jobPosts).values({
-      creatorId: userId,
-      businessId: job.businessId,
-      title: capitalizeWords(job.title),
-      description: job.description,
-      requirements: job.requirements,
-      responsibilities: job.responsibilities,
-      city: job.city,
-      employmentType: job.employmentType,
-      salaryMinimum: job.minimumSalary,
-      expiresAt: job.expireDate,
-      tags: normalize(job.tags),
-      contact: job.email,
-      schedule: job.schedule,
-      address: job.address,
-      location: {x: job.location.lng, y: job.location.lat}
-    });
-    return true;}catch(e){
+    try {
+      const res = await db.insert(jobPosts).values({
+        creatorId: userId,
+        businessId: job.businessId,
+        title: capitalizeWords(job.title),
+        description: job.description,
+        requirements: job.requirements,
+        responsibilities: job.responsibilities,
+        city: job.city,
+        employmentType: job.employmentType,
+        salaryMinimum: job.minimumSalary,
+        expiresAt: job.expireDate,
+        tags: normalize(job.tags),
+        contact: job.email,
+        schedule: job.schedule,
+        address: job.address,
+        location: { x: job.location.lng, y: job.location.lat }
+      }).returning()
+      this.insertCreatedEmbedding(res[0].id)
+      return true;
+    } catch (e) {
       console.log(e)
       return false
     }
@@ -111,6 +115,42 @@ export abstract class Post {
         code: "INTERNAL_ERROR",
       };
     }
+  }
+  static async embedJobPost(jobID: number) {
+    console.log(`getting job id ${jobID}`)
+    const jobPost = await Post.getPostDetails(jobID)
+
+    const scheduleStr = Array.isArray(jobPost[0].schedule)
+      ? jobPost[0].schedule.join(', ')
+      : '';
+
+    const tagsStr = Array.isArray(jobPost[0].tags)
+      ? jobPost[0].tags.join(', ')
+      : '';
+
+    const text = `
+    Job Title: ${jobPost[0].title || ''}
+    Description: ${jobPost[0].description || ''}
+    Requirements: ${jobPost[0].requirements || ''}
+    Responsibilities ${jobPost[0].responsibilities || ''}
+    Schedule: ${scheduleStr}
+    Tags: ${tagsStr}
+  `.trim();
+    const output = await getEmbedding(text);
+    const embedding = output.tolist()[0]
+    return embedding
+  }
+
+  static async insertCreatedEmbedding(postID: number) {
+    const embedding = await this.embedJobPost(postID)
+    const res = await db.insert(jobPostEmbedding).values({
+      postid: postID,
+      postEmbedding: embedding
+    })
+      .onConflictDoUpdate({
+        target: jobPostEmbedding.postid,
+        set: { postEmbedding: embedding },
+      })
   }
 }
 

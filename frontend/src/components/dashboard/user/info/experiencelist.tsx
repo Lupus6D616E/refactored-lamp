@@ -5,6 +5,7 @@ type Item = {
   id: number;
   experience:string;
   position:string;
+  duration:string;
 };
 
 type ItemsListProps = {
@@ -22,7 +23,7 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
 
     try {
 
-      const res = await edenTreatyApi.user.certifications({id: itemId}).delete()
+      const res = await edenTreatyApi.user.workexperience({id: itemId}).delete()
     
       if (res.status !== 200) {
         throw new Error('Failed to delete');
@@ -48,6 +49,7 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
             <div>
               <span className="text-sm opacity-70 block">Experience: {item.experience}</span>
               <span className="text-sm opacity-70 block">Position: {item.position}</span>
+              <span className="text-sm opacity-70 block">duration: {item.duration}</span>
             </div>
 
             {/* Delete X Button */}

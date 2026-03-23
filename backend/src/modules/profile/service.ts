@@ -9,9 +9,11 @@ import {
   user,
   businessUser,
   businessProfile,
+  seekerProfileEmbedding,
 } from "@db/schema";
 import { ProfileModel } from "./model";
 import { auth, type AuthUser } from "@lib/auth";
+import { getEmbedding } from "@lib/embeddings";
 export abstract class Profile {
   static async uploadResume(
     userSession: AuthUser,
@@ -103,14 +105,15 @@ export abstract class Profile {
   }
 
   static async insertExperience(
-    userSession: AuthUser,
+    userID: string,
     data: ProfileModel.experienceBody,
   ): Promise<number> {
     try {
       await db.insert(userWorkExperience).values({
-        userId: userSession.id,
+        userId: userID,
         experience: data.experience,
         position: data.position,
+        duration: data.duration,
       });
     } catch {
       return 404;
@@ -137,6 +140,7 @@ export abstract class Profile {
         id: userWorkExperience.id,
         position: userWorkExperience.position,
         experience: userWorkExperience.experience,
+        duration: userWorkExperience.duration,
       })
       .from(userWorkExperience)
       .where(eq(userWorkExperience.userId, userId));
@@ -166,7 +170,7 @@ export abstract class Profile {
           skills: data.skills,
           address: data.address,
           education: data.education,
-          location: {x: data.location.lng, y: data.location.lat}
+          location: { x: data.location.lng, y: data.location.lat }
         })
         .onConflictDoUpdate({
           target: seekerProfile.userId,
@@ -176,7 +180,7 @@ export abstract class Profile {
             description: data.description,
             address: data.address,
             education: data.education,
-          location: {x: data.location.lng, y: data.location.lat}
+            location: { x: data.location.lng, y: data.location.lat }
           },
         });
     } catch {
@@ -237,6 +241,40 @@ export abstract class Profile {
       .where(eq(businessUser.userId, userId));
     console.log(result);
     return result;
+  }
+  static async embedUserProfile(userID: string) {
+    const certs = await Profile.getCertification(userID)
+    const experience = await Profile.getExperience(userID)
+    const profile = await Profile.getSeekerProfile(userID)
+    const skillsStr = Array.isArray(profile.skills)
+      ? profile.skills.join(', ')
+      : '';
+    const certStr = certs.map(c => c.certification).join(", ")
+    const formattedExperience = experience
+      .map(exp => `${exp.position} at ${exp.experience} for ${exp.duration}`)
+      .join(", ");
+    const text = `
+          Description: ${profile.description}
+          Skills: ${skillsStr}
+          Education: ${profile.education}
+          Certificaitons: ${certStr}
+          Previous Work Experience: ${formattedExperience}
+      `
+    const output = await getEmbedding(text);
+    const embedding = output.tolist()[0]
+    return embedding
+  }
+
+  static async insertCreatedEmbedding(userID: string) {
+    const profileEmbedding = await this.embedUserProfile(userID)
+    const res = await db.insert(seekerProfileEmbedding).values({
+      userid: userID,
+      profileEmbedding: profileEmbedding
+    })
+      .onConflictDoUpdate({
+        target: seekerProfileEmbedding.userid,
+        set: { profileEmbedding: profileEmbedding },
+      })
   }
   static async createUser(
     name: string,

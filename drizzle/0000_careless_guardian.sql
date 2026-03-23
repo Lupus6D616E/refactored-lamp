@@ -8,3 +8,4 @@ CREATE INDEX IF NOT EXISTS idx_user_name_trgm_gist
 ON public."user" USING GIST (name gist_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_business_name_trgm_gist
 ON public."business_profile" USING GIST (name gist_trgm_ops);
+CREATE EXTENSION IF NOT EXISTS vector;

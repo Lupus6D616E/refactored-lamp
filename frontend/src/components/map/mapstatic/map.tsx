@@ -7,6 +7,12 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+
+
+const TILE_URL = import.meta.env.DEV
+  ? 'http://localhost:7755/tile/{z}/{x}/{y}.png'
+  : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';   // ← change to whatever you use in production
+
 // ─── Default icon fix (keep this) ───
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -56,7 +62,7 @@ export function StaticMap({
     >
       <TileLayer
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="http://localhost:7755/tile/{z}/{x}/{y}.png"
+        url={TILE_URL}
       />
 
       {/* This component moves the view when props change */}

@@ -1,8 +1,10 @@
+import { edenTreatyApi } from '@lib/eden';
 import React, { useState } from 'react';
 
 const AddExperienceCard: React.FC = () => {
   const [experience, setExperience] = useState('');
   const [position, setPosition] = useState('');
+  const [duration, setDuration] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -14,19 +16,15 @@ const AddExperienceCard: React.FC = () => {
     setMessage('');
 
     try {
-      const response = await fetch('/user/addexperience', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ experience, position }), 
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessage('Certification added successfully!');
+      const response = await edenTreatyApi.user.addexperience.post({
+        duration,
+        experience,
+        position
+      })
+      if (response.data) {
+        setMessage('experience added successfully!');
         setExperience('');
-        console.log('Response:', data);
+        console.log('Response:', response.status);
       } else {
         setMessage('Failed to add item.');
       }
@@ -58,6 +56,15 @@ const AddExperienceCard: React.FC = () => {
             className="input input-bordered w-full"
             value={position}
             onChange={(e) => setPosition(e.target.value)}
+            disabled={loading}
+          />
+              <input
+            type="text"
+            placeholder="example: 3 years"
+            required={true}
+            className="input input-bordered w-full"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
             disabled={loading}
           />
           <div className="card-actions">

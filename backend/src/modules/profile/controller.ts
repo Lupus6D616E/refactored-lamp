@@ -72,7 +72,8 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
   .post(
     "/addexperience",
     async ({ currentUser, body }) => {
-      const response = await Profile.insertExperience(currentUser, body);
+      console.log(`adding experience ${body.position} for ${currentUser.id}`)
+      const response = await Profile.insertExperience(currentUser.id, body);
       if (response === 0) {
         return {
           success: true,

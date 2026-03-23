@@ -1,4 +1,4 @@
-import { foreignKey, pgEnum, point, varchar } from "drizzle-orm/pg-core";
+import { foreignKey, pgEnum, point, varchar, vector } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -13,7 +13,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const publicTest = pgTable("public_test",{
+export const publicTest = pgTable("public_test", {
   name: text("name").primaryKey()
 })
 
@@ -100,8 +100,9 @@ export const userWorkExperience = pgTable("user_work_experience", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  experience: varchar("experience", { length: 100 }).notNull(),
-  position: varchar("position", { length: 100 }).notNull(),
+  experience: text("experience").notNull(),
+  position: text("position").notNull(),
+  duration: text("duration").notNull(),
 }).enableRLS()
 
 export const userCertification = pgTable("user_certification", {
@@ -248,7 +249,7 @@ export const jobApplications = pgTable(
       .references(() => user.id),
     jobId: integer("job_id")
       .notNull()
-      .references(() => jobPosts.id),
+      .references(() => jobPosts.id, { onDelete: 'cascade' }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     status: applicationStatusEnum("application_status")
       .notNull()
@@ -283,7 +284,7 @@ export const mail = pgTable("mail", {
     .notNull(),
   receiverId: text('receiver_id'),
   senderRole: text('sender_role', { enum: ["user", "business", "admin"] }).notNull().default('user'),
-  recieverRole:  text('reciever_role', { enum: ["user", "business", "admin"] }).notNull().default('user'),
+  recieverRole: text('reciever_role', { enum: ["user", "business", "admin"] }).notNull().default('user'),
   businessId: uuid('business_id')
     .references(() => businessProfile.id, { onDelete: 'cascade' }), // null for direct messages
   dateSent: timestamp('date_sent').notNull().defaultNow(),
@@ -293,7 +294,7 @@ export const mail = pgTable("mail", {
 },
   (table) => {
     const constraints = [];
-   constraints.push(
+    constraints.push(
       foreignKey({
         columns: [table.senderId],
         foreignColumns: [user.id],
@@ -327,3 +328,21 @@ export const mail = pgTable("mail", {
     return constraints;
   },).enableRLS()
 
+export const seekerProfileEmbedding = pgTable("seeker_profile_embedding", {
+  id: serial('id').primaryKey(),
+  userid: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  profileEmbedding: vector('profile_embedding', { dimensions: 384 }).notNull()
+}, (table) => [index('profile_embedding_idx')
+  .using('hnsw', table.profileEmbedding.op('vector_cosine_ops'))]).
+  enableRLS()
+export const jobPostEmbedding = pgTable("job_post_embedding", {
+  id: serial('id').primaryKey(),
+  postid: integer("post_id")
+    .notNull()
+    .references(() => jobPosts.id, { onDelete: "cascade" }).unique(),
+  postEmbedding: vector('post_embedding', { dimensions: 384 }).notNull()
+}, (table) => [index('post_embedding_idx')
+  .using('hnsw', table.postEmbedding.op('vector_cosine_ops'))]).
+  enableRLS()

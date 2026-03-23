@@ -131,6 +131,23 @@ export function AdvancedSearchBar({ onResults }: Props) {
       console.error("Network/search failed:", err);
     }
   };
+  
+  const smartSearch = async () => {
+     try {
+      const response = await edenTreatyApi.search.jobpost.personalized.get({
+      });
+      if (response.error) {
+        console.error("Search error:", response.error);
+        // Handle error (e.g. toast notification)
+        return;
+      }
+      console.log("Search results:", response.data);
+      onResults(response.data.results)
+      // Update UI with response.data.results, etc.
+    } catch (err) {
+      console.error("Network/search failed:", err);
+    }
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4">
@@ -286,6 +303,12 @@ export function AdvancedSearchBar({ onResults }: Props) {
             onClick={handleSearch}
           >
             Search
+          </button>
+           <button
+            className="btn btn-primary btn-lg w-full sm:w-auto"
+            onClick={smartSearch}
+          >
+            Personalized
           </button>
         </div>
       </div>

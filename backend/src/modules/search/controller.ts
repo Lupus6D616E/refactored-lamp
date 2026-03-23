@@ -3,7 +3,7 @@ import { searchModel } from "./model";
 import { Search } from "./service";
 import { betterAuthPlugin } from "@lib/auth";
 export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
-.use(betterAuthPlugin)
+  .use(betterAuthPlugin)
   .get(
     "/jobpost",
     async ({ query }) => {
@@ -20,6 +20,15 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
       query: searchModel.searchJobQuery,
     },
   )
+  .get("/jobpost/personalized", async ({currentUser}) => {
+    const result = await Search.smartJobSearch(currentUser.id)
+    return{
+      results: result
+    }
+  }, {
+    role: ['user']
+  }
+  )
   .get(
     "/seeker",
     async ({ query }) => {
@@ -31,12 +40,12 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
         result: result, // ← your actual results
       };
     },
-    { 
+    {
       role: ['admin'],
       query: searchModel.searchUserQuery,
     },
   )
-    .get(
+  .get(
     "/business",
     async ({ query }) => {
       // query is fully typed!
@@ -47,7 +56,7 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
         result: result, // ← your actual results
       };
     },
-    { 
+    {
       query: searchModel.searchBusinessQuery,
     },
   )
@@ -59,7 +68,7 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
       const result = await Search.findBusinessUser(query);
       console.log(result);
       return {
-        result: result, 
+        result: result,
       };
     },
     {
