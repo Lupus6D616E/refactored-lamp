@@ -267,6 +267,7 @@ export abstract class Profile {
 
   static async insertCreatedEmbedding(userID: string) {
     const profileEmbedding = await this.embedUserProfile(userID)
+    console.log("created embedding")
     const res = await db.insert(seekerProfileEmbedding).values({
       userid: userID,
       profileEmbedding: profileEmbedding

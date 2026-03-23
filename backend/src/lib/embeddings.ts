@@ -10,7 +10,7 @@ env.cacheDir = './.cache/hf';           // where models are stored
 // env.allowLocalModels  = true;        // default = true
 
 // ────────────────────────────────────────────────
-const model_id = 'Xenova/all-MiniLM-L6-v2';     // ← Xenova = optimized ONNX version
+const model_id = 'Xenova/bge-large-en-v1.5';     // ← Xenova = optimized ONNX version
 
 // Load once (usually keep this as a module-level singleton)
 const extractor = await pipeline(
@@ -42,6 +42,7 @@ export async function getEmbedding(text: string){
     const output = await extractor(text, {
         pooling: 'mean',          // most common choice
         normalize: true,          // L2 normalization (cosine similarity ready)
+        
     });
 
     // output is usually shape [batch, sequence, hidden] → we want [batch, hidden]
@@ -53,7 +54,10 @@ export async function getEmbedding(text: string){
 // ────────────────────────────────────────────────
 // Example usage
 if (import.meta.main) {
-    console.log("creating embedding for post 10")
-    Post.insertCreatedEmbedding(14)
-    Post.insertCreatedEmbedding(15)
+  const embtens = await getEmbedding("Bun is a fast all-in-one JavaScript runtime");
+  const emb = embtens.tolist()[0]
+  console.log("Embedding length:", emb.length);     // → 384
+  console.log("First 5 values:", emb.slice(0, 5));
+
+  Profile.insertCreatedEmbedding("g0FiQuHNebjdzYlBoDVeVAtjlJ6LyQPH")
 }

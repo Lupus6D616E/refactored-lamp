@@ -332,8 +332,8 @@ export const seekerProfileEmbedding = pgTable("seeker_profile_embedding", {
   id: serial('id').primaryKey(),
   userid: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  profileEmbedding: vector('profile_embedding', { dimensions: 384 }).notNull()
+    .references(() => user.id, { onDelete: "cascade" }).unique(),
+  profileEmbedding: vector('profile_embedding', { dimensions: 1024 }).notNull()
 }, (table) => [index('profile_embedding_idx')
   .using('hnsw', table.profileEmbedding.op('vector_cosine_ops'))]).
   enableRLS()
@@ -342,7 +342,7 @@ export const jobPostEmbedding = pgTable("job_post_embedding", {
   postid: integer("post_id")
     .notNull()
     .references(() => jobPosts.id, { onDelete: "cascade" }).unique(),
-  postEmbedding: vector('post_embedding', { dimensions: 384 }).notNull()
+  postEmbedding: vector('post_embedding', { dimensions: 1024 }).notNull()
 }, (table) => [index('post_embedding_idx')
   .using('hnsw', table.postEmbedding.op('vector_cosine_ops'))]).
   enableRLS()

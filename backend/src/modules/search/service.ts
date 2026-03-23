@@ -72,13 +72,15 @@ export abstract class Search {
     const similarPosts = await db
       .select({
         id: jobPostEmbedding.id,
-        postId: jobPostEmbedding.postid
+        postId: jobPostEmbedding.postid,
+        similarity: sql<number>`1 - (${cosineDistance(jobPostEmbedding.postEmbedding, profileEmbedding.embedding)})`.as('similarity'),
       })
       .from(jobPostEmbedding)
       .orderBy(cosineDistance(jobPostEmbedding.postEmbedding,profileEmbedding.embedding))
       .limit(5);
     console.log(`got embeddings, ${similarPosts}`)
     const postIds = similarPosts.map(({postId}) => postId)
+    similarPosts.forEach((item)=> {console.log(`${item.postId} and sim: ${item.similarity}`)})
     const result = await db
     .select({
         id: jobPosts.id,
