@@ -22,6 +22,7 @@ export const user = pgTable("user", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
+  businessVerified: boolean("business_verified").default(false).notNull(),
   image: text("image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
@@ -337,6 +338,7 @@ export const seekerProfileEmbedding = pgTable("seeker_profile_embedding", {
 }, (table) => [index('profile_embedding_idx')
   .using('hnsw', table.profileEmbedding.op('vector_cosine_ops'))]).
   enableRLS()
+  
 export const jobPostEmbedding = pgTable("job_post_embedding", {
   id: serial('id').primaryKey(),
   postid: integer("post_id")

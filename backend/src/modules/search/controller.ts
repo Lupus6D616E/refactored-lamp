@@ -12,7 +12,7 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
       const result = await Search.findjobpost(query);
       console.log(result);
       return {
-        results: result, // ← your actual results
+        results: result
       };
     },
     {

@@ -12,6 +12,7 @@ import { OpenAPI } from "@lib/auth";
 import { adminPlugin } from "@modules/admin/controller";
 import { businessPlugin } from "@modules/business/controller";
 import { messagePlugin } from "@modules/mail/controller";
+import { verificationPlugin } from "@modules/verification/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -48,6 +49,7 @@ const app = new Elysia()
   .use(adminPlugin)
   .use(businessPlugin)
   .use(messagePlugin)
+  .use(verificationPlugin)
   .use(openapi({documentation: {
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()

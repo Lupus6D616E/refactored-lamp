@@ -53,11 +53,58 @@ export async function getEmbedding(text: string){
 
 // ────────────────────────────────────────────────
 // Example usage
-if (import.meta.main) {
-  const embtens = await getEmbedding("Bun is a fast all-in-one JavaScript runtime");
-  const emb = embtens.tolist()[0]
-  console.log("Embedding length:", emb.length);     // → 384
-  console.log("First 5 values:", emb.slice(0, 5));
 
-  Profile.insertCreatedEmbedding("g0FiQuHNebjdzYlBoDVeVAtjlJ6LyQPH")
+
+import { db } from "@db/db"
+import { jobPostEmbedding, jobPosts, seekerProfile, seekerProfileEmbedding, user,  } from "@db/schema";
+import { notExists, eq, and, exists } from "drizzle-orm";
+
+if (import.meta.main) {
+    createjobembeddings()
+
+}
+
+
+async function createuserembeddings(){
+    const users = await db
+  .select()
+  .from(user)
+  .where(
+    and(
+    notExists(
+      db
+        .select()
+        .from(seekerProfileEmbedding)
+        .where(eq(seekerProfileEmbedding.userid, user.id))
+    ),
+    exists(
+        db
+          .select() // minimal select for existence check
+          .from(seekerProfile)
+          .where(eq(seekerProfile.userId, user.id)) // adjust column name if needed
+    )
+)
+  )
+for (const user of users) {
+    console.log(`doing ${user.name}`)
+  await Profile.insertCreatedEmbedding(user.id);
+}
+}
+async function createjobembeddings(){
+    const jobpostlist = await db
+    .select()
+    .from(jobPosts)
+    .where(
+        notExists(
+            db.select()
+            .from(jobPostEmbedding)
+            .where(eq(jobPostEmbedding.postid, jobPosts.id))
+        )
+    )
+
+for (const jobPost of jobpostlist) {
+    console.log(`doing ${jobPost.id}`)
+    await Post.embedJobPost(jobPost.id);
+}
+
 }
