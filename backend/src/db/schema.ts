@@ -338,7 +338,7 @@ export const seekerProfileEmbedding = pgTable("seeker_profile_embedding", {
 }, (table) => [index('profile_embedding_idx')
   .using('hnsw', table.profileEmbedding.op('vector_cosine_ops'))]).
   enableRLS()
-  
+
 export const jobPostEmbedding = pgTable("job_post_embedding", {
   id: serial('id').primaryKey(),
   postid: integer("post_id")
@@ -348,3 +348,24 @@ export const jobPostEmbedding = pgTable("job_post_embedding", {
 }, (table) => [index('post_embedding_idx')
   .using('hnsw', table.postEmbedding.op('vector_cosine_ops'))]).
   enableRLS()
+
+export const businessApplications = pgTable("business_applications",{
+  id: serial('id').primaryKey(),
+  userid: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }).unique(),
+  name: text("name").unique().notNull(),
+  description: text("description").notNull(),
+  industry: text("industry").notNull(),
+  address: text("address").notNull(),
+  verified: boolean("verified").default(false).notNull()
+}).enableRLS()
+
+export const businessApplicationsDocuments = pgTable("business_applications_documents",{
+  id: serial('id').primaryKey(),
+  applicationId: integer("application_id")
+      .notNull()
+      .references(() => businessApplications.id, { onDelete: 'cascade' }),
+  documentUrl: text("document_url").notNull(),
+  documentName: text("document_name").notNull() 
+}).enableRLS()
