@@ -3,6 +3,7 @@ import { ApplyTheme } from "@components/auxilliary/ApplyTheme";
 import { VerificationPage } from "./verify";
 import { authClient } from "@lib/auth-client";
 import { ForbiddenPage } from "@components/auxilliary/Forbidden";
+import { VerifyPage } from "./admin/adminVerification";
 
 function App() {
 
@@ -11,7 +12,8 @@ function App() {
     <main>
         <ApplyTheme />
         {session?.user.role === "business" && session !== null && <VerificationPage />}
-        {session?.user.role !== "business" &&  <ForbiddenPage />}
+        {session?.user.role === "admin" &&  <VerifyPage />}
+        {(session?.user.role === "user" || session === null) && <ForbiddenPage />}
     </main>
   );
 }

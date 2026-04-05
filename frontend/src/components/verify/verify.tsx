@@ -2,6 +2,7 @@ import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
 import React, { useEffect, useState } from "react";
 import { PendingPage } from "./pending";
+import { RejectedPage } from "./rejected";
 export const VerificationPage: React.FC = () => {
 
     const [files, setFiles] = useState<File[]>([]);
@@ -21,11 +22,15 @@ export const VerificationPage: React.FC = () => {
                     console.log("no applications found")
                 }
                 else {
-                    if (res.data.status === true) {
+                    if (res.data.status === "accepted"
+                    ) {
                         setVerified("verified")
                     }
-                    else {
+                    else if (res.data.status === "") {
                         setVerified("pending")
+                    }
+                    else{
+                        setVerified("rejected")
                     }
                 }
             } catch (err) {
@@ -205,5 +210,9 @@ export const VerificationPage: React.FC = () => {
     }
     else if (isVerified === "pending") {
         return (<PendingPage />)
+    }
+
+        else if (isVerified === "rejected") {
+            return (<RejectedPage />)
     }
 };

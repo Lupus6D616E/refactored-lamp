@@ -54,4 +54,36 @@ export abstract class Verification {
             id: status[0].id
         }
     }
+    static async getPendingVerifications(type: string){
+        const res = await db
+        .select({
+            id: businessApplications.id,
+            businessName: businessApplications.name,
+            userName: user.name,
+            email: user.email,
+            status: businessApplications.verified
+        })
+        .from(businessApplications)
+        .leftJoin(user,eq(user.id,businessApplications.userid))
+        .where(eq(businessApplications.verified,type))
+        console.log(res)
+        return res
+    }
+    static async getVerificationItem(id: number){
+        const res = await db
+        .select({
+            id: businessApplications.id,
+            businessName: businessApplications.name,
+            userName: user.name,
+            description: businessApplications.description,
+            address: businessApplications.address,
+            industry: businessApplications.industry,
+            email: user.email,
+            status: businessApplications.verified
+        })
+        .from(businessApplications)
+        .leftJoin(user,eq(user.id,businessApplications.userid))
+        .where(eq(businessApplications.id,id))
+        return res[0]
+    }
 }

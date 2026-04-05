@@ -29,8 +29,13 @@ function App() {
     }
     else if(session.user.role === "user"){
     return (
-        <main>
-            nice try
+         <main>
+             <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+                        <div className="card-body">
+                            return to user dashboard: 
+                                    <button className='btn' onClick={() => window.location.href = 'dashboard.html'}>Go Home</button>
+                        </div>
+            </div>
         </main>
     )
     }

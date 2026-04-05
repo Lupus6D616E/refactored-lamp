@@ -30,3 +30,16 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
     },{
         role:["business"]
     })
+    .get('/admin/listpendingverification', async({ currentUser }) =>{
+        const res = await Verification.getPendingVerifications("pending")
+        return res
+    },{
+        role:["admin"]
+    })
+    .get('/admin/verification/:id', async({ currentUser, params })=>{
+        const res = await Verification.getVerificationItem(parseInt(params.id))
+        return res
+    },{
+        role:["admin"]
+    })
+

@@ -141,6 +141,7 @@ export const businessProfile = pgTable("business_profile", {
   description: text("description").notNull(),
   industry: text("industry").notNull(),
   address: text("address").notNull(),
+  bnn: text("bnn"),
   location: point('location', { mode: 'xy' }),
 }).enableRLS()
 
@@ -358,7 +359,7 @@ export const businessApplications = pgTable("business_applications",{
   description: text("description").notNull(),
   industry: text("industry").notNull(),
   address: text("address").notNull(),
-  verified: boolean("verified").default(false).notNull()
+  verified: text("verified").default("pending").notNull()
 }).enableRLS()
 
 export const businessApplicationsDocuments = pgTable("business_applications_documents",{
