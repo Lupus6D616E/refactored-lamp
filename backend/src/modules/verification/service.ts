@@ -86,4 +86,15 @@ export abstract class Verification {
         .where(eq(businessApplications.id,id))
         return res[0]
     }
+    static async getPDF(id: number){
+        const res = await db
+        .select({
+            id: businessApplicationsDocuments.id,
+            filepath: businessApplicationsDocuments.documentUrl,
+            filename: businessApplicationsDocuments.documentName
+        })
+        .from(businessApplicationsDocuments)
+        .where(eq(businessApplicationsDocuments.applicationId,id))
+        return res
+    }
 }
