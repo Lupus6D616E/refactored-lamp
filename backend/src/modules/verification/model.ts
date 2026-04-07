@@ -6,6 +6,7 @@ export namespace verificationModel{
             address: t.String(),
             description: t.String(),
             industry: t.String(),
+            bin: t.String(),
             documents: t.Files({
                 maxSize: '10m',        // optional per-file limit
                 type: ['application/pdf', 'application/msword']

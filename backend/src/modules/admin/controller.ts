@@ -64,14 +64,11 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
       body:AdminModel.bootStrapAdminAccountBody
       })
   .post("/createbusiness",async ({ body }) => {
-    const res = await Admin.createBusiness(body.name.toLowerCase(),body.description,body.industry,body.address)
+    const res = await Admin.createBusiness(body.name.toLowerCase(),body.description,body.industry,body.address,body.bin)
     if( res === 409){
       return status(409,"Business Already Exists")
-    }else if( res === 201){
+    }else{
       return status(201, "Business Created")
-    }
-    else{
-      return status(500)
     }
   },{
     role:["admin"],

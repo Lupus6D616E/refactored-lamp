@@ -1,9 +1,11 @@
 
 import { betterAuthPlugin } from '@lib/auth'
-import { Elysia, status } from 'elysia'
+import { Elysia, status, t } from 'elysia'
 import { verificationModel } from './model'
 import { Verification } from './service'
 import AdmZip from 'adm-zip';
+import { Business } from '@modules/business/service';
+import { Admin } from '@modules/admin/service';
 export const verificationPlugin = new Elysia({ prefix: "/verify" })
     .use(betterAuthPlugin)
     .post('/business/upload', async ({ currentUser, body }) => {
@@ -12,9 +14,10 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
             industry,       // string
             description,    // string 
             address,
+            bin,
             documents,      // File[] 
         } = body
-        const res = await Verification.createVerificationRequest(currentUser.id, name, industry, description, address, documents)
+        const res = await Verification.createVerificationRequest(currentUser.id, name, industry, description, address,bin ,documents)
         return res
     }, {
         role: ["business"],
@@ -67,4 +70,27 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
         role: ["admin"]
     }
     )
+    .post('admin/verification/verify', async ({ currentUser, body}) =>{
+        console.log(body.id, body.decision)
+        if(body.decision === "reject"){
+        Verification.rejectBusinessApplication(body.id)
+        return{
+            success: true,
+            message: `application ID: ${body.id} Rejected`
+        }
+        }
+         if(body.decision === "accept"){
+        Verification.acceptBusinessApplication(body.id)
+        return{
+            success: true,
+            message: `application ID: ${body.id} accepted`
+        }
+        }
+    },{
+        role:["admin"],
+        body: t.Object({
+            id: t.Number(),
+            decision: t.String()
+        })
+    })
 

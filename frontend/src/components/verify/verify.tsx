@@ -13,7 +13,7 @@ export const VerificationPage: React.FC = () => {
     const [description, setDescription] = useState("");
     const [address, setAddress] = useState("");
     const [industry, setIndustry] = useState("");
-
+    const [bin, setBin] = useState("");
     useEffect(() => {
         const fetchStatus = async () => {
             try {
@@ -26,10 +26,10 @@ export const VerificationPage: React.FC = () => {
                     ) {
                         setVerified("verified")
                     }
-                    else if (res.data.status === "") {
+                    else if (res.data.status === "pending") {
                         setVerified("pending")
                     }
-                    else{
+                    else if (res.data.status === "rejected"){
                         setVerified("rejected")
                     }
                 }
@@ -80,16 +80,14 @@ export const VerificationPage: React.FC = () => {
             description: description,
             address: address,
             industry: industry,
-            documents: files
+            documents: files,
+            bin: bin
         })
         if (res.data?.success) {
             setButtonText('success');
-            setTimeout(() => {
-                setButtonText('Submit');
-            }, 2000); // 2 seconds
         }
     };
-    if (isVerified === "none") {
+    if (isVerified === "none" || isVerified === "verified") {
         return (
             <div className="min-h-screen flex items-center justify-center bg-base-200 p-6">
                 <form
@@ -164,6 +162,25 @@ export const VerificationPage: React.FC = () => {
                             required
                         />
                     </div>
+
+
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text font-medium text-base-content/80">
+                                Business Identification Number
+                            </span>
+                        </label>
+                        <input
+                            name="industry"
+                            type="text"
+                            placeholder="BIN"
+                            value={bin}
+                            className="input input-bordered w-full"
+                            onChange={(e) => setBin(e.target.value)}
+                            required
+                        />
+                    </div>
+
 
                     <h2 className="text-2xl font-bold text-center">
                         Upload PDF Files

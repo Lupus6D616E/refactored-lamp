@@ -20,6 +20,7 @@ interface businessInfo {
     email: string| null
     industry: string;
     status: string;
+    bin: string;
 }
 
 interface ChildProps {
@@ -66,6 +67,7 @@ export const PendingVerificationList: React.FC<ChildProps> = ({businessInfo, set
        email: res.data.email,
        industry: res.data.industry,
        status: res.data.status,
+       bin: res.data.bin
       }));
   };
 

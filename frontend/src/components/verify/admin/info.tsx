@@ -11,6 +11,7 @@ interface InfoCardProps {
     email: string | null
     industry: string;
     status: string;
+    bin: string;
 }
 
 export const InfoCard: React.FC<InfoCardProps> = ({
@@ -22,6 +23,7 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     email,
     industry,
     status,
+    bin,
 
 }) => {
     async function downloadPDFs(id: number) {
@@ -39,7 +41,6 @@ export const InfoCard: React.FC<InfoCardProps> = ({
 
   try {
     // Get the raw binary data as Blob
-    console.log(data)
     const blob = data instanceof Blob ? data : new Blob([data], { type: 'application/zip' })
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -53,6 +54,9 @@ export const InfoCard: React.FC<InfoCardProps> = ({
     console.error('Failed to process ZIP blob:', err);
   }
 }
+    async function makedecision(id: number, decision: string ){
+        const res = await edenTreatyApi.verify.admin.verification.verify.post({id:id, decision: decision})
+    }
     return (
         <div className="card w-96 bg-base-100 shadow-xl">
 
@@ -69,6 +73,8 @@ export const InfoCard: React.FC<InfoCardProps> = ({
                 <h2 className="card-title text-2xl font-bold">email:{email}</h2>
 
                 <h2 className="card-title text-2xl font-bold">status:{status}</h2>
+
+                <h2 className="card-title text-2xl font-bold">bin:{bin}</h2>
                 <p className="text-base-content/80 mt-2 line-clamp-3">
                     {description}
                 </p>
@@ -104,6 +110,14 @@ export const InfoCard: React.FC<InfoCardProps> = ({
 
                 <div className="card-actions justify-end mt-6">
                     <button className="btn btn-primary" onClick={() => downloadPDFs(id)}>download pdfs!</button>
+                </div>
+
+                <div className="card-actions justify-end mt-6">
+                    <button className="btn btn-primary" onClick={() => makedecision(id,"accept")}>accept!</button>
+                </div>
+
+                <div className="card-actions justify-end mt-6">
+                    <button className="btn btn-primary" onClick={() => makedecision(id,"reject")}>reject!</button>
                 </div>
             </div>
         </div>

@@ -6,6 +6,7 @@ type FormDataType = {
   description: string;
   address: string;
   industry: string;
+  bin: string;
 };
 
 export function AddBusinessCard() {
@@ -30,6 +31,7 @@ export function AddBusinessCard() {
       description: data.get("description") as string,
       address: data.get("address") as string,
       industry: data.get("industry") as string,
+      bin: data.get("bin") as string
     };
 
     await submitForm(payload);
@@ -115,6 +117,20 @@ export function AddBusinessCard() {
               name="industry"
               type="text"
               placeholder="Time travel"
+              className="input input-bordered w-full"
+              required
+            />
+          </div>
+              <div className="form-control">
+            <label className="label">
+              <span className="label-text font-medium text-base-content/80">
+                bin
+              </span>
+            </label>
+            <input
+              name="bin"
+              type="text"
+              placeholder="bin"
               className="input input-bordered w-full"
               required
             />

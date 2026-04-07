@@ -20,6 +20,7 @@ export namespace AdminModel {
     description: t.String(),
     industry: t.String(),
     address: t.String(),
+    bin: t.String(),
   });
   export const addUserToBusinessModel = t.Object({
     email: t.String(),

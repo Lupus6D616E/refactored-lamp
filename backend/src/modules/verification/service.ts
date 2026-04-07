@@ -1,7 +1,8 @@
 import { db } from "@db/db";
 import { verificationModel } from "./model";
 import { businessApplications, businessApplicationsDocuments, user } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { Admin } from "@modules/admin/service";
 
 export abstract class Verification {
     static async createVerificationRequest(
@@ -10,14 +11,16 @@ export abstract class Verification {
         industry: string,       // string
         description: string,    // string 
         address: string,
+        bin: string,
         documents: File[],      // File[] 
     ): Promise<verificationModel.businessVerificationReturn> {
-        console.log('Text fields:', { name, industry, address, description })
+        console.log('Text fields:', { name, industry, address,bin, description })
         const application = await db.insert(businessApplications).values({
             userid: userId,
             description: description,
             name: name,
             industry: industry,
+            bin: bin,
             address: address
         }).returning()
         // Process multiple files
@@ -46,6 +49,7 @@ export abstract class Verification {
         })
         .from(businessApplications)
         .where(eq(businessApplications.userid,userId))
+        .orderBy(desc(businessApplications.createdAt))
         if(status[0] === null){
             return null
         }
@@ -79,6 +83,7 @@ export abstract class Verification {
             address: businessApplications.address,
             industry: businessApplications.industry,
             email: user.email,
+            bin: businessApplications.bin,
             status: businessApplications.verified
         })
         .from(businessApplications)
@@ -96,5 +101,25 @@ export abstract class Verification {
         .from(businessApplicationsDocuments)
         .where(eq(businessApplicationsDocuments.applicationId,id))
         return res
+    }
+    static async rejectBusinessApplication(id: number){
+        const res = await db.update(businessApplications)
+        .set({ verified:"rejected"})
+        .where(eq(businessApplications.id, id))
+    }
+    static async acceptBusinessApplication(id: number){
+        const verified = await db.update(businessApplications)
+        .set({ verified:"accepted"})
+        .where(eq(businessApplications.id, id)).returning()
+        const business = verified[0]
+        const res = await Admin.createBusiness(business.name,business.description,business.industry,business.address,business.bin)
+        const useremail = await db.select({
+            email: user.email
+        })
+        .from(user)
+        .where(eq(user.id,business.userid))   
+        console.log("business created")      
+        const added = await Admin.addUserToBusiness(useremail[0].email,business.name)
+        console.log("user added to created business")
     }
 }

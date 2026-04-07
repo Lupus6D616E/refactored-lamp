@@ -90,6 +90,7 @@ export abstract class Admin {
     description: string,
     industry: string,
     address: string,
+    bin: string,
   ) {
     try {
       const result = await db
@@ -99,6 +100,7 @@ export abstract class Admin {
           description,
           industry,
           address,
+          bin
         })
         .onConflictDoNothing({ target: businessProfile.name })
         .returning({
@@ -108,7 +110,7 @@ export abstract class Admin {
       if (result.length === 0) {
         return 409;
       }
-      return 201;
+      return result;
     } catch (e) {
       console.log(e);
     }

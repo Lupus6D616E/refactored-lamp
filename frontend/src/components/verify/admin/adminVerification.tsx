@@ -13,6 +13,7 @@ interface businessInfo {
     email: string| null
     status: string;
     industry: string;
+    bin: string
 }
 export function VerifyPage() {
     const [businessInfo, setBusinessInfo] = useState<businessInfo>({
@@ -23,7 +24,8 @@ export function VerifyPage() {
         address: "empty",
         email: "empty",
         industry: "empty",
-        status: "pending"
+        status: "pending",
+        bin: "0"
     })
 
     return (
@@ -41,6 +43,7 @@ export function VerifyPage() {
                         description={businessInfo.description}
                         address={businessInfo.address}
                         email={businessInfo.email}
+                        bin={businessInfo.bin}
                     />
                 </div>
             </div>
