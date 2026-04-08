@@ -4,6 +4,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../db/db"; // your drizzle instance
 import { openAPI, admin } from "better-auth/plugins";
 import * as schema from "../db/schema";
+import { mailer } from "./mailer";
+import { getBaseUrl } from "./detectdeployed";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -12,7 +14,19 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
+    requireEmailVerification: false, // set this to true when we're done
+  },
+   emailVerification: {
+    sendVerificationEmail: async ( { user, url, token }, request) => {
+      console.log(process.env.NODE_ENV)
+       mailer.sendMail({
+        from: 'onboarding@resend.dev',
+        to: user.email,
+        subject: "Verify your email address",
+        text: `Click the link to verify your email: ${getBaseUrl()}/auth/api/verify-email?token=${token}`,
+      });
+    },
+    sendOnSignIn: true,
   },
   plugins: [openAPI(), admin({})],
 	baseURL: process.env.BETTER_AUTH_URL,

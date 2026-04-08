@@ -13,18 +13,21 @@ export default function UserProfileCard() {
   const [education, setEducation] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
   useEffect(() => {
     const getProfileDetails = async () => {
       const res = await edenTreatyApi.user.myprofile.get();
-      if (res.data){
+      if (res.data) {
         const userprofile = res.data
-        if(userprofile.description !== null){
-        setDescription(userprofile.description)
+        if (userprofile.description !== null) {
+          setDescription(userprofile.description)
         }
-        if(userprofile.address !== null){
+        if (userprofile.address !== null) {
           setAddress(userprofile.address)
         }
-        if(userprofile.education !== null){
+        if (userprofile.education !== null) {
           setEducation(userprofile.education)
         }
         setSkills(userprofile.skills)
@@ -32,7 +35,24 @@ export default function UserProfileCard() {
       }
     };
     getProfileDetails()
-  },[]);
+  }, []);
+  const handleSendVerification = async () => {
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      await authClient.sendVerificationEmail({
+        email: user.email,
+      });
+      setMessage("Verification email sent!");
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to send verification email.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (isPending) {
     return (
       <div className="card w-96 bg-base-100 shadow-xl">
@@ -80,10 +100,17 @@ export default function UserProfileCard() {
             </p>
             <p className="text-sm text-base-content/70">{skills}</p>
             <p className="text-sm text-base-content/70">{address}</p>
-            
+
             <p className="text-sm text-base-content/70">
               {schedule}
             </p>
+            {
+              session.user.emailVerified !== true &&
+
+              <button className="btn" onClick={handleSendVerification} disabled={loading}>
+                {loading ? "Sending..." : "Send Verification Email"}
+              </button>
+            }
           </div>
         </div>
       </div>
