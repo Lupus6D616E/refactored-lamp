@@ -17,5 +17,5 @@ export interface DecisionPayload {
   userId: string
   jobId: number
   message: string
-  decision: 'accepted' | 'rejected'
+  decision: 'accepted' | 'rejected' | 'pending'
 }

@@ -19,14 +19,14 @@ export const auth = betterAuth({
    emailVerification: {
     sendVerificationEmail: async ( { user, url, token }, request) => {
       console.log(process.env.NODE_ENV)
-       mailer.sendMail({
-        from: 'onboarding@resend.dev',
+       mailer.sendMail({  
+        from: 'noreply-verify@mail.flexihire.link',
         to: user.email,
         subject: "Verify your email address",
         text: `Click the link to verify your email: ${getBaseUrl()}/auth/api/verify-email?token=${token}`,
       });
     },
-    sendOnSignIn: true,
+    sendOnSignIn: false,
   },
   plugins: [openAPI(), admin({})],
 	baseURL: process.env.BETTER_AUTH_URL,

@@ -1,7 +1,7 @@
 import { edenTreatyApi } from "@lib/eden";
 import { useEffect, useState } from "react";
 
-type CardStatus = "pending" | "rejected" | "accepted" | "expired";
+type CardStatus = "pending" | "rejected" | "accepted" | "expired" | "processing";
 
 interface Item {
   jobId: number;

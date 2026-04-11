@@ -12,7 +12,7 @@ export const DashboardCards = ({ data, loading }: Props) => {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setSubmitting] = useState(false)
-    const handleDecision = async (userId:string,action: 'accepted' | 'rejected') => {
+    const handleDecision = async (userId:string,action: 'accepted' | 'rejected' | "pending") => {
       setSubmitting(true)
     if (!message.trim()) {
       setError('Message is required')

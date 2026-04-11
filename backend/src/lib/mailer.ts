@@ -4,7 +4,7 @@ import { authClient } from './auth-client';
 const createTransporter = () => {
     const isProd = process.env.NODE_ENV === 'production';
 
-    if (!isProd) {
+    if (isProd) {
         return nodemailer.createTransport({
             host: 'localhost',
             port: 1025,
@@ -36,7 +36,7 @@ const createTransporter = () => {
 export const mailer = createTransporter()
 if (import.meta.main) {
 console.log("you are now testing")
-  await mailer.sendMail({
+  await mailer.sendMail({   
     from: '"Your App" <noreply@yourdomain.com>',
     to: "test@test.com",
     subject: 'Verify your email address',

@@ -6,7 +6,7 @@ export namespace businessModel {
     export const applicationDecision =  t.Object({
         jobId: t.Number(),
         userId: t.String(),
-        decision: t.Union([t.Literal("accepted"), t.Literal("rejected")]),
+        decision: t.Union([t.Literal("accepted"), t.Literal("rejected"), t.Literal("pending")]),
         message: t.String(),
       })
       

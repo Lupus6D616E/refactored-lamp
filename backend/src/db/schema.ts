@@ -242,6 +242,7 @@ export const applicationStatusEnum = pgEnum("application_status", [
   "rejected",
   "accepted",
   "expired",
+  "processing"
 ]);
 export const jobApplications = pgTable(
   "job_applications",

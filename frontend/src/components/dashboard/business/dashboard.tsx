@@ -5,6 +5,7 @@ import { JobPostCards } from "./JobPostCards";
 import { JobPostData, BusinessSelect, MessageData } from "./types";
 import { edenTreatyApi } from "@lib/eden";
 import { MessageCards } from "./messageCards";
+import { NoBusinessPage } from "./NoVerifiedBusinesses";
 
 export function DashboardPage() {
   const [dashboards, setDashboards] = useState<BusinessSelect[]>([]);
@@ -58,6 +59,11 @@ export function DashboardPage() {
     fetchMessages()
   }, [selectedId]);
 
+  if(dashboards.length === 0){
+    return(
+      <NoBusinessPage />
+    )
+  }
   return (
     <div className="min-h-screen bg-base-200">
       <DashboardNavbar

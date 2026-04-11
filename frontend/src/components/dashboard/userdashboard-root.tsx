@@ -16,6 +16,7 @@ import { MessageList } from '@components/dashboard/user/info/messages'
 import { useEffect } from 'react'
 import { themeChange } from 'theme-change'
 import ThemeSwitcherCard from '@components/auxilliary/ThemesSwitcherCard'
+import NavBar from '@components/auxilliary/navbar'
 function App() {
     useEffect(() => {
   themeChange(false)
@@ -29,6 +30,7 @@ function App() {
     else if(session.user.role === "user"){
     return (
         <main>
+            <NavBar />
             <ThemeSwitcherCard />
             <UserProfileCard />
             <LogoutButton />
@@ -47,6 +49,7 @@ function App() {
     else if(session.user.role === "business"){
     return (
         <main>
+            <NavBar />
             <DashboardPage />
         </main>
     )
