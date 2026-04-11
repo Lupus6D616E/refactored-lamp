@@ -9,7 +9,7 @@ export default function NavBar() {
 <div className="navbar bg-base-100 shadow-sm">
   <ApplyTheme />
   <div className="flex-1">
-    <a className="btn btn-ghost text-xl" href={"public/index.html"}>daisyUI</a>
+    <a className="btn btn-ghost text-xl" href={"/public/index.html"}>daisyUI</a>
   </div>
   <div className="flex-none">
     <ul className="menu menu-horizontal px-1">

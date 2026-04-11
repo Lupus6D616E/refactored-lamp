@@ -80,6 +80,9 @@ export const DashboardCards = ({ data, loading }: Props) => {
             <button onClick={() => handleDecision(stat.id!,"accepted")} className="btn btn-lg">
               Approve
             </button>
+             <button onClick={() => handleDecision(stat.id!,"pending")} className="btn btn-lg">
+              Pending
+            </button>
             <button onClick={() => handleDecision(stat.id!,"rejected")} className="btn btn-lg">
               Reject
             </button>
