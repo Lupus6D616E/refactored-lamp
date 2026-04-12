@@ -190,7 +190,14 @@ export function CreateJobForm() {
         onChange={(e) => setEmail(e.target.value)}
         className="w-full border p-2 rounded"
       />
-
+          <input
+        type="text"
+        placeholder="address"
+        required
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        className="w-full border p-2 rounded"
+      />
       <textarea
         placeholder="description"
         required
@@ -327,7 +334,7 @@ export function CreateJobForm() {
         disabled={loading}
         className="w-full bg-black text-white p-2 rounded"
       >
-        {loading ? "Creating account..." : "Sign up"}
+        {loading ? "Creating Job Post..." : "Post Job"}
       </button>
     </form>
   );

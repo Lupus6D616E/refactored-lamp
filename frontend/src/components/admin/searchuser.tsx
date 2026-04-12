@@ -3,6 +3,7 @@ interface SearchSeekerResult {
   name: string;
   email: string;
   description: string | null;
+  banned: boolean | null;
   distance: number;
   sim: number;
 }
@@ -131,8 +132,11 @@ export function SearchUserCard() {
           <div className="divide-y rounded-lg border">
             {seekerResults.map((user, idx) => (
               <div key={idx} className="p-3">
-                <p className="font-medium">{user.name}</p>
-                <p className="text-sm opacity-70">{user.email}</p>
+                {!user.banned && <div className="badge badge-primary">Unbanned</div>}
+                {user.banned && <div className="badge badge-error">Banned</div>}
+                <p className="font-medium">USER ID:{user.id}</p>
+                <p className="font-medium">USER NAME:{user.name}</p>
+                <p className="text-sm opacity-70">USER EMAIL{user.email}</p>
                 <p className="text-sm opacity-70">{user.description}</p>
                 <a className="btn btn-secondary" href={`userprofile.html?id=${user.id}`}> visit profile </a>
               </div>
@@ -143,9 +147,9 @@ export function SearchUserCard() {
           <div className="divide-y rounded-lg border">
             {businessResults.map((user, idx) => (
               <div key={idx} className="p-3">
-                <p className="font-medium">{user.name}</p>
-                <p className="text-sm opacity-70">{user.email}</p>
-                <a className=" btn btn-secondary"> </a>
+                <p className="font-medium">USER ID:{user.id}</p>
+                <p className="font-medium">USER NAME:{user.name}</p>
+                <p className="text-sm opacity-70">USER EMAIL{user.email}</p>
                 {user.businessName.map((business, index) => (
                 <div key={index}>
                   <p className="font-medium"> business name: {index}:{user.businessName[index]} </p>

@@ -6,6 +6,8 @@ import { edenTreatyApi } from "@lib/eden";
 import { AddBusinessCard } from "./addbusiness";
 import { SearchBusinessCard } from "./searchbusiness";
 import { AddUserCard } from "./addusertobusiness";
+import BanUserCard from "./BanUserCard";
+import UnbanUserCard from "./UnbanUserCard";
 
 export interface AdminStats {
   seekers: number;
@@ -100,6 +102,8 @@ export function AdminDashboard() {
           <AddBusinessCard />
           <SearchBusinessCard />
           <AddUserCard />
+          <BanUserCard />
+          <UnbanUserCard /> 
         </div>
       </main>
     </div>

@@ -62,7 +62,7 @@ export abstract class Business {
         industry: businessProfile.industry,
         address: businessProfile.address,
       })
-      .from(businessProfile).where(eq(businessProfile.id, businessProfile));
+      .from(businessProfile).where(eq(businessProfile.id, businessId));
     return result[0]
   }
   static async getUserBusinesses(userId: string) {

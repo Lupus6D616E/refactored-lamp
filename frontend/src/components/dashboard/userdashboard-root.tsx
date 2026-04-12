@@ -27,6 +27,9 @@ function App() {
             <><p> You are not logged in! </p><p> <a href='/public/signin.html'>Return to Sign-In</a></p></>
         )
     }
+    else if(session.user.role === "admin"){
+        window.location.href = "admin.html"
+    }
     else if(session.user.role === "user"){
     return (
         <main>

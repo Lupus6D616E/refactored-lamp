@@ -108,6 +108,7 @@ export abstract class Search {
         id: user.id,
         name: user.name,
         email: user.email,
+        banned: user.banned,
         description: sql<string>`
       COALESCE(
         ${seekerProfile.description},
@@ -155,7 +156,6 @@ export abstract class Search {
       filters.push(sql`${user.name} % ${search.name.trim()}`);
       filters.push(eq(user.role, "business"));
     }
-    console.log("got here")
     try {
       const result = await db
         .select({
