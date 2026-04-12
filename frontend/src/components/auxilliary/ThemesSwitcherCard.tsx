@@ -5,7 +5,7 @@ const themes = ['light', 'dark', 'aqua', 'cupcake'] as const
 type Theme = (typeof themes)[number]
 
 export default function ThemeSwitcherCard() {
-  const [selectedTheme, setSelectedTheme] = useState<Theme>('light')
+  const [selectedTheme, setSelectedTheme] = useState<Theme>()
 
   // Optional: read initial theme from localStorage (theme-change already does this)
   useEffect(() => {

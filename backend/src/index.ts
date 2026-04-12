@@ -54,7 +54,9 @@ const app = new Elysia()
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()
         }})) 
-  .listen(3000, ({ hostname, port }) => {
+  .listen({
+        port: 3000,
+    }, ({ hostname, port }) => {
     console.log(`Server started http://${hostname}:${port}`);
   });
 
