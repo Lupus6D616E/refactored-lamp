@@ -31,9 +31,8 @@ export const auth = betterAuth({
   plugins: [openAPI(), admin({})],
 	baseURL: process.env.BETTER_AUTH_URL,
   basePath: "/api",
-   trustedOrigins: [
-    "refactored-lamp-production.up.railway.app/",          // ← Railway frontend domain
-    "https://your-custom-domain.com",                    // if you have one
+   trustedOrigins: [      
+    "https://www.flexihire.link",                    // if you have one
     "http://localhost:5173",                             // for local dev (Vite default)
     "http://localhost:3000",                             // or whatever port your frontend uses locally
     // add any preview/staging domains too

@@ -30,6 +30,6 @@ await Bun.build({
   },
   target: 'browser',
   minify: true,
-  // splitting: true,          // ← enable if you want shared chunks (recommended!)
+  splitting: true,          // ← enable if you want shared chunks (recommended!)
   // naming: "[dir]/[name]-[hash].[ext]",   // customize output paths
 });
