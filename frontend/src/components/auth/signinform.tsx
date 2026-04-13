@@ -30,7 +30,7 @@ export function SigninForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
-      <h1 className="text-xl font-semibold">Sign in</h1>
+      <h1 className="text-xl btn-primary font-semibold">Sign in</h1>
 
       <input
         type="email"

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { themeChange } from 'theme-change'
 
-const themes = ['light', 'dark', 'aqua', 'cupcake'] as const
+const themes = ['light', 'dark', 'aqua', 'cupcake', 'mytheme'] as const
 type Theme = (typeof themes)[number]
 
 export function ApplyTheme() {

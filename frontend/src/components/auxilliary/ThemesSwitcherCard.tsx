@@ -1,7 +1,7 @@
 // src/components/ThemeSwitcherCard.tsx
 import { useEffect, useState } from 'react'
 
-const themes = ['light', 'dark', 'aqua', 'cupcake'] as const
+const themes = ['light', 'dark', 'aqua', 'cupcake','mytheme'] as const
 type Theme = (typeof themes)[number]
 
 export default function ThemeSwitcherCard() {

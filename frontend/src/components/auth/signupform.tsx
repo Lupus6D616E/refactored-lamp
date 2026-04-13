@@ -72,6 +72,8 @@ export function SignupCard() {
     } finally {
       setLoading(false);
     }
+
+    window.location.href = "/public/dashboard.html";
   }
 
   return (
@@ -194,7 +196,7 @@ export function SignupCard() {
             {/* Submit */}
             <div className="form-control">
               <button
-                className="btn btn-primary"
+                className="btn btn-secondary btn-sm md:btn-md lg:btn-lg w-full md:w-auto md:px-10"
                 type="submit"
                 disabled={loading}
               >
