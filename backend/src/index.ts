@@ -39,6 +39,7 @@ const isProd = process.env.NODE_ENV === 'production'
 const app = new Elysia()
   .get("/hello","geto")
   .use(await staticPlugin({
+    bunFullstack:true,
     assets: isProd ? './dist' : 'frontend/public'
   }))
   .use(betterAuthPlugin)
