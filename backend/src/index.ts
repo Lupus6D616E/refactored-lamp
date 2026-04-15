@@ -36,6 +36,7 @@ process.on("SIGINT", () => {
 });
 
 const isProd = process.env.NODE_ENV === 'production'
+console.log(process.env.NODE_ENV)
 const app = new Elysia()
   .get("/hello","geto")
   .use(await staticPlugin({
