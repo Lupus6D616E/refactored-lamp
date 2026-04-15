@@ -111,6 +111,11 @@ export default function UserProfileCard() {
                 {loading ? "Sending..." : "Send Verification Email"}
               </button>
             }
+            {
+              session.user.emailVerified &&     <p className="text-sm text-base-content/70">
+              User is verified!
+            </p>
+            }
           </div>
         </div>
       </div>

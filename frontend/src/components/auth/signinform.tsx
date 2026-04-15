@@ -6,6 +6,8 @@ export function SigninForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,7 +45,7 @@ export function SigninForm() {
       />
 
       <input
-        type="password"
+        type={showPassword ? "text" : "password"}
         placeholder="Password"
         autoComplete="current-password"
         required
@@ -51,6 +53,7 @@ export function SigninForm() {
         onChange={(e) => setPassword(e.target.value)}
         className="w-full border p-2 rounded"
       />
+      
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -61,6 +64,14 @@ export function SigninForm() {
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>
+       <button
+                  type="button"
+                  className="btn btn-sm"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "hide Password" : "show Password"}
+                </button>
     </form>
   );
 }

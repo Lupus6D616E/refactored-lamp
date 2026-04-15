@@ -153,7 +153,7 @@ export function SignupCard() {
             {/* Confirm Password */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Confirm password</span>
+                <span https://refactored-lamp-production.up.railway.app/public/signin.htmlclassName="label-text">Confirm password</span>
               </label>
               <div className="relative">
                 <input

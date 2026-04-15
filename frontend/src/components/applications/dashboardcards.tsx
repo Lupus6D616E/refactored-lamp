@@ -12,7 +12,7 @@ export const DashboardCards = ({ data, loading }: Props) => {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setSubmitting] = useState(false)
-    const handleDecision = async (userId:string,action: 'accepted' | 'rejected' | "pending") => {
+    const handleDecision = async (userId:string,action: 'accepted' | 'rejected' | "processing") => {
       setSubmitting(true)
     if (!message.trim()) {
       setError('Message is required')
@@ -80,8 +80,8 @@ export const DashboardCards = ({ data, loading }: Props) => {
             <button onClick={() => handleDecision(stat.id!,"accepted")} className="btn btn-lg">
               Approve
             </button>
-             <button onClick={() => handleDecision(stat.id!,"pending")} className="btn btn-lg">
-              Pending
+             <button onClick={() => handleDecision(stat.id!,"processing")} className="btn btn-lg">
+              Processing
             </button>
             <button onClick={() => handleDecision(stat.id!,"rejected")} className="btn btn-lg">
               Reject
