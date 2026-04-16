@@ -80,7 +80,12 @@ const ArticlesPage: React.FC = () => {
     }
 
     function goToPage(){
+        if(inputPage <= totalpages){
         setPage(inputPage)
+        }
+        else{
+        alert("page above total number of pages")
+        }
     }
     return (
         <div className="p-6 max-w-5xl mx-auto space-y-6">
