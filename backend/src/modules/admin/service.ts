@@ -1,5 +1,7 @@
 import { db } from "@db/db";
+import { extname } from "node:path";
 import {
+  articles,
   businessProfile,
   businessUser,
   jobApplications,
@@ -48,6 +50,28 @@ export abstract class Admin {
       return true;
     } else {
       return false;
+    }
+  }
+  static async createArticle(title: string, body: string, image: File) {
+    try {
+      
+      const res = await db
+        .insert(articles).values({
+          title: title,
+          body: body
+        }).returning()
+      const ext = extname(image.name)
+      const realpath = `userdata/news/${res[0].id}/leading${ext}`
+      const fakepath = `/static/images/news/${res[0].id}/leading${ext}`
+      await Bun.write(realpath, image)
+      await db.update(articles).set({
+        imageUrl: fakepath
+      })
+      .where(eq(articles.id,res[0].id))
+      return true
+    }
+    catch {
+      return false
     }
   }
   static async addUserToBusiness(email: string, businessName: string) {

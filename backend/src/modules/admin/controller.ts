@@ -74,6 +74,23 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     role:["admin"],
     body: AdminModel.createBusinessBody
   })
+  .post("/createpost",async ({ body}) => {
+    console.log(body)
+    const res = await Admin.createArticle(body.title,body.body,body.image)
+    if(res){
+      return status(201,"article reated")
+    }
+    else{
+       return status(500,"upload failure")
+    }
+  },{
+    role: ["admin"],
+    body: t.Object({
+      title: t.String(),
+      body: t.String(),
+      image: t.File()
+    })
+  })
   .get(
     "/stats",
     async ({}) => {

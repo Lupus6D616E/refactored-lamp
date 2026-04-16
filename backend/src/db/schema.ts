@@ -375,3 +375,13 @@ export const businessApplicationsDocuments = pgTable("business_applications_docu
   documentUrl: text("document_url").notNull(),
   documentName: text("document_name").notNull() 
 }).enableRLS()
+
+export const articles = pgTable("articles",{
+  id: serial("id").primaryKey(),
+  createdAt:  timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  body: text("body").notNull(),
+  title: text("title").notNull(),
+  imageUrl: text("image_url")
+}).enableRLS()

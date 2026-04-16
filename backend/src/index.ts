@@ -13,6 +13,8 @@ import { adminPlugin } from "@modules/admin/controller";
 import { businessPlugin } from "@modules/business/controller";
 import { messagePlugin } from "@modules/mail/controller";
 import { verificationPlugin } from "@modules/verification/controller";
+import { imagePlugin } from "@modules/static/controller";
+import { newsPlugin } from "@modules/news/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -43,6 +45,8 @@ const app = new Elysia()
     bunFullstack:true,
     assets: isProd ? './dist' : 'frontend/public'
   }))
+  .use(newsPlugin)
+  .use(imagePlugin)
   .use(betterAuthPlugin)
   .use(profilePlugin)
   .use(postPlugin)
