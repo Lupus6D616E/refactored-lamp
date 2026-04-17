@@ -11,6 +11,7 @@ import {
 import { auth } from "@lib/auth";
 import { count, eq } from "drizzle-orm";
 import { AdminModel } from "./model";
+import { s3Client } from "@lib/minio";
 
 export abstract class Admin {
   static async changeAccountType(email: string, type: AdminModel.role) {
@@ -61,9 +62,9 @@ export abstract class Admin {
           body: body
         }).returning()
       const ext = extname(image.name)
-      const realpath = `userdata/news/${res[0].id}/leading${ext}`
-      const fakepath = `/static/images/news/${res[0].id}/leading${ext}`
-      await Bun.write(realpath, image)
+      const realpath = `news/news_${res[0].id}${ext}`
+      const fakepath = `/static/images/news/news_${res[0].id}${ext}`
+      await s3Client.write(realpath, image)
       await db.update(articles).set({
         imageUrl: fakepath
       })

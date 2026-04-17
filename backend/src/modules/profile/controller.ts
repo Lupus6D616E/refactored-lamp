@@ -1,7 +1,8 @@
 import { betterAuthPlugin } from "@lib/auth";
-import { Elysia, status } from "elysia";
+import { Elysia, redirect, status } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
+import { s3Client } from "@lib/minio";
 
 export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
@@ -120,10 +121,12 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
           message: "No resume",
         };
       } else {
-        set.headers["Content-Type"] = "application/pdf";
-        set.headers["Content-Disposition"] =
-          `attachment; filename="resume.pdf"`;
-        return Bun.file(result);
+        const file = s3Client.file(result);
+        const presignedUrl = file.presign({
+          expiresIn: 3600,        // seconds (1 hour)
+          // method: "GET"        // default
+        });
+        return redirect(presignedUrl);
       }
     },
     {
@@ -208,10 +211,12 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
       if (result === null) {
         return status(404, "No resume found");
       } else {
-        set.headers["Content-Type"] = "application/octet-stream";
-        set.headers["Content-Disposition"] =
-          `attachment; filename="resume.pdf"`;
-        return Bun.file(result);
+        const file = s3Client.file(result);
+        const presignedUrl = file.presign({
+          expiresIn: 3600,        // seconds (1 hour)
+          // method: "GET"        // default
+        });
+        return redirect(presignedUrl);
       }
     },
     {

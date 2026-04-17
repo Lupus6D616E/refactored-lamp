@@ -1,10 +1,19 @@
 import { Elysia, status } from "elysia";
 import { betterAuthPlugin } from "@lib/auth";
+import { s3Client } from "@lib/minio";
 
 const env = process.env.NODE_ENV || 'development'; 
 
 export const imagePlugin = new Elysia({ prefix: "/static" })
   .use(betterAuthPlugin)
-  .get("/images/news/:id/:filename", ({ params:{id, filename} }) => {
-    return Bun.file(`userdata/news/${id}/${filename}`)
+  .get("/images/news/:filename", async ({ params:{filename} }) => {
+    try{
+    const file = await s3Client.file(`news/${filename}`)
+      return  file
+    }
+    catch{
+      return {
+        message: "lol"
+      }
+    }
   })    

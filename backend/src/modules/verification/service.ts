@@ -3,6 +3,7 @@ import { verificationModel } from "./model";
 import { businessApplications, businessApplicationsDocuments, user } from "@db/schema";
 import { desc, eq } from "drizzle-orm";
 import { Admin } from "@modules/admin/service";
+import { s3Client } from "@lib/minio";
 
 export abstract class Verification {
     static async createVerificationRequest(
@@ -27,8 +28,8 @@ export abstract class Verification {
         for (const doc of documents) {
             console.log(`Document: ${doc.name} (${doc.size} bytes, type: ${doc.type})`)
             // Save with Bun.write()
-            const path = `userdata/verification/${userId}/${doc.name}`
-            await Bun.write(path, doc)
+            const path = `verification/${userId}/${doc.name}`
+            await s3Client.write(path, doc)
             await db.insert(businessApplicationsDocuments)
                 .values({
                     applicationId: application[0].id,

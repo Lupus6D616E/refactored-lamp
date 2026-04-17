@@ -14,6 +14,7 @@ import {
 import { ProfileModel } from "./model";
 import { auth, type AuthUser } from "@lib/auth";
 import { getEmbedding } from "@lib/embeddings";
+import { s3Client } from "@lib/minio";
 export abstract class Profile {
   static async uploadResume(
     userSession: AuthUser,
@@ -21,11 +22,10 @@ export abstract class Profile {
   ) {
     const { file } = pdf;
     const oldResume = await this.getResumeUrl(userSession.id);
-    const uploadDir = "userdata/resumes";
-    await Bun.$`mkdir -p ${uploadDir}`.quiet();
+    const uploadDir = "resumes";
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}.pdf`;
     const filepath = `${uploadDir}/${filename}`;
-    await Bun.write(filepath, file);
+    await s3Client.write(filepath, file);
     console.log("file uploaded");
     console.log(filepath);
     let response: ProfileModel.resumeResponse = {
@@ -50,8 +50,6 @@ export abstract class Profile {
         size: file.size,
       };
     } else {
-      const oldResumeClear = Bun.file(oldResume!);
-      oldResumeClear.delete();
       response = {
         message: "PDF uploaded and updated sucessfully",
         size: file.size,

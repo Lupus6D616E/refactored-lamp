@@ -6,6 +6,7 @@ import { Verification } from './service'
 import AdmZip from 'adm-zip';
 import { Business } from '@modules/business/service';
 import { Admin } from '@modules/admin/service';
+import { s3Client } from '@lib/minio';
 export const verificationPlugin = new Elysia({ prefix: "/verify" })
     .use(betterAuthPlugin)
     .post('/business/upload', async ({ currentUser, body }) => {
@@ -54,7 +55,7 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
         for (const file of files) {
             try {
                 // Read the file from disk
-                const fileContent = await Bun.file(file.filepath).arrayBuffer();
+                const fileContent = await s3Client.file(file.filepath).arrayBuffer();
 
                 // Add to zip with the original or custom filename
                 zip.addFile(file.filename, Buffer.from(fileContent));
