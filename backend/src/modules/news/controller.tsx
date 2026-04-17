@@ -4,6 +4,7 @@ import { db } from "@db/db";
 import { articles } from "@db/schema";
 import { count, desc, eq } from "drizzle-orm";
 import { rm } from "node:fs/promises"
+import { s3Client } from "@lib/minio";
 const env = process.env.NODE_ENV || 'development'; 
 
 export const newsPlugin = new Elysia({ prefix: "/news" })
@@ -27,8 +28,11 @@ export const newsPlugin = new Elysia({ prefix: "/news" })
   .post("/admin/delete",async ({body})=>{
     const result = await db
     .delete(articles)
-    .where(eq(articles.id,body.id))
-    await rm(`userdata/news/${body.id}`, { recursive: true, force: true });
+    .where(eq(articles.id,body.id)).returning()
+    const path: string = result[0].imageUrl!;
+    const file: string | undefined = path.split('/').pop(); 
+    const s3file = s3Client.file(`news/${file}`)
+    await s3file.delete()
     return result
   },{
     role:["admin"],
