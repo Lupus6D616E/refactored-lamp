@@ -1,3 +1,4 @@
+import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
 import React, { useEffect, useState } from "react";
 
@@ -8,6 +9,7 @@ interface Article {
 }
 
 interface ArticleWithUrl {
+    id: number;
     title: string;
     body: string;
     imageUrl: string;
@@ -19,6 +21,7 @@ const ArticlesPage: React.FC = () => {
     const [page, setPage] = useState(1)
     const [inputPage, setInputPage] = useState(1)
     const [totalpages, setTotalPages] = useState(0)
+      const { data: session, isPending } = authClient.useSession();
     useEffect(() => {
         const fetchTotalPages = async () => {
             try {
@@ -40,6 +43,7 @@ const ArticlesPage: React.FC = () => {
                 const response = await edenTreatyApi.news.page({ number: page }).get()
                 if (response.data) {
                     const transformed = response.data.map((article) => ({
+                        id: article.id,
                         title: article.title,
                         body: article.body,
                         imageUrl: article.imageUrl ?? "/public/images/doge.jpg"
@@ -79,6 +83,16 @@ const ArticlesPage: React.FC = () => {
         setPage(page-1)
     }
 
+    async function handleDeleteArticle(id: number){
+        try{
+        const res = await edenTreatyApi.news.admin.delete.post({
+            id: id
+        })
+        window.alert("article deleted")}
+        catch(e){
+            window.alert(e)
+        }
+    }
     function goToPage(){
         if(inputPage <= totalpages){
         setPage(inputPage)
@@ -107,7 +121,9 @@ const ArticlesPage: React.FC = () => {
                             {article.body}
                         </p>
                     </div>
+                     {session?.user.role === "admin" && <button className="btn" onClick={()=> handleDeleteArticle(article.id)} >delete article</button>}
                 </div>
+                
             ))}
 
             <button className="btn" disabled={page === 1} onClick={handleDecreasePage} >prev page</button>
