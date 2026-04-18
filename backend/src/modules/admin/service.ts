@@ -61,6 +61,7 @@ export abstract class Admin {
           title: title,
           body: body
         }).returning()
+      
       const ext = extname(image.name)
       const realpath = `news/news_${res[0].id}${ext}`
       const fakepath = `/static/images/news/news_${res[0].id}${ext}`

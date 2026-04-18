@@ -115,7 +115,7 @@ const CreatePost: React.FC = () => {
                                                 Click to upload image
                                             </p>
                                             <p className="text-sm text-base-content/50">
-                                                PNG, JPG, GIF up to 5MB
+                                                PNG, JPG, GIF up to 10MB
                                             </p>
                                         </>
                                         {previewUrl && <img src={previewUrl} alt="Preview" style={{ width: "200px" }} />}

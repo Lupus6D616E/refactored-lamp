@@ -88,7 +88,9 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     body: t.Object({
       title: t.String(),
       body: t.String(),
-      image: t.File()
+      image: t.File({
+        maxSize: "10m"
+      })
     })
   })
   .get(
