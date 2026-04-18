@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { authClient } from "backend/src/lib/auth-client";
 
+
 export function SigninForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +33,8 @@ export function SigninForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
-      <h1 className="text-xl btn-primary font-semibold">Sign in</h1>
+      <h1 className="text-4xl btn-primary font-semibold text-center">Sign in</h1>
+
 
       <input
         type="email"
@@ -60,7 +62,7 @@ export function SigninForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-black text-white p-2 rounded"
+        className="btn btn-primary w-full rounded-xl text-lg shadow-lg shadow-blue-200"
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>

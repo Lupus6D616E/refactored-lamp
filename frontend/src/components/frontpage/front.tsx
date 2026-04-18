@@ -127,29 +127,16 @@ const FeatureCard: React.FC<{title: string, description: string, img: string, sh
       <dialog id="my_modal_3" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box p-0 overflow-visible bg-white rounded-2xl border-none">
           
-          {/* LOGO PLACEMENT: Floating Brand Logo */}
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-10">
-              <div className="w-30 h-30 bg-white rounded-full shadow-xl flex items-center justify-center border-4 border-slate-50">
-                <div className="bg-gradient-to-br from-[#0038a8] to-[#00ced1] p-3 rounded-full flex items-center justify-center w-16 h-16">
-                   <img
-                    src="/public/images/logo.png"
-                    alt="FlexiHire Logo" 
-                    className="w-full h-full object-contain drop-shadow-md"
-                  />
-                </div>
-              </div>
-            </div>
 
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-20">✕</button>
           </form>
 
-          <div className="pt-14 pb-8 px-8 text-center">
-            {/* LOGO PLACEMENT: In-line Text Logo */}
-            <h3 className="text-4xl font-bold bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent inline-block mb-2">
+          <div className="pt-10 pb-8 px-8 text-center">
+            <h3 className="pb-8 text-5xl font-bold bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent inline-block mb-2">
               FlexiHire
             </h3>
-            <p className="text-slate-600 font-medium mb-2">Sign in to view and accept job offers from local businesses in your area.</p>
+            <p className="text-slate-600 font-medium mb-2 pt-8">Sign in to view and accept job offers from local businesses in your area.</p>
             
             <div className="flex flex-col gap-3 mt-4">
               <button 
