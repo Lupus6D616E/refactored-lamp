@@ -94,6 +94,7 @@ export function SignupCard() {
           <h2 className="card-title">Create an account</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            
             {/* Name */}
             <div className="form-control">
               <label className="label">
