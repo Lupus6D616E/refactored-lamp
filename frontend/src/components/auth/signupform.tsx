@@ -1,6 +1,7 @@
 
 import { edenTreatyApi } from "@lib/eden";
 import { useState } from "react";
+import zxcvbn from "zxcvbn";
 
 type userType = "user" | "business"
 
@@ -20,13 +21,23 @@ export function SignupCard() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState("user");
-
+  const [score, setScore] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const isStrong = score >= 3
+  const strengthLabels = ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"];
+  
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+
+    const result = zxcvbn(value);
+    setScore(result.score);
+  };
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -130,13 +141,14 @@ export function SignupCard() {
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Password</span>
+                <p>{strengthLabels[score]}</p>
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   className="input input-bordered w-full pr-12"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                   required
                 />
                 <button
@@ -198,7 +210,7 @@ export function SignupCard() {
               <button
                 className="btn btn-secondary btn-sm md:btn-md lg:btn-lg w-full md:w-auto md:px-10"
                 type="submit"
-                disabled={loading}
+                disabled={loading || !isStrong}
               >
                 {loading ? "Creating account..." : "Sign up"}
               </button>

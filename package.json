@@ -35,12 +35,14 @@
     "react-leaflet": "^5.0.0",
     "resend": "^6.10.0",
     "tailwindcss": "^4.2.2",
-    "theme-change": "^2.5.0"
+    "theme-change": "^2.5.0",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.21",
     "@types/nodemailer": "^8.0.0",
     "@types/pg": "^8.20.0",
+    "@types/zxcvbn": "^4.4.5",
     "bun-types": "latest",
     "drizzle-kit": "^0.31.10"
   },
