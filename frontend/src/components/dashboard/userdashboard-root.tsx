@@ -17,6 +17,7 @@ import { useEffect } from 'react'
 import { themeChange } from 'theme-change'
 import ThemeSwitcherCard from '@components/auxilliary/ThemesSwitcherCard'
 import NavBar from '@components/auxilliary/navbar'
+import UploadProfilePicture from './user/upload/UploadProfilePicture'
 function App() {
     useEffect(() => {
   themeChange(false)
@@ -46,6 +47,7 @@ function App() {
             <UpdateProfile />
             <ApplicationList />
             <MessageList />
+            <UploadProfilePicture />
         </main>
     )
     }

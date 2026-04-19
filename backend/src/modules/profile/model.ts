@@ -9,6 +9,14 @@ export namespace ProfileModel {
       maxSize: 10 * 1024 * 1024,
     }),
   });
+
+  export const profilePictureBody = t.Object({
+    file: t.File({
+      type: ["image/jpeg","image/png"],
+      minSize: 1,
+      maxSize: "5m"
+    })
+  })
   export const resumeResponse = t.Object({
     message: t.String(),
     size: t.Number(),
@@ -46,4 +54,5 @@ export namespace ProfileModel {
   export type experienceBody = typeof experienceBody.static;
   export type resumeResponse = typeof resumeResponse.static;
   export type resumeBody = typeof resumeBody.static;
+  export type profilePictureBody = typeof profilePictureBody.static
 }

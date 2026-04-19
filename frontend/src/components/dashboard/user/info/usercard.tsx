@@ -81,15 +81,22 @@ export default function UserProfileCard() {
       <div className="card-body">
         <h2 className="card-title">Welcome back!</h2>
         <div className="flex items-center space-x-4">
-          <div className="avatar placeholder">
+          {session.user.image === null && <div className="avatar placeholder">
             <div className="bg-neutral text-neutral-content rounded-full w-16">
               <span className="text-xl uppercase">
                 {user.name?.[0] ?? user.email[0]}
               </span>
             </div>
-          </div>
+          </div>}
+          {session.user.image && <div className="avatar">
+            <div className="mask mask-squircle w-24">
+              <img src={`/static/images/profilepicture/user/${user.id}`}></img>
+            </div>
+          </div>}
           <div>
             {user.name && <p className="text-lg font-semibold">{user.name}</p>}
+
+            <p className="text-sm text-base-content/70">{user.image}</p>
             <p className="text-sm text-base-content/70">{user.email}</p>
             <p className="text-sm text-base-content/70">{user.role}</p>
             <p className="text-sm text-base-content/70">
@@ -112,9 +119,9 @@ export default function UserProfileCard() {
               </button>
             }
             {
-              session.user.emailVerified &&     <p className="text-sm text-base-content/70">
-              User is verified!
-            </p>
+              session.user.emailVerified && <p className="text-sm text-base-content/70">
+                User is verified!
+              </p>
             }
           </div>
         </div>

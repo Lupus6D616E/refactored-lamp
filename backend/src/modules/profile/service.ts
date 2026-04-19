@@ -15,6 +15,7 @@ import { ProfileModel } from "./model";
 import { auth, type AuthUser } from "@lib/auth";
 import { getEmbedding } from "@lib/embeddings";
 import { s3Client } from "@lib/minio";
+import { extname } from "node:path";
 export abstract class Profile {
   static async uploadResume(
     userSession: AuthUser,
@@ -217,6 +218,7 @@ export abstract class Profile {
   static async getUserProfile(userId: string) {
     const result = await db
       .select({
+        image: user.image,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -274,6 +276,23 @@ export abstract class Profile {
         target: seekerProfileEmbedding.userid,
         set: { profileEmbedding: profileEmbedding },
       })
+  }
+  static async uploadProfilePicture(userId: string, image: File){
+    try
+    {const ext = extname(image.name)
+    
+    const path = `/profile/${userId}/pfp`
+    s3Client.write(path,image,{type:"image/*"})
+    const res = await db.update(user).set({
+      image: path
+    }).where(eq(user.id,userId)).returning()
+    console.log()
+    return true
+  }
+    catch{
+      return false
+    }
+
   }
   static async createUser(
     name: string,

@@ -17,6 +17,7 @@ interface BusinessInfo {
 }
 
 type Profile = {
+  image:string | null
   name: string;
   email: string;
   address: string | null;
@@ -31,6 +32,7 @@ type Profile = {
 
 // Mock data shown before fetch completes
 const mockProfile: Profile = {
+  image: null,
   name: "Loading User",
   email: "loading@example.com",
   role: "Loading...",
@@ -89,21 +91,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
     fetchBusinesses();
     fetchProfile();
   }, [id]);
-  const fetchResume = async () => {
-    const { data, error } = await edenTreatyApi.user.downloaduserresume({ id: id }).get();
-    if (error) {
-      console.error('Download failed:', error);
-      return;
-    }
-    const blob = data instanceof Blob ? data : new Blob([data], { type: 'application/pdf' })
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'resume.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  function goDownloadResume(){
+    window.location.href = `/user/downloaduserresume/${id}`
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -125,11 +114,23 @@ export const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
       <div className="card bg-base-100 shadow-md">
         <div className="card-body flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
+            { !profile.image  && <div className="avatar placeholder">
+            <div className="bg-neutral text-neutral-content rounded-full w-16">
+              <span className="text-xl uppercase">
+                {profile.name?.[0] ?? profile.email[0]}
+              </span>
+            </div>
+          </div>}
+          { profile.image && <div className="avatar">
+            <div className="mask mask-squircle w-24">
+              <img src={`/static/images/profilepicture/user/${id}`}></img>
+            </div>
+          </div>}
             <h2 className="card-title text-2xl">{profile.name}</h2>
             <p className="text-sm opacity-70">{profile.email}</p>
             <div className="badge badge-primary mt-2">{profile.role}</div>
           </div>
-          <button onClick={fetchResume} className="btn btn-outline btn-primary">Download resume</button>
+          <button onClick={goDownloadResume} className="btn btn-outline btn-primary">Download resume</button>
         </div>
       </div>
 

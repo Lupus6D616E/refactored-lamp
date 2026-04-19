@@ -16,4 +16,16 @@ export const imagePlugin = new Elysia({ prefix: "/static" })
         message: "lol"
       }
     }
-  })    
+  })
+  .get("/images/profilepicture/user/:id", async ({ params:{id}}) => {
+     try{
+    const file = await s3Client.file(`profile/${id}/pfp`)
+      return  file
+    }
+    catch{
+      return {
+        message: "lol"
+      }
+    }
+  }
+  )

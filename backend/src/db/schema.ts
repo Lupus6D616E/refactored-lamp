@@ -111,7 +111,7 @@ export const userCertification = pgTable("user_certification", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  certification: varchar("certification", { length: 100 }).notNull(),
+  certification: text("certification").notNull(),
 }).enableRLS()
 
 export const seekerProfile = pgTable("seeker_profile", {

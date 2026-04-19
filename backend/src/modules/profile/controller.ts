@@ -145,6 +145,21 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
     },
   )
   .post(
+    "/uploadprofilepicture",
+    async ({currentUser, body}) =>{
+      const response = await Profile.uploadProfilePicture(currentUser.id,body.file)
+      if(response){
+        return status(201)
+      }
+      else{
+        return status(500)
+      }
+    },{
+      role: ["user"],
+      body: ProfileModel.profilePictureBody
+    }
+  )
+  .post(
     "/updateprofile",
     async ({ currentUser, body, set }) => {
       const result = await Profile.updateSeekerProfile(currentUser.id, body);
@@ -188,6 +203,7 @@ export const profilePlugin = new Elysia({ prefix: "/user" })
       const userExperience = await Profile.getExperience(params.id);
       const userProfile = await Profile.getUserProfile(params.id);
       return {
+        image: userProfile.image,
         name: userProfile.name,
         email: userProfile.email,
         address: seekerProfile.address,
