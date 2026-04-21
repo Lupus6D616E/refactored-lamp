@@ -1,4 +1,4 @@
-import { Elysia  } from "elysia";
+import { Elysia, redirect  } from "elysia";
 import { exec } from "child_process";
 import { watch } from "fs";
 import { betterAuthPlugin } from "backend/src/lib/auth";
@@ -40,7 +40,13 @@ process.on("SIGINT", () => {
 const isProd = process.env.NODE_ENV === 'production'
 console.log(process.env.NODE_ENV)
 const app = new Elysia()
-  .get("/hello","geto")
+  .get("/", () =>{
+    return redirect("/public/index.html")
+  })
+  .get("/public", () =>{
+    return redirect("/public/index.html")
+  }
+  )
   .use(await staticPlugin({
     bunFullstack:true,
     assets: isProd ? './dist' : 'frontend/public'

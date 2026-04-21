@@ -1,9 +1,11 @@
 import { createRoot } from "react-dom/client";
 import UserProfile from "./profile";
+import NavBar from "@components/auxilliary/navbar";
 
 function App() {
   return (
     <main>
+        <NavBar />
         <UserProfile id={getPostId()} /> 
     </main>
   );

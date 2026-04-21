@@ -115,4 +115,29 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
       role: ["business"],
       body: businessModel.applicationIdType,
     },
-  );
+  )
+  .post(
+    "/changepicture",
+    async ({ currentUser, body}) => {
+    const isMember = await Business.checkMembership(
+        currentUser.id,
+        body.businessId,
+      );
+    if(isMember){
+      try{
+        await Business.uploadProfilePictures(body.businessId,body.profilePicture,body.bannerPicture)
+        return status(201)
+      }
+      catch(e){
+        console.log(e)
+        return status(500)
+      }
+    }
+    else{
+      return status(403)
+    }
+    },{
+      role: ["business"],
+      body: businessModel.changePictureBody
+    }
+  )

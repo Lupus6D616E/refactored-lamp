@@ -7,7 +7,7 @@ type Profile = {
   address: string | null;
   industry: string| null
   description: string | null;
- 
+ hasPicture: boolean
 };
 
 // Mock data shown before fetch completes
@@ -17,7 +17,7 @@ const mockProfile: Profile = {
   industry: "Loading industry...",
   description:
     "This is placeholder text while the real profile data is loading.",
-
+ hasPicture: false
 };
 
 interface UserProfileProps {
@@ -49,9 +49,29 @@ const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
+         { !profile.hasPicture  && <div className="avatar placeholder">
+            <div className="bg-neutral text-neutral-content rounded-full w-16">
+              <span className="text-xl uppercase">
+                {profile.name?.[0] }
+              </span>
+            </div>
+          </div>}
+          { profile.hasPicture && <div className="avatar">
+            <div className="mask mask-squircle w-24">
+              <img src={`/static/images/business/${id}/profilepicture`}></img>
+            </div>
+          </div>}
       {/* Header Section */}
       <div className="card bg-base-100 shadow-md">
+        <figure>
+    <img
+      src={`/static/images/business/${id}/banner`}
+      width={"100%"}
+      height={"50%"}
+      alt="banner" />
+  </figure>
         <div className="card-body flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          
           <div>
             <h2 className="card-title text-2xl">{profile.name}</h2>
             <p className="leading-relaxed">address: {profile.address}</p>

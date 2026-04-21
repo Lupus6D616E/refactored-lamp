@@ -141,7 +141,8 @@ export const businessProfile = pgTable("business_profile", {
   description: text("description").notNull(),
   industry: text("industry").notNull(),
   address: text("address").notNull(),
-  bin: text("bin").notNull().default("0"),
+  bin: text("bin").notNull().unique(),
+  hasPicture: boolean("has_picture").notNull().default(false),
   location: point('location', { mode: 'xy' }),
 }).enableRLS()
 

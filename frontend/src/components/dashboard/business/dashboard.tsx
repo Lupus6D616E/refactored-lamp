@@ -6,6 +6,7 @@ import { JobPostData, BusinessSelect, MessageData } from "./types";
 import { edenTreatyApi } from "@lib/eden";
 import { MessageCards } from "./messageCards";
 import { NoBusinessPage } from "./NoVerifiedBusinesses";
+import UploadBusinessProfilePictures from "./UploadPictureCard";
 
 export function DashboardPage() {
   const [dashboards, setDashboards] = useState<BusinessSelect[]>([]);
@@ -81,6 +82,12 @@ export function DashboardPage() {
           </div>
         </div>
       </main>
+
+      <main className="p-6">
+        <UploadBusinessProfilePictures selectedId={selectedId!}/>
+      </main>
+      
+
       <main className="p-6">
         <div className="card w-min-screen bg-base-300 card-sm shadow-sm">
           <div className="card-body">

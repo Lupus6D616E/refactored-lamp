@@ -2,6 +2,7 @@ import { db } from "@db/db";
 import { businessProfile, businessUser, jobApplications, jobPosts, user } from "@db/schema";
 import { and, count, eq } from "drizzle-orm";
 import { businessModel } from "./model";
+import { s3Client } from "@lib/minio";
 
 export abstract class Business {
   static async markJobFilled(postId: number) {
@@ -61,6 +62,7 @@ export abstract class Business {
         description: businessProfile.description,
         industry: businessProfile.industry,
         address: businessProfile.address,
+        hasPicture: businessProfile.hasPicture
       })
       .from(businessProfile).where(eq(businessProfile.id, businessId));
     return result[0]
@@ -98,4 +100,24 @@ export abstract class Business {
       return false;
     }
   }
+    static async uploadProfilePictures(businessId: string,profilePicture: File, bannerPicture: File){
+      try
+      {
+      const profilePicturePath = `/business/${businessId}/pfp`
+      const bannerPicturePath = `/business/${businessId}/banner`
+      s3Client.write(profilePicturePath,profilePicture,{type:"image/*"})
+      s3Client.write(bannerPicturePath,bannerPicture,{type:"image/*"})
+      db
+      .update(businessProfile)
+      .set({
+        hasPicture: true
+      })
+      .where(eq(businessProfile.id,businessId))
+      return true
+    }
+      catch(e){
+        console.log(e)
+      }
+  
+    }
 }

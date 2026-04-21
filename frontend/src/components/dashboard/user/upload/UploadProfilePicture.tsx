@@ -93,14 +93,6 @@ const UploadProfilePicture: React.FC = () => {
                             {/* Submit Button */}
                             <div className="flex gap-4 pt-6">
                                 <button
-                                    type="button"
-                                    onClick={() => window.history.back()}
-                                    className="btn btn-ghost flex-1"
-                                >
-                                    Cancel
-                                </button>
-
-                                <button
                                     type="submit"
                                     disabled={isSubmitting}
                                     className="btn btn-primary flex-1 text-lg"
