@@ -49,7 +49,7 @@ const app = new Elysia()
   )
   .use(await staticPlugin({
     bunFullstack:true,
-    assets: isProd ? './dist' : 'frontend/public'
+    assets: isProd ? 'dist' : 'frontend/public'
   }))
   .use(newsPlugin)
   .use(imagePlugin)

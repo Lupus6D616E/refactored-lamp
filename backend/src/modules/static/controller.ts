@@ -54,3 +54,16 @@ export const imagePlugin = new Elysia({ prefix: "/static" })
   }
   )
 
+  .get("/images/assets/:filename", async ({ params: { filename} }) => {
+    try {
+      const file = await s3Client.file(`assets/${filename}`)
+      return file
+    }
+    catch {
+      return {
+        message: "lol"
+      }
+    }
+  }
+  )
+

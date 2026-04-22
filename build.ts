@@ -15,7 +15,7 @@ const buildCSS = () =>
 
 await buildCSS();
 
-const glob = new Glob("./frontend/public/*.html");
+const glob = new Glob("frontend/public/**");
 const entrypoints: string[] = [];
 for await (const file of glob.scan(".")) {
   entrypoints.push(file);
@@ -28,8 +28,6 @@ await Bun.build({
     chunk: "chunks/[name]-[hash].[ext]", // For shared code chunks
     asset: "assets/[name]-[hash].[ext]", // For CSS, images, etc.
   },
-  target: 'browser',
-  minify: true,
-  splitting: true,          // ← enable if you want shared chunks (recommended!)
+  target: 'browser',        // ← enable if you want shared chunks (recommended!)
   // naming: "[dir]/[name]-[hash].[ext]",   // customize output paths
 });

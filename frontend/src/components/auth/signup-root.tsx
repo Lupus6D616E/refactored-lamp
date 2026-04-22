@@ -10,9 +10,9 @@ function App() {
             <h1 className="text-5xl font-bold">Sign up now!</h1>
             <p className="py-6">Join others in your quest for employment</p>
           </div>
-          <figure className="lg:w-1/2 hidden lg:flex items-center justify-center rounded-lg overflow-hidden">
+          <figure className="lg:w-1/2  lg:flex items-center justify-center rounded-lg overflow-hidden">
             <img
-              src="/public/images/design3.png"
+              src="/static/images/assets/design.png"
               alt="FlexiHire Illustration"
               className="w-full max-w-sm h-auto object-contain"
             />
