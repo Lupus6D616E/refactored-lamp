@@ -1,4 +1,4 @@
-import { foreignKey, pgEnum, point, varchar, vector } from "drizzle-orm/pg-core";
+import { foreignKey, jsonb, pgEnum, point, varchar, vector } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
@@ -352,7 +352,7 @@ export const jobPostEmbedding = pgTable("job_post_embedding", {
   .using('hnsw', table.postEmbedding.op('vector_cosine_ops'))]).
   enableRLS()
 
-export const businessApplications = pgTable("business_applications",{
+export const businessApplications = pgTable("business_applications", {
   id: serial('id').primaryKey(),
   userid: text("user_id")
     .notNull()
@@ -363,26 +363,76 @@ export const businessApplications = pgTable("business_applications",{
   address: text("address").notNull(),
   bin: text("bin").notNull(),
   verified: text("verified").default("pending").notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
+  createdAt: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
 }).enableRLS()
 
-export const businessApplicationsDocuments = pgTable("business_applications_documents",{
+export const businessApplicationsDocuments = pgTable("business_applications_documents", {
   id: serial('id').primaryKey(),
   applicationId: integer("application_id")
-      .notNull()
-      .references(() => businessApplications.id, { onDelete: 'cascade' }),
+    .notNull()
+    .references(() => businessApplications.id, { onDelete: 'cascade' }),
   documentUrl: text("document_url").notNull(),
-  documentName: text("document_name").notNull() 
+  documentName: text("document_name").notNull()
 }).enableRLS()
 
-export const articles = pgTable("articles",{
+export const articles = pgTable("articles", {
   id: serial("id").primaryKey(),
-  createdAt:  timestamp('created_at', { withTimezone: true })
+  createdAt: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),
   body: text("body").notNull(),
   title: text("title").notNull(),
   imageUrl: text("image_url")
 }).enableRLS()
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: serial("id").primaryKey(),
+
+    // Who receives the notification
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    // What kind of notification (e.g., "like", "comment", "follow", "system")
+    type: text("type").notNull(),
+
+    // Title / short description (optional)
+    title: text("title"),
+
+    // Main message body
+    message: text("message").notNull(),
+
+    // Link to the related resource (e.g., "/post/123" or post ID)
+    link: text("link"),
+
+    // Optional metadata (actor user, post id, comment id, etc.)
+    data: jsonb("data").$type<{
+      actorId?: number;
+      postId?: number;
+      commentId?: number;
+      // ... any other context
+    }>(),
+
+    // Read status
+    isRead: boolean("is_read").default(false).notNull(),
+
+    // When the notification was created
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+
+    // Optional: when it was read (for analytics)
+    readAt: timestamp("read_at", { withTimezone: true }),
+  },
+  (table) => [
+    // Important indexes for performance
+    index("notifications_user_id_idx").on(table.userId),
+    index("notifications_user_id_is_read_idx").on(table.userId, table.isRead),
+    index("notifications_created_at_idx").on(table.createdAt), // for sorting
+    index("notifications_type_idx").on(table.type), // if you filter by type
+  ]
+);
