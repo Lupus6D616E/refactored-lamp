@@ -43,7 +43,6 @@ package-lock.json
 **/*.bun
 
 #image blobs
-frontend/public/images/
 frontend/public/output.css
 userdata/
 dist
