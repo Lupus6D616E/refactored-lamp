@@ -28,7 +28,7 @@ function App() {
     <SigninForm />
   </div>
 
-  <figure className="lg:w-1/2  lg:flex items-center justify-center rounded-lg overflow-hidden">
+  <figure className="lg:w-1/2 lg:flex items-center justify-center rounded-lg overflow-hidden">
     <img
       src="/static/images/assets/design.png" 
       alt="FlexiHire Illustration"
