@@ -10,18 +10,18 @@ function gotosignupform(){
 const Navbar: React.FC = () => (
   <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50">
     <div className="flex-1">
-      <a className="text-3xl font-bold bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">
-        FlexiHire
-      </a>
+      <a className="text-3xl font-black font-brand tracking-tighter bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">
+            FlexiHire
+          </a>
     </div>
     <div className="flex-none">
       <ul className="menu menu-horizontal px-1">
-        <li><a href="/public/signin.html">login</a></li>
+        <li><a href="/public/signin.html">Sign In</a></li>
         <li>
           <details>
             <summary>Other</summary>
             <ul className="dropdown-content menu bg-base-100 rounded-box z-[1] w-20 p-1 shadow-sm">
-              <li><a href="/public/signup.html">Sign up</a></li>
+              <li><a href="/public/signup.html">Sign Up</a></li>
               <li><a>Contact</a></li>
             </ul>
           </details>
