@@ -356,7 +356,7 @@ export const businessApplications = pgTable("business_applications", {
   id: serial('id').primaryKey(),
   userid: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }).unique(),
+    .references(() => user.id, { onDelete: "cascade" }).unique().notNull(),
   name: text("name").unique().notNull(),
   description: text("description").notNull(),
   industry: text("industry").notNull(),
@@ -410,12 +410,7 @@ export const notifications = pgTable(
     link: text("link"),
 
     // Optional metadata (actor user, post id, comment id, etc.)
-    data: jsonb("data").$type<{
-      actorId?: number;
-      postId?: number;
-      commentId?: number;
-      // ... any other context
-    }>(),
+    data: jsonb("data") ,
 
     // Read status
     isRead: boolean("is_read").default(false).notNull(),

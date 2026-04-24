@@ -4,9 +4,10 @@ import { Elysia, status, t } from 'elysia'
 import { verificationModel } from './model'
 import { Verification } from './service'
 import AdmZip from 'adm-zip';
-import { Business } from '@modules/business/service';
-import { Admin } from '@modules/admin/service';
 import { s3Client } from '@lib/minio';
+import { createNotification } from '@lib/notifications';
+import { Admin } from '@modules/admin/service';
+import { Search } from '@modules/search/service';
 export const verificationPlugin = new Elysia({ prefix: "/verify" })
     .use(betterAuthPlugin)
     .post('/business/upload', async ({ currentUser, body }) => {
@@ -74,14 +75,24 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
     .post('admin/verification/verify', async ({ currentUser, body}) =>{
         console.log(body.id, body.decision)
         if(body.decision === "reject"){
-        Verification.rejectBusinessApplication(body.id)
+        await Verification.rejectBusinessApplication(body.id)
+        const data = await Verification.getVerificationItem(body.id)
+        createNotification(data.userId,"business verification","Business Rejection",`Your business ${data.businessName}, has been rejected.`, {
+            applicationId: data.id,
+            userId: data.userId
+        })
         return{
             success: true,
             message: `application ID: ${body.id} Rejected`
         }
         }
          if(body.decision === "accept"){
-        Verification.acceptBusinessApplication(body.id)
+        await Verification.acceptBusinessApplication(body.id)
+         const data = await Verification.getVerificationItem(body.id)
+        createNotification(data.userId,"business verification","Business Accepted",`Your business ${data.businessName}, has been accepted.`, {
+            applicationId: data.id,
+            userId: data.userId
+        })
         return{
             success: true,
             message: `application ID: ${body.id} accepted`

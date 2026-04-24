@@ -95,8 +95,6 @@ export default function UserProfileCard() {
           </div>}
           <div>
             {user.name && <p className="text-lg font-semibold">{user.name}</p>}
-
-            <p className="text-sm text-base-content/70">{user.image}</p>
             <p className="text-sm text-base-content/70">{user.email}</p>
             <p className="text-sm text-base-content/70">{user.role}</p>
             <p className="text-sm text-base-content/70">

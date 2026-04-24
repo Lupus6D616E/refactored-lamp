@@ -25,8 +25,8 @@ export abstract class Business {
           eq(jobApplications.applicantId, userId),
           eq(jobApplications.jobId, postId),
         ),
-      );
-    return result
+      ).returning();
+    return result[0]
   }
   static async getJobApplications(jobId: number) {
     const applications = await db

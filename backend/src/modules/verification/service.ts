@@ -79,6 +79,7 @@ export abstract class Verification {
         .select({
             id: businessApplications.id,
             businessName: businessApplications.name,
+            userId: businessApplications.userid,
             userName: user.name,
             description: businessApplications.description,
             address: businessApplications.address,

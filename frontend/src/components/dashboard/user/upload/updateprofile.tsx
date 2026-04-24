@@ -137,7 +137,7 @@ export function UpdateProfile() {
                     className="btn btn-xs btn-ghost btn-circle"
                     onClick={() => removeskill(skill)}
                   >
-                    ✕
+                    
                   </button>
                 </div>
               ))}
