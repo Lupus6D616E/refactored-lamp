@@ -4,7 +4,7 @@ import { authClient } from './auth-client';
 const createTransporter = () => {
     const isProd = process.env.NODE_ENV === 'production';
 
-    if (isProd) {
+    if (!isProd) {
         return nodemailer.createTransport({
             host: 'localhost',
             port: 1025,
