@@ -1,6 +1,6 @@
 import { db } from "@db/db";
 import { PostModel } from "./model";
-import { jobApplications, jobPostEmbedding, jobPosts } from "@db/schema";
+import { jobApplications, jobPostEmbedding, jobPosts, jobPostTitleEmbedding } from "@db/schema";
 import { eq, and } from "drizzle-orm";
 import { getEmbedding } from "@lib/embeddings";
 
@@ -28,6 +28,7 @@ export abstract class Post {
         location: { x: job.location.lng, y: job.location.lat }
       }).returning()
       this.insertCreatedEmbedding(res[0].id)
+      this.insertCreatedTitleEmbedding(res[0].id)
       return true;
     } catch (e) {
       console.log(e)
@@ -116,6 +117,14 @@ export abstract class Post {
       };
     }
   }
+  static async embedJobPostTitle(jobId: number){
+     console.log(`getting job id ${jobId}`)
+    const jobPost = await Post.getPostDetails(jobId)
+    const text = jobPost[0].title
+    const output = await getEmbedding(text);
+    const embedding = output.tolist()[0]
+    return embedding
+  }
   static async embedJobPost(jobID: number) {
     console.log(`getting job id ${jobID}`)
     const jobPost = await Post.getPostDetails(jobID)
@@ -141,6 +150,19 @@ export abstract class Post {
     return embedding
   }
 
+  static async insertCreatedTitleEmbedding(postId:number){
+
+      const embedding = await this.embedJobPostTitle(postId)
+    const res = await db.insert(jobPostTitleEmbedding).values({
+      postId: postId,
+      postTitleEmbedding: embedding
+    })
+      .onConflictDoUpdate({
+        target: jobPostEmbedding.postid,
+        set: { postTitleEmbedding: embedding },
+      })
+  }
+  
   static async insertCreatedEmbedding(postID: number) {
     const embedding = await this.embedJobPost(postID)
     const res = await db.insert(jobPostEmbedding).values({

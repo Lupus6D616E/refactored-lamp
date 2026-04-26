@@ -56,12 +56,12 @@ export async function getEmbedding(text: string){
 
 
 import { db } from "@db/db"
-import { jobPostEmbedding, jobPosts, seekerProfile, seekerProfileEmbedding, user,  } from "@db/schema";
+import { jobPostEmbedding, jobPosts, jobPostTitleEmbedding, seekerProfile, seekerProfileEmbedding, user,  } from "@db/schema";
 import { notExists, eq, and, exists } from "drizzle-orm";
 
 if (import.meta.main) {
     createjobembeddings()
-
+    createjobtitleembeddings()
 }
 
 
@@ -104,7 +104,26 @@ async function createjobembeddings(){
 
 for (const jobPost of jobpostlist) {
     console.log(`doing ${jobPost.id}`)
-    await Post.embedJobPost(jobPost.id);
+    await Post.insertCreatedEmbedding(jobPost.id);
+}
+
+}
+
+async function createjobtitleembeddings(){
+    const jobpostlist = await db
+    .select()
+    .from(jobPosts)
+    .where(
+        notExists(
+            db.select()
+            .from(jobPostTitleEmbedding)
+            .where(eq(jobPostTitleEmbedding.postId, jobPosts.id))
+        )
+    )
+
+for (const jobPost of jobpostlist) {
+    console.log(`doing ${jobPost.id}`)
+    await Post.insertCreatedTitleEmbedding(jobPost.id);
 }
 
 }

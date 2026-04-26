@@ -352,6 +352,16 @@ export const jobPostEmbedding = pgTable("job_post_embedding", {
   .using('hnsw', table.postEmbedding.op('vector_cosine_ops'))]).
   enableRLS()
 
+export const jobPostTitleEmbedding = pgTable("job_post_title_embedding", {
+  id: serial('id').primaryKey(),
+  postId: integer("post_id")
+    .notNull()
+    .references(() => jobPosts.id, { onDelete: "cascade" }).unique(),
+  postTitleEmbedding: vector('post_title_embedding', { dimensions: 1024 }).notNull()
+}, (table) => [index('post_title_embedding_idx')
+  .using('hnsw', table.postTitleEmbedding.op('vector_cosine_ops'))]).
+  enableRLS()
+
 export const businessApplications = pgTable("business_applications", {
   id: serial('id').primaryKey(),
   userid: text("user_id")
@@ -430,4 +440,4 @@ export const notifications = pgTable(
     index("notifications_created_at_idx").on(table.createdAt), // for sorting
     index("notifications_type_idx").on(table.type), // if you filter by type
   ]
-);
+).enableRLS();
