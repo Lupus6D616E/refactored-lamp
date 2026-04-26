@@ -90,10 +90,8 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
     role: (allowedRoles: Array<"user" | "admin" | "business">) => ({
       async resolve({ status, request: { headers } }) {
         const session = await auth.api.getSession({ headers });
-
         if (!session) return status(401);
         const role = session.user.role;
-
         if (role !== "user" && role !== "admin" && role !== "business") {
           return status(500); // corrupted data
         }

@@ -114,7 +114,7 @@ export abstract class Verification {
         .set({ verified:"accepted"})
         .where(eq(businessApplications.id, id)).returning()
         const business = verified[0]
-        const res = await Admin.createBusiness(business.name,business.description,business.industry,business.address,business.bin)
+        const res = await Admin.createBusiness(business.name.toLowerCase(),business.description,business.industry,business.address,business.bin)
         const useremail = await db.select({
             email: user.email
         })

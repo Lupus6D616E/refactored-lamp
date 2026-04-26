@@ -9,11 +9,8 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 
 
-const TILE_URL = import.meta.env.DEV
-  ? 'http://localhost:7755/tile/{z}/{x}/{y}.png'
-  : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';   // ← change to whatever you use in production
+const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';  
 
-// ─── Default icon fix (keep this) ───
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,

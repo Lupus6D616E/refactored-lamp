@@ -47,6 +47,10 @@ const app = new Elysia()
   .get("/public", () =>{
     return redirect("/public/index.html")
   }
+)
+  .get("/public/", () =>{
+    return redirect("/public/index.html")
+  }
   )
   .use(await staticPlugin({
     bunFullstack:true,

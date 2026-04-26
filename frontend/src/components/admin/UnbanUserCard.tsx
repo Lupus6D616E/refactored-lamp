@@ -24,6 +24,16 @@ export default function UnbanUserCard({ onSuccess, onError }: UnbanUserCardProps
     setMessage(null);
 
     try {
+      const user = await authClient.admin.getUser({
+      query: {
+        id: userId.trim(), // required
+      },
+    });
+    if(user.data?.banned === false ){
+      throw{
+        message: "user is already unbanned"
+      }
+    }
       const { data, error } = await authClient.admin.unbanUser({
         userId: userId.trim(),
       });
@@ -31,7 +41,11 @@ export default function UnbanUserCard({ onSuccess, onError }: UnbanUserCardProps
       if (error) {
         throw error;
       }
-
+      if(data.user === null){
+        throw {
+          message: "user does not exist"
+        }
+      }
       setMessage({ 
         type: 'success', 
         text: `User ${userId} has been unbanned successfully.` 

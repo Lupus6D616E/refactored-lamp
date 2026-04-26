@@ -153,12 +153,7 @@ export function CreateJobForm() {
       <Map onAddressSelect={handleAddressUpdate} />
       <p>
         lat{position.lat} lng:{position.lng}
-      </p>
-      {address ? (
-        <p>Address:{address}</p>
-      ) : (
-        <p>Click on Search button to find Address</p>
-      )}
+      </p>  
       <select
         required={true}
         value={selectedBusiness}
@@ -183,7 +178,7 @@ export function CreateJobForm() {
         className="w-full border p-2 rounded"
       />
       <input
-        type="text"
+        type="email"
         placeholder="contact email"
         required
         value={email}

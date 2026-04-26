@@ -16,7 +16,7 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
       }
     },
     {
-      role: ["admin"],
+      role: ['admin'],
       body: AdminModel.changeAccountRoleBody
     },
   )
@@ -31,17 +31,15 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
         }
       }
       else if(res.success === false){
-        if(res.message === `User not found`){
-          return status(404,"User Not Found")
-        }
-        else if(res.message === `Organization not found`){
-          return status(404,"Organization Not Found")
-        }
+        if(res.message)
+          return status(404,res.message)
         else{
-          return status(500)
+          console.log(res)
+          return status(500, "an unexplainable error has occurred")
         }
       }
       else{
+
         return status(500)
       }
     },
@@ -78,7 +76,7 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     console.log(body)
     const res = await Admin.createArticle(body.title,body.body,body.image)
     if(res){
-      return status(201,"article reated")
+      return status(201,"article Created")
     }
     else{
        return status(500,"upload failure")
@@ -96,11 +94,12 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
   })
   .get(
     "/stats",
-    async ({}) => {
+    async ({ currentUser}) => {
+      console.log(currentUser.role)
       const res = await Admin.statistics()
       return res
     },
     {
-      role: ["admin"],
+      role: ['admin'],
     },
-  );
+  )
