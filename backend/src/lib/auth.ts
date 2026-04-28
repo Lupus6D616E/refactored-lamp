@@ -32,7 +32,8 @@ export const auth = betterAuth({
 	baseURL: process.env.BETTER_AUTH_URL,
   basePath: "/api",
    trustedOrigins: [      
-    "https://www.flexihire.link",                    // if you have one
+    "https://www.flexihire.link",                   
+    "https://test.flexihire.link",
     "http://localhost:5173",                             // for local dev (Vite default)
     "http://localhost:3000",                             // or whatever port your frontend uses locally
     // add any preview/staging domains too

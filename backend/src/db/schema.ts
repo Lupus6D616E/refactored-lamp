@@ -420,7 +420,7 @@ export const notifications = pgTable(
     link: text("link"),
 
     // Optional metadata (actor user, post id, comment id, etc.)
-    data: jsonb("data") ,
+    data: jsonb("data"),
 
     // Read status
     isRead: boolean("is_read").default(false).notNull(),
@@ -441,3 +441,41 @@ export const notifications = pgTable(
     index("notifications_type_idx").on(table.type), // if you filter by type
   ]
 ).enableRLS();
+
+export const email = pgTable("email", {
+  id: uuid("id").primaryKey(),
+  to: text("to")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  from: text("from").notNull(),
+  createdAt: timestamp("created_at").notNull(),
+  subject: text("subject"),
+  messageId: text("message_id"),
+  bcc: text("bcc")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  cc: text("cc")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  replyTo: text("reply_to")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  html: text("html"),
+  text: text("text"),
+  attachments: text("attachments")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+}).enableRLS()
+export const emailAttachments = pgTable("email_attachments", {
+  id: uuid("id").primaryKey(),
+  emailId: uuid("email_id").references(() => email.id, {onDelete: "cascade"}).notNull(),
+  filename: text("filename").notNull(),
+  contentId: text("content_id").notNull(),
+  contentType: text("content_type").notNull(),
+  contentDisposition: text("content_disposition").notNull()
+}).enableRLS()

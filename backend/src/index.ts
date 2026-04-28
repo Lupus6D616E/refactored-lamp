@@ -16,6 +16,7 @@ import { verificationPlugin } from "@modules/verification/controller";
 import { imagePlugin } from "@modules/static/controller";
 import { newsPlugin } from "@modules/news/controller";
 import { notificationPlugin } from "@modules/notifications/controller";
+import { webHookPlugin } from "@modules/webhooks/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -68,6 +69,7 @@ const app = new Elysia()
   .use(messagePlugin)
   .use(verificationPlugin)
   .use(notificationPlugin)
+  .use(webHookPlugin)
   .use(openapi({documentation: {
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()
