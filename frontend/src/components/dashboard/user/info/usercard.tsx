@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "backend/src/lib/auth-client";
+import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
 import { useEffect, useState } from "react";
 

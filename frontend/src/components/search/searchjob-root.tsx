@@ -1,6 +1,6 @@
 "use client";
 import { createRoot } from "react-dom/client";
-import { authClient } from "backend/src/lib/auth-client";
+import { authClient } from "@lib/auth-client";
 import { AdvancedSearchBar } from "@components/search/searchjobbar";
 import { useState } from "react";
 import { SearchResult } from "./types";

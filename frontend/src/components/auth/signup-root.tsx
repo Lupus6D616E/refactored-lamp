@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { SignupCard } from "frontend/src/components/auth/signupform";
+import { SignupCard } from "@components/auth/signupform";
 
 function App() {
   return (
