@@ -5,8 +5,9 @@ import { AdminModel } from "./model";
 import { email, emailAttachments } from "@db/schema";
 import { db } from "@db/db";
 import { extname } from "node:path";
-import { count, eq, param } from "drizzle-orm";
+import { count, eq, asc, desc } from "drizzle-orm";
 import { s3Client } from "@lib/minio";
+import { mailer } from "@backend/src/lib/mailer";
 export const adminPlugin = new Elysia({ prefix: "/admin" })
   .use(betterAuthPlugin)
   .post(
@@ -117,16 +118,18 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
           createdAt: email.createdAt,
           subject: email.subject,
           text: email.text,
+          html: email.html,
           attachments: email.attachments,
         }).from(email)
-          .orderBy(email.createdAt)
+          .orderBy(desc(email.createdAt))
           .limit(5)
           .offset((parseInt(params.page) - 1) * 5)
         const emailCount = await db.select({ count: count() }).from(email)
         const data = res.map(prop => ({
           ...prop,
           subject: prop.subject ?? "no subject",
-          text: prop.text ?? "no text"
+          text: prop.text ?? "no text",
+          html: prop.html ?? "no html"
         }))
         return {
           emails: data,
@@ -164,10 +167,54 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
         const real = await file.arrayBuffer()
         return real; // stream
       }
-      catch(e){
+      catch (e) {
         console.log(e)
         return status(404)
       }
     }, {
     role: ["admin"]
   })
+  .post("/email/reply",
+    async ({ currentUser, body }) => {
+      try{const data = await db
+      .select()
+      .from(email)
+      .where(eq(email.id,body.id))
+      .limit(1)
+
+    let attachment = undefined
+      if (body.file) {
+      const arrayBuffer = await body.file.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+
+      attachment = {
+        filename: body.file.name,
+        content: buffer,
+        contentType: body.file.type
+      }
+    }
+
+      mailer.sendMail({
+        from: 'Support@mail.flexihire.link',
+        to: data[0].from,
+        subject: body.subject,
+        text: body.body,
+        attachments: attachment? [attachment] : []
+      });
+      return status(200)
+    }
+    catch{
+      return status(501)
+    }
+    }
+    , {
+      role: ["admin"],
+      body: t.Object({
+        id: t.String(),
+        subject: t.String(),
+        body: t.String(),
+        file: t.Optional( t.File())
+      })
+      
+    }
+  )

@@ -2,12 +2,15 @@
 
 import { edenTreatyApi } from '@lib/eden';
 import React, { useState, useEffect } from 'react';
+import { Letter } from 'react-letter';
+import EmailReplyModal from './emailreplymodal';
 
 interface Email {
   id: string;
   from: string;
   createdAt: Date; // ISO string from API
   subject: string;
+  html: string;
   text: string;
   attachments: string[];
 }
@@ -24,7 +27,7 @@ const EmailInbox: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-
+const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const fetchEmails = async (page: number) => {
     setLoading(true);
     try {
@@ -160,16 +163,18 @@ const EmailInbox: React.FC = () => {
                   <div>
                     <div className="font-medium">{selectedEmail.from}</div>
                     <div className="text-sm text-base-content/60">
-                      {selectedEmail.createdAt.toISOString()} dte
+                      {selectedEmail.createdAt.toLocaleTimeString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})}
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="prose prose-base max-w-none">
-                <p className="whitespace-pre-wrap">{selectedEmail.text}</p>
+                <Letter 
+                html={selectedEmail.html}
+                text={selectedEmail.text}
+                />
               </div>
-
               {selectedEmail.attachments.length > 0 && (
                 <div className="mt-10">
                   <h3 className="font-semibold mb-3">Attachments</h3>
@@ -189,8 +194,23 @@ const EmailInbox: React.FC = () => {
                     ))}
                   </div>
                 </div>
+                
               )}
+
+               <div className="p-4 border-t border-base-300 bg-base-200">
+    <button
+      onClick={() => setIsReplyModalOpen(true)}
+      className="btn btn-primary gap-2"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6 6-6" />
+      </svg>
+      Reply
+    </button>
+  </div>
+
             </div>
+            
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center text-base-content/50">
@@ -201,7 +221,15 @@ const EmailInbox: React.FC = () => {
           </div>
         )}
       </div>
+      <EmailReplyModal
+  isOpen={isReplyModalOpen}
+  onClose={() => setIsReplyModalOpen(false)}
+  originalEmail={selectedEmail}
+/>
+
     </div>
+
+    
   );
 };
 

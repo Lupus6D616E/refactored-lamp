@@ -1,7 +1,7 @@
 import { Elysia, redirect  } from "elysia";
 import { exec } from "child_process";
 import { watch } from "fs";
-import { betterAuthPlugin } from "backend/src/lib/auth";
+import { betterAuthPlugin } from "@lib/auth";
 import { staticPlugin } from "@elysiajs/static";
 import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";

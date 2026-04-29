@@ -28,14 +28,15 @@
     /* Modules */
     "module": "ES2022",                                /* Specify what module code is generated. */
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
-    "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
+    "moduleResolution": "bundler",                       /* Specify how TypeScript looks up a file from a given module specifier. */
+                               /* Specify the base directory to resolve non-relative module names. */
     "paths": {
-      "@components/*": ["frontend/src/components/*"],
-      "@public/*": ["public/*"],
-      "@lib/*": ["backend/src/lib/*"],
-      "@db/*": ["backend/src/db/*"],
-      "@modules/*": ["backend/src/modules/*"]
+      "@backend/*": ["./backend/*"],
+      "@components/*": ["./frontend/src/components/*"],
+      "@public/*": ["./public/*"],
+      "@lib/*": ["./backend/src/lib/*"],
+      "@db/*": ["./backend/src/db/*"],
+      "@modules/*": ["./backend/src/modules/*"]
       
     },                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

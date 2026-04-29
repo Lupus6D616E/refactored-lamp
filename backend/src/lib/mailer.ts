@@ -48,21 +48,3 @@ const createTransporter = () => {
 }
 
 export const mailer = createTransporter()
-if (import.meta.main) {
-console.log("you are now testing")
-  await mailer.sendMail({   
-    from: '"Your App" <noreply@yourdomain.com>',
-    to: "test@test.com",
-    subject: 'Verify your email address',
-    html: `
-      <p>Click the link to verify:</p>
-      <a href="test">test</a>
-    `,
-  });
-  await authClient.sendVerificationEmail({
-    email: "user@email.com",
-    callbackURL: "/" // The redirect URL after verification
-})
-console.log("did it work")
-
-}

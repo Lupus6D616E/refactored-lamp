@@ -6,8 +6,6 @@ import { Verification } from './service'
 import AdmZip from 'adm-zip';
 import { s3Client } from '@lib/minio';
 import { createNotification } from '@lib/notifications';
-import { Admin } from '@modules/admin/service';
-import { Search } from '@modules/search/service';
 export const verificationPlugin = new Elysia({ prefix: "/verify" })
     .use(betterAuthPlugin)
     .post('/business/upload', async ({ currentUser, body }) => {
