@@ -1,5 +1,5 @@
 import { Elysia, status, t } from "elysia";
-import { betterAuthPlugin } from "@lib/auth";
+import { auth, betterAuthPlugin } from "@lib/auth";
 import { Admin } from "./service";
 import { AdminModel } from "./model";
 import { email, emailAttachments } from "@db/schema";
@@ -8,12 +8,31 @@ import { extname } from "node:path";
 import { count, eq, asc, desc } from "drizzle-orm";
 import { s3Client } from "@lib/minio";
 import { mailer } from "@backend/src/lib/mailer";
+import { logger, pino } from "@bogeychan/elysia-logger";
+
+
 export const adminPlugin = new Elysia({ prefix: "/admin" })
   .use(betterAuthPlugin)
+  .use(
+    logger({
+      level: "info",
+      stream: pino.multistream([
+        process.stdout,
+        pino.destination("./logs/out.log")]),
+      autoLogging: false, // disabled
+    })
+  )
   .post(
     "/changetype",
-    async ({ body }) => {
+    async ({ body ,log ,request: {url}, currentUser, currentSession}) => {
       const res = await Admin.changeAccountType(body.email, body.type)
+        log.info({
+          user: currentUser.email,
+          IP: currentSession.ipAddress,
+          URL: url,
+          changedUser: body.email,
+          type: body.type
+        },"CHANGE USER")
       if (res === true) {
         return status(200)
       }
@@ -28,7 +47,14 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
   )
   .post(
     "/addtobusiness",
-    async ({ body }) => {
+    async ({ body, currentUser, currentSession, request: { url }, log }) => {
+      log.info({
+        user: currentUser.email,
+        IP: currentSession.ipAddress,
+        URL: url,
+        addUser: body.email,
+        business: body.business
+      }, "ADD TO BUSINESS")
       const res = await Admin.addUserToBusiness(body.email, body.business.toLowerCase())
       if (res.success === true) {
         return {
@@ -56,8 +82,14 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
   )
   .post(
     "/bootstrap",
-    async ({ body }) => {
+    async ({ body, server, request, log }) => {
       const res = await Admin.bootstrapAdminAccount(body.secret, body.email, body.password, body.name)
+      log.warn({
+        IP: server?.requestIP(request),
+        URL: request.url,
+        attempt: res,
+        user: body.email
+      }, "BOOTSTRAP ATTEMPT")
       if (res === true) {
         return status(201, "Admin created");
       } else {
@@ -67,8 +99,16 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     {
       body: AdminModel.bootStrapAdminAccountBody
     })
-  .post("/createbusiness", async ({ body }) => {
+  .post("/createbusiness", async ({ body, log, currentUser, currentSession, request: { url } }) => {
+
     const res = await Admin.createBusiness(body.name.toLowerCase(), body.description, body.industry, body.address, body.bin)
+    log.info({
+      user: currentUser.email,
+      IP: currentSession.ipAddress,
+      URL: url,
+      businessCreated: !(res === 409),
+      businessName: body.name
+    }, "BUSINESS CREATED")
     if (res === 409) {
       return status(409, "Business Already Exists")
     } else {
@@ -78,9 +118,15 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     role: ["admin"],
     body: AdminModel.createBusinessBody
   })
-  .post("/createpost", async ({ body }) => {
-    console.log(body)
+  .post("/createpost", async ({ body, log, currentUser, currentSession, request: { url } }) => {
     const res = await Admin.createArticle(body.title, body.body, body.image)
+    log.info({
+      user: currentUser.email,
+      IP: currentSession.ipAddress,
+      URL: url,
+      articleCreated: res,
+      articleTitle: body.title
+    }, "ARTICLE CREATED")
     if (res) {
       return status(201, "article Created")
     }
@@ -100,7 +146,7 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
   })
   .get(
     "/stats",
-    async ({ currentUser }) => {
+    async ({ currentUser, currentSession, log }) => {
       const res = await Admin.statistics()
       return res
     },
@@ -149,7 +195,7 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
   }
   )
   .get("/email/getfile/:id",
-    async ({ currentUser, params, set }) => {
+    async ({ currentUser, params, set, log, currentSession, request: { url } }) => {
       try {
         const res = await db
           .select({
@@ -165,7 +211,14 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
         set.headers["Content-Type"] = res[0].contentType || "application/octet-stream";
         set.headers["Content-Disposition"] = `attachment; filename="${res[0].filename}"`;
         const real = await file.arrayBuffer()
+        log.info({
+          user: currentUser.email,
+          IP: currentSession.ipAddress,
+          URL: url,
+          contentId: params.id,
+        }, "DOWNLOAD ATTACHMENT")
         return real; // stream
+
       }
       catch (e) {
         console.log(e)
@@ -175,37 +228,46 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
     role: ["admin"]
   })
   .post("/email/reply",
-    async ({ currentUser, body }) => {
-      try{const data = await db
-      .select()
-      .from(email)
-      .where(eq(email.id,body.id))
-      .limit(1)
+    async ({ currentUser, body, log, currentSession, request: { url } }) => {
+      try {
+        const data = await db
+          .select()
+          .from(email)
+          .where(eq(email.id, body.id))
+          .limit(1)
 
-    let attachment = undefined
-      if (body.file) {
-      const arrayBuffer = await body.file.arrayBuffer()
-      const buffer = Buffer.from(arrayBuffer)
+        let attachment = undefined
+        if (body.file) {
+          const arrayBuffer = await body.file.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
 
-      attachment = {
-        filename: body.file.name,
-        content: buffer,
-        contentType: body.file.type
+          attachment = {
+            filename: body.file.name,
+            content: buffer,
+            contentType: body.file.type
+          }
+        }
+
+        mailer.sendMail({
+          from: 'Support@mail.flexihire.link',
+          to: data[0].from,
+          subject: body.subject,
+          text: body.body,
+          attachments: attachment ? [attachment] : []
+        });
+        log.info({
+          user: currentUser.email,
+          IP: currentSession.ipAddress,
+          URL: url,
+          repliedTo: body.id,
+          subject: body.subject,
+          body: body.body,
+        }, "EMAIL REPLY")
+        return status(200)
       }
-    }
-
-      mailer.sendMail({
-        from: 'Support@mail.flexihire.link',
-        to: data[0].from,
-        subject: body.subject,
-        text: body.body,
-        attachments: attachment? [attachment] : []
-      });
-      return status(200)
-    }
-    catch{
-      return status(501)
-    }
+      catch {
+        return status(501)
+      }
     }
     , {
       role: ["admin"],
@@ -213,8 +275,10 @@ export const adminPlugin = new Elysia({ prefix: "/admin" })
         id: t.String(),
         subject: t.String(),
         body: t.String(),
-        file: t.Optional( t.File())
+        file: t.Optional(t.File())
       })
-      
     }
   )
+  .get('/logs/latest', () => Bun.file('./logs/out.log'),{
+    role:["admin"]
+  })

@@ -14,3 +14,7 @@ Open http://localhost:3000/ with your browser to see the result.
 
 Requires PostgreSQL to be installed
 bun x drizzle-kit push to initialize tables then bunx drizzle-kit migrate
+
+## Logging 
+
+Set up your own Logrotate script to rotate ./logs/out.log

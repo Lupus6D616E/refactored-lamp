@@ -6,9 +6,19 @@ import { Verification } from './service'
 import AdmZip from 'adm-zip';
 import { s3Client } from '@lib/minio';
 import { createNotification } from '@lib/notifications';
+import { logger, pino } from '@bogeychan/elysia-logger';
 export const verificationPlugin = new Elysia({ prefix: "/verify" })
     .use(betterAuthPlugin)
-    .post('/business/upload', async ({ currentUser, body }) => {
+    .use(
+        logger({
+            level: "info",
+            stream: pino.multistream([
+                process.stdout,
+                pino.destination("./logs/out.log")]),
+            autoLogging: false, // disabled
+        })
+    )
+    .post('/business/upload', async ({ currentSession, log, request: {url},currentUser, body }) => {
         const {
             name,           // string
             industry,       // string
@@ -17,7 +27,14 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
             bin,
             documents,      // File[] 
         } = body
-        const res = await Verification.createVerificationRequest(currentUser.id, name, industry, description, address,bin ,documents)
+        const res = await Verification.createVerificationRequest(currentUser.id, name, industry, description, address, bin, documents)
+               log.info({
+                  user: currentUser.email,
+                  IP: currentSession.ipAddress,
+                  URL: url,
+                  BIN: bin,
+                  success: res.success
+                },"CREATE VERIFICATION REQUEST")
         return res
     }, {
         role: ["business"],
@@ -45,10 +62,10 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
     }, {
         role: ["admin"]
     })
-    .get('admin/verification/files/:id', async ({ currentUser, params }) => {
+    .get('admin/verification/files/:id', async ({ log, currentUser,currentSession, request: {url}, params }) => {
         const files = await Verification.getPDF(parseInt(params.id))
         if (!files?.length) {
-            return status(404,"not found");
+            return status(404, "not found");
         }
         const zip = new AdmZip();
         for (const file of files) {
@@ -64,40 +81,53 @@ export const verificationPlugin = new Elysia({ prefix: "/verify" })
             }
         }
         const zipBuffer = zip.toBuffer();
-    
+               log.info({
+                  user: currentUser.email,
+                  IP: currentSession.ipAddress,
+                  URL: url,
+                  fileId: params.id
+                },"DOWNLOAD VERIFICATION DOCUMENTS")
+
         return zipBuffer
     }, {
         role: ["admin"]
     }
     )
-    .post('admin/verification/verify', async ({ currentUser, body}) =>{
+    .post('admin/verification/verify', async ({ currentUser, body ,log, currentSession, request:{url}}) => {
         console.log(body.id, body.decision)
-        if(body.decision === "reject"){
-        await Verification.rejectBusinessApplication(body.id)
-        const data = await Verification.getVerificationItem(body.id)
-        createNotification(data.userId,"business verification","Business Rejection",`Your business ${data.businessName}, has been rejected.`, {
-            applicationId: data.id,
-            userId: data.userId
-        })
-        return{
-            success: true,
-            message: `application ID: ${body.id} Rejected`
+        log.info({
+            user: currentUser.email,
+            IP: currentSession.ipAddress,
+            URL: url,
+            verifyId: body.id,
+            decision: body.decision
+        }, "VERIFY BUSINESS")
+        if (body.decision === "reject") {
+            await Verification.rejectBusinessApplication(body.id)
+            const data = await Verification.getVerificationItem(body.id)
+            createNotification(data.userId, "business verification", "Business Rejection", `Your business ${data.businessName}, has been rejected.`, {
+                applicationId: data.id,
+                userId: data.userId
+            })
+            return {
+                success: true,
+                message: `application ID: ${body.id} Rejected`
+            }
         }
+        if (body.decision === "accept") {
+            await Verification.acceptBusinessApplication(body.id)
+            const data = await Verification.getVerificationItem(body.id)
+            createNotification(data.userId, "business verification", "Business Accepted", `Your business ${data.businessName}, has been accepted.`, {
+                applicationId: data.id,
+                userId: data.userId
+            })
+            return {
+                success: true,
+                message: `application ID: ${body.id} accepted`
+            }
         }
-         if(body.decision === "accept"){
-        await Verification.acceptBusinessApplication(body.id)
-         const data = await Verification.getVerificationItem(body.id)
-        createNotification(data.userId,"business verification","Business Accepted",`Your business ${data.businessName}, has been accepted.`, {
-            applicationId: data.id,
-            userId: data.userId
-        })
-        return{
-            success: true,
-            message: `application ID: ${body.id} accepted`
-        }
-        }
-    },{
-        role:["admin"],
+    }, {
+        role: ["admin"],
         body: t.Object({
             id: t.Number(),
             decision: t.String()

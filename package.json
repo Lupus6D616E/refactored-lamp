@@ -8,6 +8,7 @@
     "start": "NODE_ENV=production bun backend/src/index.ts"
   },
   "dependencies": {
+    "@bogeychan/elysia-logger": "^0.1.10",
     "@elysiajs/eden": "^1.4.9",
     "@elysiajs/html": "^1.4.0",
     "@elysiajs/openapi": "^1.4.14",
@@ -29,6 +30,7 @@
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "nodemailer": "^8.0.5",
     "pg": "^8.20.0",
+    "pino-roll": "^4.0.0",
     "postgres": "^3.4.9",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
