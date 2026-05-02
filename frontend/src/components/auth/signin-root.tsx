@@ -13,7 +13,7 @@ function App() {
 
       <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50">
           <div className="flex-1">
-              <a className="text-3xl font-black font-brand tracking-tighter bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">
+              <a href="/public" className="text-3xl font-black font-brand tracking-tighter bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">
             FlexiHire
           </a>
           </div>
@@ -30,7 +30,7 @@ function App() {
 
   <figure className="lg:w-1/2 hidden lg:flex items-center justify-center rounded-lg overflow-hidden">
     <img
-      src="/public/images/design.png" 
+      src="/static/images/assets/design.png" 
       alt="FlexiHire Illustration"
       className="w-full max-w-sm h-auto object-contain"
     />

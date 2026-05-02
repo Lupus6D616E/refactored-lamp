@@ -21,7 +21,7 @@ const Navbar: React.FC = () => (
           <details>
             <summary>Other</summary>
             <ul className="dropdown-content menu bg-base-100 rounded-box z-[1] w-20 p-1 shadow-sm">
-              <li><a href="/public/signup.html">Sign Up</a></li>
+              <li><a href="/public/signup.html">SignUp</a></li>
               <li><a>Contact</a></li>
             </ul>
           </details>
