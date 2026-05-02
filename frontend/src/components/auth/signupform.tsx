@@ -222,6 +222,18 @@ export function SignupCard() {
         </button>
               </div>
             </div>
+                    {!password &&
+                                <div role="alert" className="alert alert-error alert-soft">
+                                    <span>a password is required.</span>
+                                </div>}
+                      {!name &&
+                                <div role="alert" className="alert alert-error alert-soft">
+                                    <span>a name is required.</span>
+                                </div>}
+                                  {!email &&
+                                <div role="alert" className="alert alert-error alert-soft">
+                                    <span>an email is required.</span>
+                                </div>}
           
           {/* Terms and Privacy Text */}
             <p className="text-[11px] text-gray-500 text-center leading-relaxed px-2">

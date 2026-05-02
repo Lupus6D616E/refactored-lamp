@@ -9,7 +9,7 @@ import {
   user,
 } from "@db/schema";
 import { auth } from "@lib/auth";
-import { count, eq } from "drizzle-orm";
+import { count, eq, and} from "drizzle-orm";
 import { AdminModel } from "./model";
 import { s3Client } from "@lib/minio";
 
@@ -77,27 +77,52 @@ export abstract class Admin {
     }
   }
   static async addUserToBusiness(email: string, businessName: string) {
+    console.log(`${email}  ${businessName} `)
     return db
       .transaction(async (tx) => {
         const userObtained = await tx
-          .select({ userId: user.id })
+          .select({ userId: user.id ,
+            role: user.role
+          })
           .from(user)
           .where(eq(user.email, email))
           .limit(1);
-
-        if (!userObtained[0]) throw new Error(`User not found`);
-
+        if (!userObtained[0]){
+          return{
+            success: false,
+            message: "user not found"
+          }
+        }
+        if (userObtained[0].role !== "business"){
+          return{
+            success: false,
+            message: "user is not a business user"
+          }
+        }
         const businessObtained = await tx
           .select({ businessId: businessProfile.id })
           .from(businessProfile)
           .where(eq(businessProfile.name, businessName))
           .limit(1);
-
-        if (!businessObtained[0]) throw new Error(`Organization not found`);
-
+        if (!businessObtained[0]){
+          return{
+            success: false,
+            message: "business not found"
+          }
+        }
+        const checkBusinessUser = await tx
+        .select()
+        .from(businessUser)
+        .where(and(eq(businessUser.userId, userObtained[0].userId),eq(businessUser.businessId,businessObtained[0].businessId)))
         const userId = userObtained[0].userId;
         const businessId = businessObtained[0].businessId;
-
+        
+        if(checkBusinessUser.length > 0){
+            return{
+            success: false,
+            message: "user is already in business"
+          }
+        }
         // UPSERT-style prevention (works even without DB unique constraint)
         await tx
           .insert(businessUser)
@@ -107,7 +132,8 @@ export abstract class Admin {
         return { success: true, message: "user added" };
       })
       .catch((err) => {
-        return { success: false, message: err };
+        console.log(`hello ${err}`)
+        return { success: false, message: "the fuck" };
       });
   }
 

@@ -9,6 +9,7 @@ export namespace searchModel {
     tags: t.Optional(t.Array(t.String())),
     tagsMode: t.Optional(t.String()),
     schedule: t.Optional(t.Array(t.String())),
+    scheduleMode: t.Optional(t.String()),
   });
   export const searchUserQuery = t.Object({
     name: t.String(),

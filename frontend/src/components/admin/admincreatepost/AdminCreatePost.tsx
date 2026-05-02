@@ -45,17 +45,24 @@ const CreatePost: React.FC = () => {
         e.preventDefault();
         setIsSubmitting(true);
         if (formData.image) {
-            
-            const res = await edenTreatyApi.admin.createpost.post({ title: formData.title, body: formData.body, image: formData.image })
-            if(res.status === 201){
-            alert('Post created successfully! 🎉');
+            if (formData.image.size > 10000000) {
+                alert("image too large")
             }
-            else{
-                alert(res.response)
+            else if(formData.title.length > 100){
+                alert ("title too long. max 100 characters.")
+            }
+            else {
+                const res = await edenTreatyApi.admin.createpost.post({ title: formData.title, body: formData.body, image: formData.image })
+                if (res.status === 201) {
+                    alert('Post created successfully! 🎉');
+                }
+                else {
+                    alert(res.error?.value)
+                }
             }
         }
-        else{
-            window.alert("an image is required.")
+        else {
+            alert("an image is required.");
         }
         // Reset form
         setFormData({ title: '', body: '', image: null });
@@ -122,7 +129,10 @@ const CreatePost: React.FC = () => {
                                     </label>
                                 </div>
                             </div>
-
+                            {!formData.image &&
+                                <div role="alert" className="alert alert-error alert-soft">
+                                    <span>an image is required.</span>
+                                </div>}
                             {/* Body */}
                             <div className="form-control">
                                 <label className="label">
@@ -150,7 +160,7 @@ const CreatePost: React.FC = () => {
 
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting || !formData.title || !formData.body}
+                                    disabled={isSubmitting}
                                     className="btn btn-primary flex-1 text-lg"
                                 >
                                     {isSubmitting ? (

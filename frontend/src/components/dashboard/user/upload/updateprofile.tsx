@@ -170,9 +170,9 @@ export function UpdateProfile() {
           <input
             type="text"
             className="input input-bordered flex-1"
-            placeholder="Click on Search button to find Address"
+            placeholder="Press set cursor, then confirm."
             value={address}
-            disabled={true}
+            disabled={false}
           ></input>
           <p>lat{position.lat} lng:{position.lng}</p>
           {/* Submit */}

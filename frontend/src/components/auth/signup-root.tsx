@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { SignupCard } from "frontend/src/components/auth/signupform";
+import { SignupCard } from "@components/auth/signupform";
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
       <div className="hidden lg:flex lg:w-1/2 justify-center lg:justify-end">
         <figure className="rounded-lg">
           <img
-            src="/public/images/signup.png" 
+            src="/static/images/assets/signup.png" 
             alt="FlexiHire Illustration"
             className="w-full max-w-sm h-auto object-contain"
           />

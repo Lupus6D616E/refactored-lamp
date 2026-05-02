@@ -1,6 +1,5 @@
 import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
-import { number } from "better-auth/*";
 import React, { useEffect, useState } from "react";
 
 

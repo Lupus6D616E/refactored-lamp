@@ -3,6 +3,7 @@ import { betterAuthPlugin } from "@lib/auth";
 import { Business } from "./service";
 import { Post } from "@modules/post/service";
 import { businessModel } from "./model";
+import { createNotification } from "@lib/notifications";
 
 export const businessPlugin = new Elysia({ prefix: "/business" })
   .use(betterAuthPlugin)
@@ -77,7 +78,13 @@ export const businessPlugin = new Elysia({ prefix: "/business" })
       );
       if (isMember) {
         try {
+
           const result = await Business.decideApplication(body.userId, body.jobId, body.message, body.decision)
+          const data = await Post.getPostDetails(body.jobId)
+          createNotification(body.userId,"job application","Job Application update",`Your job application for ${data[0].title} is ${body.decision}`,{
+            userId: body.userId,
+            applicationId: body.jobId
+          })
           return true;
         } catch (e) {
           console.log(e);

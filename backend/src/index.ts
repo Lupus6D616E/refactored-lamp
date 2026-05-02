@@ -1,7 +1,7 @@
 import { Elysia, redirect  } from "elysia";
 import { exec } from "child_process";
 import { watch } from "fs";
-import { betterAuthPlugin } from "backend/src/lib/auth";
+import { betterAuthPlugin } from "@lib/auth";
 import { staticPlugin } from "@elysiajs/static";
 import { profilePlugin } from "@modules/profile/controller";
 import { postPlugin } from "@modules/post/controller";
@@ -15,6 +15,8 @@ import { messagePlugin } from "@modules/mail/controller";
 import { verificationPlugin } from "@modules/verification/controller";
 import { imagePlugin } from "@modules/static/controller";
 import { newsPlugin } from "@modules/news/controller";
+import { notificationPlugin } from "@modules/notifications/controller";
+import { webHookPlugin } from "@modules/webhooks/controller";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -46,10 +48,14 @@ const app = new Elysia()
   .get("/public", () =>{
     return redirect("/public/index.html")
   }
+)
+  .get("/public/", () =>{
+    return redirect("/public/index.html")
+  }
   )
   .use(await staticPlugin({
     bunFullstack:true,
-    assets: isProd ? './dist' : 'frontend/public'
+    assets: isProd ? 'dist' : 'frontend/public'
   }))
   .use(newsPlugin)
   .use(imagePlugin)
@@ -62,6 +68,8 @@ const app = new Elysia()
   .use(businessPlugin)
   .use(messagePlugin)
   .use(verificationPlugin)
+  .use(notificationPlugin)
+  .use(webHookPlugin)
   .use(openapi({documentation: {
             components: await OpenAPI.components,
             paths: await OpenAPI.getPaths()

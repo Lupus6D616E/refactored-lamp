@@ -67,7 +67,7 @@ const ResumeUpload: React.FC = () => {
             <button
               className="btn btn-primary"
               onClick={handleUpload}
-              disabled={!file || uploading}
+              disabled={uploading}
             >
               {uploading ? (
                 <>

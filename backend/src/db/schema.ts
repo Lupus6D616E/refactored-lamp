@@ -352,11 +352,21 @@ export const jobPostEmbedding = pgTable("job_post_embedding", {
   .using('hnsw', table.postEmbedding.op('vector_cosine_ops'))]).
   enableRLS()
 
+export const jobPostTitleEmbedding = pgTable("job_post_title_embedding", {
+  id: serial('id').primaryKey(),
+  postId: integer("post_id")
+    .notNull()
+    .references(() => jobPosts.id, { onDelete: "cascade" }).unique(),
+  postTitleEmbedding: vector('post_title_embedding', { dimensions: 1024 }).notNull()
+}, (table) => [index('post_title_embedding_idx')
+  .using('hnsw', table.postTitleEmbedding.op('vector_cosine_ops'))]).
+  enableRLS()
+
 export const businessApplications = pgTable("business_applications", {
   id: serial('id').primaryKey(),
   userid: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }).unique(),
+    .references(() => user.id, { onDelete: "cascade" }).unique().notNull(),
   name: text("name").unique().notNull(),
   description: text("description").notNull(),
   industry: text("industry").notNull(),
@@ -410,12 +420,7 @@ export const notifications = pgTable(
     link: text("link"),
 
     // Optional metadata (actor user, post id, comment id, etc.)
-    data: jsonb("data").$type<{
-      actorId?: number;
-      postId?: number;
-      commentId?: number;
-      // ... any other context
-    }>(),
+    data: jsonb("data"),
 
     // Read status
     isRead: boolean("is_read").default(false).notNull(),
@@ -435,4 +440,42 @@ export const notifications = pgTable(
     index("notifications_created_at_idx").on(table.createdAt), // for sorting
     index("notifications_type_idx").on(table.type), // if you filter by type
   ]
-);
+).enableRLS();
+
+export const email = pgTable("email", {
+  id: uuid("id").primaryKey(),
+  to: text("to")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  from: text("from").notNull(),
+  createdAt: timestamp("created_at").notNull(),
+  subject: text("subject"),
+  messageId: text("message_id"),
+  bcc: text("bcc")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  cc: text("cc")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  replyTo: text("reply_to")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  html: text("html"),
+  text: text("text"),
+  attachments: text("attachments")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+}).enableRLS()
+export const emailAttachments = pgTable("email_attachments", {
+  id: uuid("id").primaryKey(),
+  emailId: uuid("email_id").references(() => email.id, {onDelete: "cascade"}).notNull(),
+  filename: text("filename").notNull(),
+  contentId: text("content_id").notNull(),
+  contentType: text("content_type").notNull(),
+  contentDisposition: text("content_disposition").notNull()
+}).enableRLS()

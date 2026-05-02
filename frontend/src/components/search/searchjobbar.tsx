@@ -42,6 +42,8 @@ interface SearchFilters {
   salaryMinimum: number | "";
   tags: string[];
   schedule: string[];
+  tagsMode: string ;
+  scheduleMode: string;
 }
 interface Props {
   onResults: (results:SearchResult[]) => void;
@@ -55,6 +57,8 @@ export function AdvancedSearchBar({ onResults }: Props) {
     salaryMinimum: "",
     tags: [],
     schedule: [],
+    tagsMode: "loose",
+    scheduleMode: "loose"
   });
 
 
@@ -109,8 +113,9 @@ export function AdvancedSearchBar({ onResults }: Props) {
       employmentType: filters.employments,
       salaryMinimum: filters.salaryMinimum || undefined,
       tags: filters.tags.length > 0 ? filters.tags : undefined,
-      schedule: filters.schedule || undefined,
-      tagsMode: "any",
+      schedule: selectedDays.length > 0 ? selectedDays : undefined,
+      tagsMode: filters.tagsMode,
+      scheduleMode: filters.scheduleMode
     };
 
     try {
@@ -211,7 +216,7 @@ export function AdvancedSearchBar({ onResults }: Props) {
             </select>
           </div>
 
-          {/* 4. Min price */}
+          {/* 4. Min salar */}
           <div>
             <label className="label">
               <span className="label-text">Min Salary</span>
@@ -252,7 +257,25 @@ export function AdvancedSearchBar({ onResults }: Props) {
               </div>
             ))}
           </div>
-
+          <div>
+            <label className="label">
+              <span className="label-text">Tag Strictness</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={filters.tagsMode}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, tagsMode: e.target.value }))
+              }
+            >
+              <option value={"loose"}>Loose</option>
+              
+              <option value={"exact"}>Exact</option>
+   
+              <option value={"strict"}>Strict</option>
+   
+            </select>
+          </div>
           <div className="flex gap-2">
             <input
               ref={tagInputRef}
@@ -296,6 +319,25 @@ export function AdvancedSearchBar({ onResults }: Props) {
             Selected: {selectedDays.join(", ") || "None"}
           </div>
         </div>
+        <div>
+            <label className="label">
+              <span className="label-text">Schedule Strictness</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={filters.scheduleMode}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, scheduleMode: e.target.value }))
+              }
+            >
+              <option value={"loose"}>Loose</option>
+              
+              <option value={"exact"}>Exact</option>
+   
+              <option value={"strict"}>Strict</option>
+   
+            </select>
+          </div>
         {/* Search button */}
         <div className="mt-8 flex justify-end">
           <button

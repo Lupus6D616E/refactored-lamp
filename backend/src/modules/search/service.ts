@@ -36,17 +36,27 @@ export abstract class Search {
       }
     }
     if (search.employmentType) {
-      if (search.city !== "All") {
+      if (search.employmentType !== "All") {
         filters.push(eq(jobPosts.employmentType, search.employmentType));
       }
     }
     if (search.tags !== undefined && search.tags.length > 0) {
-      if (search.tagsMode === "all") {
+      if (search.tagsMode === "strict") {
         filters.push(arrayContains(jobPosts.tags, search.tags));
       } else if (search.tagsMode === "exact") {
         filters.push(eq(jobPosts.tags, search.tags));
       } else {
         filters.push(arrayOverlaps(jobPosts.tags, search.tags));
+      }
+    }
+
+    if (search.schedule !== undefined && search.schedule.length > 0) {
+      if (search.scheduleMode === "strict") {
+        filters.push(arrayContains(jobPosts.schedule, search.schedule));
+      } else if (search.scheduleMode === "exact") {
+        filters.push(eq(jobPosts.schedule, search.schedule));
+      } else {
+        filters.push(arrayOverlaps(jobPosts.schedule, search.schedule));
       }
     }
     const result = await db
