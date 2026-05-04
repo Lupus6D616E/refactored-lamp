@@ -10,11 +10,15 @@ export const aiPlugin = new Elysia({ prefix: "/ai" })
   .post(
     "/compare",
     async ({ body, currentUser, set }) => {
+      
       const rateStatus = await ReviewBot.ratelimit(currentUser.id);
       if (rateStatus === 429) {
         return status(429,"Exceeded Daily Comparisons");
       }
       const response = await ReviewBot.compare(currentUser.id,body.postId)
+      if(response === 404){
+        return status(404,"User has not created profile yet")
+      }
       return response
     },
     {

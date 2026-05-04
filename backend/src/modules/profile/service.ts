@@ -27,8 +27,7 @@ export abstract class Profile {
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 10)}.pdf`;
     const filepath = `${uploadDir}/${filename}`;
     await s3Client.write(filepath, file);
-    console.log("file uploaded");
-    console.log(filepath);
+
     let response: ProfileModel.resumeResponse = {
       message: "something happened",
       size: 0,
@@ -239,7 +238,7 @@ export abstract class Profile {
         eq(businessUser.businessId, businessProfile.id),
       )
       .where(eq(businessUser.userId, userId));
-    console.log(result);
+
     return result;
   }
   static async embedUserProfile(userID: string) {
@@ -259,7 +258,7 @@ export abstract class Profile {
           Education: ${profile.education}
           Certificaitons: ${certStr}
           Previous Work Experience: ${formattedExperience}
-      `
+      ` 
     const output = await getEmbedding(text);
     const embedding = output.tolist()[0]
     return embedding
@@ -286,7 +285,6 @@ export abstract class Profile {
     const res = await db.update(user).set({
       image: path
     }).where(eq(user.id,userId)).returning()
-    console.log()
     return true
   }
     catch{
@@ -310,12 +308,10 @@ export abstract class Profile {
         asResponse: false, // get data directly instead of Response object
         // returnHeaders: true,     // if you want Set-Cookie headers
       });
-      console.log(result);
       const newUser = await db
         .update(user)
         .set({ role: type })
         .where(eq(user.email, email));
-      console.log(newUser);
       return true;
     } catch (e) {
       return false;

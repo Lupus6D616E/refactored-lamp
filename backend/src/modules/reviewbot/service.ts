@@ -55,6 +55,9 @@ export abstract class ReviewBot{
               const postDetails = postResponse[0]
               const seekerResponse = await Profile.getSeekerProfile(userId)
               const seekerDetails = seekerResponse
+              if(!seekerResponse.description){
+                return 404
+              }
               const prompt = `You are a Job Matching Consultant.
               You are to compare this Job Request:{
               title:${postDetails.title}
@@ -70,8 +73,8 @@ export abstract class ReviewBot{
               Respond in at most 3 Paragraphs, then rate the applicant from 1-10.
               ` 
               const completion = await reviewBot.chat.send({
-                model: process.env.CHATBOT_MODEL!, // or any OpenRouter-supported model
-                messages: [{ role: "user", content: prompt }],
+                chatRequest: {messages: [{ role: "user", content: prompt }],
+              model: process.env.CHATBOT_MODEL!}
               });
         
               const responseText =

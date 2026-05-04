@@ -42,12 +42,10 @@ export abstract class Admin {
         asResponse: false, // get data directly instead of Response object
         // returnHeaders: true,     // if you want Set-Cookie headers
       });
-      console.log(result);
       const newAdmin = await db
         .update(user)
         .set({ role: "admin" })
         .where(eq(user.email, email));
-      console.log(newAdmin);
       return true;
     } else {
       return false;
