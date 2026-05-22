@@ -234,4 +234,4 @@ export const PostCard: React.FC<CardProps> = ({
       </div>
     </div>
   );
-};
+    };
