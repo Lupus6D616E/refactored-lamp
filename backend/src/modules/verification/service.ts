@@ -20,10 +20,10 @@ export abstract class Verification {
             const nameTaken = await db
                 .select({ exists: businessProfile.name })
                 .from(businessProfile)
-                .where(eq(businessProfile.name, name))
+                .where(eq(businessProfile.name, name.toLowerCase().trim()))
                 .limit(1);
             if(nameTaken.length > 0){
-
+                console.log("name taken")
             return {
                 success: false,
                 message: `a business with this name already exists`,

@@ -83,7 +83,7 @@ export const VerificationPage: React.FC = () => {
             documents: files,
             bin: bin
         })
-        if (res.data?.success) {
+        if (res.data) {
             setButtonText(res.data.message);
         }
     };
