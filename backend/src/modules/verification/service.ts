@@ -1,6 +1,6 @@
 import { db } from "@db/db";
 import { verificationModel } from "./model";
-import { businessApplications, businessApplicationsDocuments, user } from "@db/schema";
+import { businessApplications, businessApplicationsDocuments, businessProfile, user } from "@db/schema";
 import { desc, eq } from "drizzle-orm";
 import { Admin } from "@modules/admin/service";
 import { s3Client } from "@lib/minio";
@@ -17,6 +17,18 @@ export abstract class Verification {
     ): Promise<verificationModel.businessVerificationReturn> {
         console.log('Text fields:', { name, industry, address, bin, description })
         try {
+            const nameTaken = await db
+                .select({ exists: businessProfile.name })
+                .from(businessProfile)
+                .where(eq(businessProfile.name, name))
+                .limit(1);
+            if(nameTaken.length > 0){
+
+            return {
+                success: false,
+                message: `a business with this name already exists`,
+            }
+            }
             const application = await db.insert(businessApplications).values({
                 userid: userId,
                 description: description,
@@ -42,6 +54,10 @@ export abstract class Verification {
         }
         catch (e) {
             console.log(e)
+            return {
+                success: false,
+                message: `an error has occurred`,
+            }
         }
         return {
             success: true,

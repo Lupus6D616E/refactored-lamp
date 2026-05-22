@@ -84,7 +84,7 @@ export const VerificationPage: React.FC = () => {
             bin: bin
         })
         if (res.data?.success) {
-            setButtonText('success');
+            setButtonText(res.data.message);
         }
     };
     if (isVerified === "none" || isVerified === "verified") {
