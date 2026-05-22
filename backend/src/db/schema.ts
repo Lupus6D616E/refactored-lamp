@@ -366,7 +366,7 @@ export const businessApplications = pgTable("business_applications", {
   id: serial('id').primaryKey(),
   userid: text("user_id")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }).unique().notNull(),
+    .references(() => user.id, { onDelete: "cascade" }).notNull(),
   name: text("name").unique().notNull(),
   description: text("description").notNull(),
   industry: text("industry").notNull(),
