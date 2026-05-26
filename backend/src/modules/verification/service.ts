@@ -140,10 +140,10 @@ export abstract class Verification {
         const useremail = await db.select({
             email: user.email
         })
-            .from(user)
-            .where(eq(user.id, business.userid))
-        console.log("business created")
-        const added = await Admin.addUserToBusiness(useremail[0].email, business.name.trim().toLowerCase())
+        .from(user)
+        .where(eq(user.id,business.userid))   
+        console.log("business created")      
+        const added = await Admin.addUserToBusiness(useremail[0].email,business.name)
         console.log("user added to created business")
     }
 }

@@ -3,6 +3,7 @@ import { ApplyTheme } from "./ApplyTheme"
 import LogoutButton from "@components/auth/logout";
 import { useEffect, useState } from "react";
 import { edenTreatyApi } from "@lib/eden";
+import ThemeSwitcherCard from "./ThemesSwitcherCard";
 interface NotificationResponse {
 
   id: number;
@@ -36,11 +37,14 @@ export default function NavBar() {
   async function markread(id:number){
    const res =  await edenTreatyApi.notifications.markread({id:id}).get()
   }
+  
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50">
       <ApplyTheme />
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl" href={"/public/index.html"}>daisyUI</a>
+        <a className="text-3xl font-black font-brand tracking-tighter bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">
+            FlexiHire
+          </a>
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
@@ -48,7 +52,7 @@ export default function NavBar() {
           <li>
             {/* change popover-1 and --anchor-1 names. Use unique names for each dropdown */}
             {/* For TSX uncomment the commented types below */}
-            <button className="btn" popoverTarget="popover-1" style={{ anchorName: "--anchor-1" } /* as React.CSSProperties */}>
+            <button popoverTarget="popover-1" style={{ anchorName: "--anchor-1" } /* as React.CSSProperties */}>
               Notifications
             </button>
             <ul className="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
@@ -68,8 +72,9 @@ export default function NavBar() {
           <li>
             <details>
               <summary>{session?.user.name}</summary>
-              <ul className="bg-base-100 rounded-t-none p-2">
+              <ul className="dropdown-content menu bg-base-100 rounded-box z-[1] w-50 p-1 shadow-sm">
                 <li><a>Settings</a></li>
+                <li><ThemeSwitcherCard/></li>
                 <li><LogoutButton /></li>
               </ul>
             </details>

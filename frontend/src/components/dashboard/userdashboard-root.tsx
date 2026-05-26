@@ -18,6 +18,8 @@ import { themeChange } from 'theme-change'
 import ThemeSwitcherCard from '@components/auxilliary/ThemesSwitcherCard'
 import NavBar from '@components/auxilliary/navbar'
 import UploadProfilePicture from './user/upload/UploadProfilePicture'
+import Recojob from './user/info/recojob'
+
 function App() {
     useEffect(() => {
   themeChange(false)
@@ -35,9 +37,11 @@ function App() {
     return (
         <main>
             <NavBar />
-            <ThemeSwitcherCard />
-            <UserProfileCard />
-            <LogoutButton />
+            <div className="flex gap-4 items-start">
+                <UserProfileCard />
+                <Recojob />
+            </div>
+            
             <ResumeUpload />
             <ResumeDownload />
             <AddCertificationCard />

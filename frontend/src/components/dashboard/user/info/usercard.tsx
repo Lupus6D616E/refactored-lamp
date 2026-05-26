@@ -80,7 +80,7 @@ export default function UserProfileCard() {
     <div className="card w-96 bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title">Welcome back!</h2>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col items-center text-center space-y-4">
           {session.user.image === null && <div className="avatar placeholder">
             <div className="bg-neutral text-neutral-content rounded-full w-16">
               <span className="text-xl uppercase">
@@ -88,7 +88,7 @@ export default function UserProfileCard() {
               </span>
             </div>
           </div>}
-          {session.user.image && <div className="avatar">
+          {session.user.image && <div className="avatar" >
             <div className="mask mask-squircle w-24">
               <img src={`/static/images/profilepicture/user/${user.id}`}></img>
             </div>
@@ -97,18 +97,11 @@ export default function UserProfileCard() {
             {user.name && <p className="text-lg font-semibold">{user.name}</p>}
             <p className="text-sm text-base-content/70">{user.email}</p>
             <p className="text-sm text-base-content/70">{user.role}</p>
-            <p className="text-sm text-base-content/70">
-              {description}
-            </p>
-            <p className="text-sm text-base-content/70">
-              {education}
-            </p>
+            <p className="text-sm text-base-content/70">{description}</p>
+            <p className="text-sm text-base-content/70">{education}</p>
             <p className="text-sm text-base-content/70">{skills}</p>
             <p className="text-sm text-base-content/70">{address}</p>
-
-            <p className="text-sm text-base-content/70">
-              {schedule}
-            </p>
+            <p className="text-sm text-base-content/70">{schedule}</p>
             {
               session.user.emailVerified !== true &&
 
@@ -124,6 +117,6 @@ export default function UserProfileCard() {
           </div>
         </div>
       </div>
-    </div>
+    </div>  
   );
 }

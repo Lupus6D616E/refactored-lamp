@@ -17,7 +17,7 @@ export default function ThemeSwitcherCard() {
 
 
   return (
-    <div className="card w-96 bg-base-100 shadow-xl">
+    <div className="card w-50 bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title">Theme Switcher</h2>
         <p className="mb-4">
