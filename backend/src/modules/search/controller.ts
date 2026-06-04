@@ -28,6 +28,7 @@ export const searchPlugin = new Elysia({ prefix: "/search" }) // optional prefix
   }, {
     role: ['user']
   }
+  
   )
   .get(
     "/seeker",

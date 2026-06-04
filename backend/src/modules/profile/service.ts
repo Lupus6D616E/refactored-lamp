@@ -103,16 +103,17 @@ export abstract class Profile {
   }
 
   static async insertExperience(
-    userID: string,
+    userId: string,
     data: ProfileModel.experienceBody,
   ): Promise<number> {
     try {
       await db.insert(userWorkExperience).values({
-        userId: userID,
+        userId: userId,
         experience: data.experience,
         position: data.position,
         duration: data.duration,
       });
+      await this.insertCreatedEmbedding(userId)
     } catch {
       return 404;
     }
@@ -127,6 +128,7 @@ export abstract class Profile {
         userId: userSession.id,
         certification: data.certification,
       });
+      await this.insertCreatedEmbedding(userSession.id)
     } catch {
       return 404;
     }
@@ -181,6 +183,7 @@ export abstract class Profile {
             location: { x: data.location.lng, y: data.location.lat }
           },
         });
+      await this.insertCreatedEmbedding(userId)
     } catch {
       return 500;
     }
@@ -256,7 +259,7 @@ export abstract class Profile {
           Description: ${profile.description}
           Skills: ${skillsStr}
           Education: ${profile.education}
-          Certificaitons: ${certStr}
+          Certifications: ${certStr}
           Previous Work Experience: ${formattedExperience}
       ` 
     const output = await getEmbedding(text);
@@ -279,7 +282,6 @@ export abstract class Profile {
   static async uploadProfilePicture(userId: string, image: File){
     try
     {const ext = extname(image.name)
-    
     const path = `/profile/${userId}/pfp`
     s3Client.write(path,image,{type:"image/*"})
     const res = await db.update(user).set({
@@ -305,8 +307,7 @@ export abstract class Profile {
           password: password,
           name: name,
         },
-        asResponse: false, // get data directly instead of Response object
-        // returnHeaders: true,     // if you want Set-Cookie headers
+        asResponse: false,
       });
       const newUser = await db
         .update(user)

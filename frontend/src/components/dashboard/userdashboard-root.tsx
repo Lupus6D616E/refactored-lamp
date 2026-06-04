@@ -29,6 +29,17 @@ function App() {
                 <UserProfileCard />
                 <Recojob />
             </div>
+            
+            <ResumeUpload />
+            <ResumeDownload />
+            <AddCertificationCard />
+            <CertificationList />
+            <AddExperienceCard />
+            <ExperienceList />
+            <UpdateProfile />
+            <ApplicationList />
+            <MessageList />
+            <UploadProfilePicture />
         </main>
     )
     }

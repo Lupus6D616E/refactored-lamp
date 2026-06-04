@@ -3,9 +3,16 @@ import { Elysia, redirect, status } from "elysia";
 import { ProfileModel } from "./model";
 import { Profile } from "./service";
 import { s3Client } from "@lib/minio";
+import { Search } from "@modules/search/service";
 
 export const profilePlugin = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
+  .get("/getrecommendedjobs", async ({currentUser}) => {
+      const result = await Search.recommendJobs(currentUser.id)
+      return result
+    }, {
+      role: ['user']
+    })
   .get(
     "/getcertifications",
     async ({ currentUser }) => {
