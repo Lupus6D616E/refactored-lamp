@@ -49,38 +49,68 @@ export function ApplicationList() {
   };
 
   return (
-    <div className="card bg-base-150 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title">Items</h2>
+    <div className="card bg-base-100 shadow-md p-6 border border-base-200">
+  {/* Main Header Style */}
+  <h3 className="font-bold border-b mb-4 pb-1 text-xs uppercase opacity-50 tracking-widest">
+    Recent Listings
+  </h3>
 
-        {loading && <span className="loading loading-spinner" />}
-        {error && <p className="text-error">{error}</p>}
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <div key={item.jobId} className="card bg-base-200">
-              <div className="card-body p-4">
-                <h3 className="font-semibold">
-                  Title: {item.title}
-                </h3>
-
-                <div className="flex justify-between items-center">
-                  <span
-                    className={`badge ${statusBadge(item.status)}`}
-                  >
-                    {item.status}
-                  </span>
-                  <span className="text-sm opacity-70">
-                     <a  className="btn btn-primary btn-lg" href={`viewpost.html?id=${item.jobId}`} > Go to post </a>
-                  </span>
-                </div>
-
-                  <p>message: {item.message ?? "No message yet"}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+  {/* Status & Loading States */}
+  {loading && (
+    <div className="flex justify-center py-4">
+      <span className="loading loading-spinner loading-md text-primary" />
     </div>
+  )}
+  {error && (
+    <div className="p-2 mb-4 rounded-md bg-error/10 text-error text-xs text-center font-medium border border-error/20">
+      {error}
+    </div>
+  )}
+
+  {/* Main Content List Container */}
+  <div className="flex flex-col gap-3">
+    {items && items.length > 0 ? (
+      items.map((item) => (
+        <div 
+          key={item.jobId} 
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-base-200/30 p-3 rounded-lg border border-base-200/50 hover:bg-base-200/80 transition-all gap-3"
+        >
+          {/* Left Side: Information Details */}
+          <div className="space-y-1 w-full sm:w-auto">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Item Title */}
+              <span className="text-sm font-bold tracking-tight">
+                {item.title}
+              </span>
+
+              {/* Status Badge */}
+              <span className={`badge ${statusBadge(item.status)} badge-outline text-[10px] font-bold tracking-wide px-2 py-0.5 h-auto uppercase`}>
+                {item.status}
+              </span>
+            </div>
+
+            {/* Message Body */}
+            <p className="text-xs opacity-70">
+              <span className="font-semibold opacity-50">Message:</span> {item.message ?? "No message yet"}
+            </p>
+          </div>
+
+          {/* Right Side: Action Link Button */}
+          <div className="w-full sm:w-auto text-right">
+            <a 
+              className="btn btn-primary btn-sm w-full sm:w-auto font-bold uppercase text-[11px] transition-transform active:scale-95" 
+              href={`viewpost.html?id=${item.jobId}`}
+            >
+              Go to post
+            </a>
+          </div>
+        </div>
+      ))
+    ) : (
+      /* Fallback block kapag walang items */
+      !loading && <p className="text-xs opacity-50 italic text-center py-2">No items found</p>
+    )}
+  </div>
+</div>
   );
 }

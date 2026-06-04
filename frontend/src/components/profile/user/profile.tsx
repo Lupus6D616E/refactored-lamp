@@ -1,55 +1,23 @@
+"use client";
+
 import { authClient } from "@lib/auth-client";
 import { edenTreatyApi } from "@lib/eden";
 import React, { useEffect, useState } from "react";
 
-type ExperienceItem = {
-  id: number;
-  experience: string;
-  position: string;
-};
-type CertificateItem = {
-  id: number;
-  certification: string;
-};
-interface BusinessInfo {
-  id: string
-  name: string | null
-}
-
+// --- Types ---
 type Profile = {
-  image:string | null
+  id: string;
+  image: string | null;
   name: string;
   email: string;
   address: string | null;
-  education: string | null
+  education: string | null;
   role: string;
   description: string | null;
-  certificateArray: CertificateItem[];
-  experienceArray: ExperienceItem[];
   skills: string[];
   schedule: string[];
-};
-
-// Mock data shown before fetch completes
-const mockProfile: Profile = {
-  image: null,
-  name: "Loading User",
-  email: "loading@example.com",
-  role: "Loading...",
-  address: "Loading Street...",
-  education: "Loading College...",
-  description:
-    "This is placeholder text while the real profile data is loading.",
-  certificateArray: [
-    { id: 0, certification: "Mock 1" },
-    { id: 1, certification: "Mock 2" },
-    { id: 2, certification: "Mock 3" },],
-  experienceArray: [
-    { id: 0, experience: "Mock 1", position: "Value 1" },
-    { id: 1, experience: "Mock 2", position: "Value 2" },
-  ],
-  skills: ["mock", "loading"],
-  schedule: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+  certificateArray: any[];
+  experienceArray: any[];
 };
 
 interface UserProfileProps {
@@ -57,203 +25,243 @@ interface UserProfileProps {
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
-  const [profile, setProfile] = useState<Profile>(mockProfile);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
-  const [subject, setSubject] = useState("");
-  const { data: session, isPending } = authClient.useSession();
-  const [businesses, setBusinesses] = useState<BusinessInfo[]>([]);
-  const [selectedId, setSelectedId] = useState<string>();
-  const [loadingBusinesses, setLoadingBusinesses] = useState(true);
+  const { data: session, isPending: sessionLoading } = authClient.useSession();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [editData, setEditData] = useState({
+    description: "",
+    address: "",
+    education: "",
+    skills: "", 
+  });
+
+  const effectiveId = id || session?.user?.id;
+  const isOwner = session?.user?.id === effectiveId;
+  const fetchProfile = async (targetId: string) => {
+    try {
+      setLoading(true);
+      
+      const res = id 
+        ? await edenTreatyApi.user.userprofile({ id: targetId }).get()
+        : await edenTreatyApi.user.myprofile.get();
+      
+      if (res.data) {
+        const userprofile = res.data as any;
+        const profileImage = isOwner ? session?.user?.image : (userprofile.image || null);
+        const profileName = isOwner ? session?.user?.name : (userprofile.name || userprofile.email?.split('@')[0] || "No Name");
+        const profileEmail = isOwner ? session?.user?.email : (userprofile.email || "");
+        const profileRole = isOwner ? session?.user?.role : (userprofile.role || "user");
+
+        const fetchedProfile: Profile = {
+          id: targetId,
+          image: profileImage,
+          name: profileName || "No Name",
+          email: profileEmail || "",
+          address: userprofile.address || "",
+          education: userprofile.education || "",
+          role: profileRole,
+          description: userprofile.description || "",
+          skills: Array.isArray(userprofile.skills) ? userprofile.skills : [],
+          schedule: Array.isArray(userprofile.schedule) ? userprofile.schedule : [],
+          certificateArray: userprofile.certificateArray || [],
+          experienceArray: userprofile.experienceArray || [],
+        };
+
+        setProfile(fetchedProfile);
+        setEditData({
+          description: fetchedProfile.description || "",
+          address: fetchedProfile.address || "",
+          education: fetchedProfile.education || "",
+          skills: fetchedProfile.skills.join(", "),
+        });
+      } else {
+        setProfile(null);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await edenTreatyApi.user.userprofile({ id: id }).get();
-        if (!res.data) throw new Error("Failed to fetch profile");
-        const data: Profile = res.data;
-        setProfile(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+    if (effectiveId) {
+      fetchProfile(effectiveId);
+    }
+  }, [effectiveId, session?.user]);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      
+      const res = await (edenTreatyApi.user.myprofile as any).post({
+        description: editData.description,
+        address: editData.address,
+        education: editData.education,
+        skills: editData.skills.split(",").map(s => s.trim()).filter(s => s !== ""),
+      });
+
+      if (!res.error) {
+        setIsEditing(false);
+        if (effectiveId) await fetchProfile(effectiveId); // Refresh data
+      } else {
+        alert("Failed to save: " + (res.error.value || "Unknown error"));
       }
-    };
-    const fetchBusinesses = async () => {
-      const res = await edenTreatyApi.business.mybusinesses.get();
-      if (res.data) {
-        setBusinesses(res.data);
-        setSelectedId(res.data[0]?.id);
-        setLoadingBusinesses(false);
-      }
-    };
-    fetchBusinesses();
-    fetchProfile();
-  }, [id]);
-  function goDownloadResume(){
-    window.location.href = `/user/downloaduserresume/${id}`
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("An error occurred while saving.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (sessionLoading || (loading && !profile)) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    const res = await edenTreatyApi.message.user({ id: id }).post({ message: message, subject: subject, businessId: selectedId! })
+  if (!effectiveId) {
+    return (
+      <div className="text-center p-20">
+        <h2 className="text-xl font-bold text-error">Access Denied</h2>
+        <p className="opacity-60">Please login first to view the profile.</p>
+      </div>
+    );
+  }
 
-    setLoading(false);
-
-    if (res) {
-      return;
-    }
+  if (!profile) {
+    return (
+      <div className="text-center p-20">
+        <h2 className="text-xl font-bold text-error font-mono">Profile Not Found</h2>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
-      {/* Header Section */}
-      <div className="card bg-base-100 shadow-md">
-        <div className="card-body flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            { !profile.image  && <div className="avatar placeholder">
-            <div className="bg-neutral text-neutral-content rounded-full w-16">
-              <span className="text-xl uppercase">
-                {profile.name?.[0] ?? profile.email[0]}
-              </span>
-            </div>
-          </div>}
-          { profile.image && <div className="avatar">
-            <div className="mask mask-squircle w-24">
-              <img src={`/static/images/profilepicture/user/${id}`}></img>
-            </div>
-          </div>}
-            <h2 className="card-title text-2xl">{profile.name}</h2>
-            <p className="text-sm opacity-70">{profile.email}</p>
+      
+      <div className="card bg-base-100 shadow-xl border border-base-200">
+        <div className="card-body md:flex-row gap-8 items-center">
+          <div className="avatar flex flex-col items-center gap-4">
+            
+            {profile.image === null ? (
+              <div className="avatar placeholder">
+                <div className="bg-neutral text-neutral-content rounded-full w-24 h-24 flex items-center justify-center">
+                  <span className="text-3xl uppercase">
+                    {profile.name?.[0] ?? profile.email?.[0]}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="avatar">
+                <div className="mask mask-squircle w-24">
+                  <img src={`/static/images/profilepicture/user/${effectiveId}`} alt="Profile" />
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          <div className="flex-1 text-center md:text-left">
+            {profile.name && <h2 className="text-3xl font-bold">{profile.name}</h2>}
+            <p className="opacity-60">{profile.email}</p>
             <div className="badge badge-primary mt-2">{profile.role}</div>
           </div>
-          <button onClick={goDownloadResume} className="btn btn-outline btn-primary">Download resume</button>
         </div>
       </div>
 
-      {/* Description Section */}
-      <div className="card bg-base-100 shadow-md">
-        <div className="card-body">
-          <h3 className="card-title">Description</h3>
-          <p className="leading-relaxed">{profile.description}</p>
-        </div>
-      </div>
-
-      {/* Array of Strings */}
-      <div className="card bg-base-100 shadow-md">
-        <div className="card-body">
-          <h3 className="card-title">Certificates</h3>
-          <ul className="list-disc list-inside space-y-1">
-            {profile.certificateArray.map((item, index) => (
-              <li key={index}>{item.certification}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* Array of Objects */}
-      <div className="card bg-base-100 shadow-md">
-        <div className="card-body">
-          <h3 className="card-title">Previous Work Experience</h3>
-          <div className="overflow-x-auto">
-            <table className="table table-zebra">
-              <thead>
-                <tr>
-                  <th>Experience </th>
-                  <th>Position </th>
-                </tr>
-              </thead>
-              <tbody>
-                {profile.experienceArray.map((obj, index) => (
-                  <tr key={index}>
-                    <td>{obj.experience}</td>
-                    <td>{obj.position}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Left Side Column */}
+        <div className="space-y-6">
+          <div className="card bg-base-100 shadow-md p-6">
+            <h3 className="font-bold border-b mb-4 pb-1 text-xs uppercase opacity-50 tracking-widest">General Information</h3>
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="form-control">
+                  <label className="label-text font-bold text-xs">ADDRESS</label>
+                  <input className="input input-bordered input-sm" value={editData.address} onChange={(e)=>setEditData({...editData, address: e.target.value})} />
+                </div>
+                <div className="form-control">
+                  <label className="label-text font-bold text-xs">EDUCATION</label>
+                  <input className="input input-bordered input-sm" value={editData.education} onChange={(e)=>setEditData({...editData, education: e.target.value})} />
+                </div>
+                <button className="btn btn-primary btn-sm w-full mt-2" onClick={handleSave} disabled={saving}>
+                  {saving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-bold opacity-60">ADDRESS</p>
+                  <p className="text-sm">{profile.address || "No address set"}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold opacity-60">EDUCATION</p>
+                  <p className="text-sm">{profile.education || "No education set"}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold opacity-60">SCHEDULE AVAILABILITY</p>
+                  <p className="text-sm">{profile.schedule.join(", ") || "No schedule set"}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+
+        <div className="md:col-span-2 space-y-6">
+  <div className="card bg-base-100 shadow-md p-8">
+    <h3 className="font-bold border-b mb-3 pb-1 text-xs uppercase opacity-50 tracking-widest">Description</h3>
+    {isEditing ? (
+      <textarea 
+        className="textarea textarea-bordered h-32 w-full text-sm break-all whitespace-pre-wrap overflow-y-auto" 
+        value={editData.description} 
+        onChange={(e)=>setEditData({...editData, description: e.target.value})} 
+      />
+    ) : (
+    
+      <p className="text-sm leading-relaxed text-justify opacity-80 break-all whitespace-pre-wrap">
+        {profile.description || "No description provided."}
+      </p>
+    )}
+  </div>
+
+  
+  <div className="card bg-base-100 shadow-md p-8">
+    <h3 className="font-bold border-b mb-3 pb-1 text-xs uppercase opacity-50 tracking-widest">Skills</h3>
+    {isEditing ? (
+     
+      <textarea 
+        className="textarea textarea-bordered w-full text-sm break-all min-h-[3rem] py-2" 
+        value={editData.skills} 
+        onChange={(e)=>setEditData({...editData, skills: e.target.value})} 
+        placeholder="e.g. React, Node.js, SQL"
+        rows={2}
+      />
+    ) : (
+      <div className="flex flex-wrap gap-2">
+        {profile.skills.length > 0 ? (
+          profile.skills.map((s, i) => (
+           
+            <span key={i} className="badge badge-outline badge-secondary h-auto py-1 break-all text-center">
+              {s}
+            </span>
+          ))
+        ) : (
+          <p className="text-xs opacity-50 italic">No skills listed</p>
+        )}
       </div>
-
-      {/* Tags Section */}
-      <div className="card bg-base-100 shadow-md">
-        <div className="card-body">
-          <h3 className="card-title">Skills</h3>
-          <div className="flex flex-wrap gap-2">
-            {profile.skills.map((tag, index) => (
-              <span key={index} className="badge badge-secondary">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
+    )}
+  </div> 
+</div>
       </div>
-
-      {/* Tags Section */}
-      <div className="card bg-base-100 shadow-md">
-        <div className="card-body">
-          <h3 className="card-title">Schedule</h3>
-          <div className="flex flex-wrap gap-2">
-            {profile.schedule.map((tag, index) => (
-              <span key={index} className="badge badge-secondary">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-{ session?.user.role !== "user" && session !== null && 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
-        <h1 className="text-xl font-semibold">Message this User</h1>
-        {session?.user.role === "business" && <select
-          className="select select-bordered"
-          value={selectedId}
-          onChange={(e) => setSelectedId((e.target.value))}
-        >
-          {businesses.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-        }
-        <input
-          type="text"
-          placeholder="subject"
-          required
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-
-        <input
-          type="text"
-          placeholder="message"
-          required
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-black text-white p-2 rounded"
-        >
-          {loading ? "sending message ..." : "send message"}
-        </button>
-      </form>
-}
-      {loading && (
-        <div className="text-center opacity-60 text-sm">Loading profile…</div>
-      )}
     </div>
   );
 };
-

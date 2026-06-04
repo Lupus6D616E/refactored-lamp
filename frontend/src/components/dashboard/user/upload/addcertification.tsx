@@ -37,28 +37,64 @@ const AddCertificationCard: React.FC = () => {
   };
 
   return (
-    <div className="card bg-base-100 w-96 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title">Add Certification</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="text"
-            placeholder="Enter Certification"
-            required={true}
-            className="input input-bordered w-full"
-            value={certification}
-            onChange={(e) => setCertification(e.target.value)}
-            disabled={loading}
-          />
-          <div className="card-actions">
-            <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-              {loading ? 'Adding...' : 'Submit'}
-            </button>
-          </div>
-        </form>
-        {message && <p className="text-center mt-4">{message}</p>}
+    <div className="card bg-base-100 shadow-md p-6 border border-base-200">
+  {/* Header Style */}
+  <h3 className="font-bold border-b mb-4 pb-1 text-xs uppercase opacity-50 tracking-widest">
+    Certifications
+  </h3>
+
+  <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="form-control w-full space-y-4">
+      {/* Label Section */}
+      <div className="space-y-1">
+        <h2 className="text-sm font-bold uppercase tracking-tight">Add New Certification</h2>
+        <p className="text-xs opacity-60 leading-relaxed">
+          Enter the title of your professional certificate or award.
+        </p>
       </div>
+      
+      {/* Input Field: Nilagyan ko ng break-all para safety */}
+      <input
+        type="text"
+        placeholder="e.g. TESDA NC II Certified"
+        required={true}
+        className="input input-bordered input-sm w-full focus:outline-primary transition-all break-all"
+        value={certification}
+        onChange={(e) => setCertification(e.target.value)}
+        disabled={loading}
+      />
     </div>
+
+    {/* Action Button */}
+    <div className="card-actions">
+      <button 
+        type="submit" 
+        className="btn btn-primary btn-sm w-full font-bold transition-transform active:scale-95" 
+        disabled={loading}
+      >
+        {loading ? (
+          <>
+            <span className="loading loading-spinner loading-xs mr-2"></span>
+            Adding...
+          </>
+        ) : (
+          'Add Certification'
+        )}
+      </button>
+    </div>
+  </form>
+
+  {/* Status Message */}
+  {message && (
+    <div className={`mt-4 p-2 rounded-lg text-xs text-center font-medium border animate-pulse ${
+      message.includes('success') 
+        ? 'bg-success/10 text-success border-success/20' 
+        : 'bg-error/10 text-error border-error/20'
+    }`}>
+      {message}
+    </div>
+  )}
+</div>
   );
 };
 

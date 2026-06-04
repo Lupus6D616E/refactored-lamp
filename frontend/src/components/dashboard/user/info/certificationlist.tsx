@@ -40,46 +40,46 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDelete }) => {
   }
 
   return (
-    <ul className="menu bg-base-200 rounded-box w-full max-w-md mx-auto">
-      {items.map((item) => (
-        <li key={item.id}>
-          <a className="flex justify-between items-center active:opacity-80">
-            <div>
-              <span className="text-sm opacity-70 block">Certification: {item.certification}</span>
-            </div>
+  <div className="md:col-span-2 space-y-6">
+    <div className="card bg-base-100 shadow-md p-6">
+      <h3 className="font-bold border-b mb-3 pb-1 text-xs uppercase opacity-50 tracking-widest">Results / Certifications</h3>
+    
+      <div className="space-y-3">
+        {items.length > 0 ? (
+         items.map((item) => (
+      <div 
+          key={item.id} 
+        
+        className="flex justify-between items-start group border-b border-base-200 last:border-0 pb-2 last:pb-0 transition-all duration-200 hover:bg-base-200 rounded-lg p-2 -mx-2">
+        <p className="text-sm leading-relaxed opacity-80 flex-1 break-all mr-2">
+          {item.certification}
+        </p>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(item.id);
-              }}
-              disabled={deletingId === item.id}
-              className="btn btn-ghost btn-circle btn-sm text-error"
-              aria-label="Delete item"
-            >
-              {deletingId === item.id ? (
-                <span className="loading loading-spinner loading-xs"></span>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              )}
-            </button>
-          </a>
-        </li>
-      ))}
-    </ul>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete(item.id);
+          }}
+          disabled={deletingId === item.id}
+          className="btn btn-ghost btn-xs text-error opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label="Delete item"
+        >
+          {deletingId === item.id ? (
+            <span className="loading loading-spinner loading-xs"></span>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          )}
+        </button>
+      </div>
+    ))
+  ) : (
+    <p className="text-sm italic opacity-50">No certifications listed.</p>
+  )}
+</div>
+  </div>
+</div>
   );
 };
 

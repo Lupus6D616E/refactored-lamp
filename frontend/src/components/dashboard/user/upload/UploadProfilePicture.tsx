@@ -9,13 +9,14 @@ const UploadProfilePicture: React.FC = () => {
 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [image, setImage] = useState<File>()
+    const [image, setImage] = useState<File>();
+    const [message, setMessage] = useState<string | null>(null);
 
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             // Create preview URL
-            setImage(file)
+            setImage(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewUrl(reader.result as string);
@@ -27,18 +28,27 @@ const UploadProfilePicture: React.FC = () => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setMessage(null);
+
         if (image) {
-            const res = await edenTreatyApi.user.uploadprofilepicture.post({file: image})
-            if(res.status === 201){
-            alert('Post created successfully! 🎉');
+            const res: any = await edenTreatyApi.user.uploadprofilepicture.post({ file: image });
+            if (res.status === 201) {
+                setMessage('Profile picture updated successfully!');
+            } else {
+                const errorMessage =
+                    typeof res?.error === 'string'
+                        ? res.error
+                        : res?.error && typeof res.error === 'object' && 'message' in res.error && typeof res.error.message === 'string'
+                        ? res.error.message
+                        : res?.error && typeof res.error === 'object' && 'value' in res.error
+                        ? String((res.error as { value: unknown }).value)
+                        : 'Failed to upload profile picture.';
+                setMessage(errorMessage);
             }
-            else{
-                alert(res.error)
-            }
+        } else {
+            setMessage('An image is required.');
         }
-        else{
-            window.alert("an image is required.")
-        }
+
         // Reset form
         setPreviewUrl(null);
         setIsSubmitting(false);
@@ -46,76 +56,72 @@ const UploadProfilePicture: React.FC = () => {
 
     return (
         
-            <div className="max-w-2xl mx-auto px-4">
-                <div className="card bg-base-100 shadow-xl">
-                    <div className="card-body">
-                        <h2 className="card-title text-3xl font-bold mb-8">Upload Profile Picture</h2>
+           <div className="space-y-6">
+  <div className="card bg-base-100 shadow-md p-6 ">
+    {/* Header Style - Match sa General Information */}
+    <h3 className="font-bold border-b mb-4 pb-1 text-xs uppercase opacity-50 tracking-widest">
+      Upload Profile Picture
+    </h3>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                           
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Image Upload Area */}
+      <div className="form-control">
+        <div className="flex flex-col items-center justify-center border-2 border-dashed border-base-300 rounded-lg p-6 hover:border-primary hover:bg-primary/5 transition-all group cursor-pointer relative overflow-hidden">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            id="image-upload"
+            required
+          />
 
-                            {/* Image Upload */}
-                            <div className="form-control">
-                                <label className="label">
-                                    <span className="label-text text-lg font-medium">Profile Picture</span>
-                                </label>
-
-                                <div className="flex flex-col items-center justify-center border-2 border-dashed border-base-300 rounded-xl p-8 hover:border-primary transition-colors">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                        className="hidden"
-                                        id="image-upload"
-                                        required
-                                    />
-
-                                    <label
-                                        htmlFor="image-upload"
-                                        className="cursor-pointer flex flex-col items-center"
-                                    >
-                                        <>
-                                            <div className="w-16 h-16 bg-base-200 rounded-full flex items-center justify-center mb-4">
-                                                📸
-                                            </div>
-                                            <p className="text-base-content/70 mb-1">
-                                                Click to upload image
-                                            </p>
-                                            <p className="text-sm text-base-content/50">
-                                                PNG, JPG, GIF up to 5MB
-                                            </p>
-                                        </>
-                                        {previewUrl && <img src={previewUrl} alt="Preview" style={{ width: "200px" }} />}
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Submit Button */}
-                            <div className="flex gap-4 pt-6">
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="btn btn-primary flex-1 text-lg"
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <span className="loading loading-spinner"></span>
-                                            Creating Post...
-                                        </>
-                                    ) : (
-                                        'Create Post'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+          <div className="flex flex-col items-center text-center">
+            {previewUrl ? (
+              <div className="relative">
+                <div className="avatar mb-2">
+                  <div className="w-20 h-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <img src={previewUrl} alt="Preview" />
+                  </div>
                 </div>
-
-                {/* Optional: Tips Card */}
-                <div className="mt-8 text-center text-sm text-base-content/60">
-                    Posts with engaging images and clear titles get more reach ✨
+                <p className="text-[10px] font-bold text-primary uppercase">Change photo</p>
+              </div>
+            ) : (
+              <>
+                <div className="w-12 h-12 bg-base-200 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                  <span className="text-xl">📸</span>
                 </div>
-            </div>
+                <p className="text-xs font-bold opacity-60 uppercase">Click to browse</p>
+                <p className="text-[10px] opacity-40 uppercase">Max 5MB</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Action Button - Match sa Save Changes button style */}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="btn btn-primary btn-sm w-full mt-2"
+      >
+        {isSubmitting ? (
+          <>
+            <span className="loading loading-spinner loading-xs"></span>
+            Updating...
+          </>
+        ) : (
+          "Update Photo"
+        )}
+      </button>
+    </form>
+
+    {/* Message indicator if any */}
+    {message && (
+      <p className="text-center text-[10px] mt-4 opacity-60 italic">{message}</p>
+    )}
+  </div>
+</div>
     );
 };
 

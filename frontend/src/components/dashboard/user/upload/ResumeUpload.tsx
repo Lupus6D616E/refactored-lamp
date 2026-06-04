@@ -1,6 +1,8 @@
 'use client';
  
 import React, { useState } from 'react';
+import CertificationList from '@components/dashboard/user/info/certificationlist-parent'
+
 
 const ResumeUpload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -49,45 +51,69 @@ const ResumeUpload: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title">Upload a File</h2>
+    <div className="max-w-5xl mx-auto px-6 pt-0"> 
+  
+  {/* Grid container */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start mt-0">
+    
+    {/* --- KALIWANG COLUMN (1/3 width) --- */}
+    <div className="md:col-span-1 mt-0"> 
+      <div className="card bg-base-100 shadow-md p-6">
+        <h3 className="font-bold border-b mb-4 pb-1 text-xs uppercase opacity-50 tracking-widest">
+          File Upload
+        </h3>
 
-          <input
-            type="file"
-            className="file-input file-input-bordered file-input-primary w-full"
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-
-          {file && <p className="mt-2 text-sm">Selected: {file.name}</p>}
-
-          <div className="card-actions mt-4">
-            <button
-              className="btn btn-primary"
-              onClick={handleUpload}
+        <div className="space-y-4">
+          <div className="form-control">
+            <label className="label-text font-bold text-xs mb-1">
+              SELECT FILE
+            </label>
+            
+            <input
+              type="file"
+              className="file-input file-input-bordered file-input-primary file-input-sm w-full"
+              onChange={handleFileChange}
               disabled={uploading}
-            >
-              {uploading ? (
-                <>
-                  <span className="loading loading-spinner"></span>
-                  Uploading...
-                </>
-              ) : (
-                'Upload'
-              )}
-            </button>
+            />
+            
+            {file && (
+              <p className="mt-2 text-xs opacity-60">
+                Selected: {file?.name}
+              </p>
+            )}
           </div>
 
+          <button
+            className="btn btn-primary btn-sm w-full mt-2"
+            onClick={handleUpload}
+            disabled={uploading}
+          >
+            {uploading ? (
+              <>
+                <span className="loading loading-spinner loading-xs"></span>
+                Uploading...
+              </>
+            ) : (
+              'Upload'
+            )}
+          </button>
+
           {message && (
-            <div className={`alert ${message.includes('success') ? 'alert-success' : 'alert-error'} mt-4`}>
+            <div className={`alert ${message.includes('success') ? 'alert-success' : 'alert-error'} p-2 text-xs mt-2`}>
               <span>{message}</span>
             </div>
           )}
         </div>
       </div>
+    </div> 
+
+    {/* --- KANANG COLUMN (2/3 width) --- */}
+    <div className="md:col-span-2 space-y-6">
+      <CertificationList />
     </div>
+
+  </div> 
+</div>
   );
 };
 

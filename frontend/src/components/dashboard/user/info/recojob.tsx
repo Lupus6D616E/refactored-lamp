@@ -117,7 +117,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 font-sans" data-theme="light">
+    <div className="min-h-screen bg-base-100 font-sans">
       <main className="p-4 md:p-10 max-w-7xl mx-auto">
         {/* Statistics Panels */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
