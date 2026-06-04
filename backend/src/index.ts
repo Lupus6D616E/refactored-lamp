@@ -17,6 +17,8 @@ import { imagePlugin } from "@modules/static/controller";
 import { newsPlugin } from "@modules/news/controller";
 import { notificationPlugin } from "@modules/notifications/controller";
 import { webHookPlugin } from "@modules/webhooks/controller";
+import { cron } from "bun";
+import { expireJobApplications, expireJobPosts } from "./lib/maintenance/expirejobs";
 const buildCSS = () =>
   new Promise((resolve) =>
     exec(
@@ -37,6 +39,11 @@ const watcher = watch("frontend/public", { recursive: true }, async () => {
 process.on("SIGINT", () => {
   watcher.close();
   process.exit(0);
+});
+
+const maintenance =  Bun.cron("0 * * * *", async () => {
+  await expireJobPosts();
+  await expireJobApplications()
 });
 
 const isProd = process.env.NODE_ENV === 'production'

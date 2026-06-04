@@ -19,7 +19,7 @@ export abstract class Verification {
         try {
             const nameTaken = await db
                 .select({ exists: businessProfile.name })
-                .from(businessProfile)
+                .from(businessProfile)  
                 .where(eq(businessProfile.name, name.toLowerCase().trim()))
                 .limit(1);
             if(nameTaken.length > 0){
@@ -32,7 +32,7 @@ export abstract class Verification {
             const application = await db.insert(businessApplications).values({
                 userid: userId,
                 description: description,
-                name: name,
+                name: name.toLowerCase().trim(),
                 industry: industry,
                 bin: bin,
                 address: address
@@ -143,7 +143,7 @@ export abstract class Verification {
         .from(user)
         .where(eq(user.id,business.userid))   
         console.log("business created")      
-        const added = await Admin.addUserToBusiness(useremail[0].email,business.name)
+        const added = await Admin.addUserToBusiness(useremail[0].email,business.name.trim().toLowerCase())
         console.log("user added to created business")
     }
 }

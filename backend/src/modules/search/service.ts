@@ -13,6 +13,7 @@ import {
   arrayContains,
   and,
   arrayOverlaps,
+  desc,
   eq,
   gte,
   SQL,
@@ -78,7 +79,6 @@ export abstract class Search {
   }
   static async smartJobSearch(userID: string) {
     const profileEmbedding = await getUserEmbedding(userID)
-    console.log(`getting embeddings for ${userID}`)
     const similarPosts = await db
       .select({
         id: jobPostEmbedding.id,
@@ -87,8 +87,7 @@ export abstract class Search {
       })
       .from(jobPostEmbedding)
       .orderBy(cosineDistance(jobPostEmbedding.postEmbedding,profileEmbedding.embedding))
-      .limit(5);
-    console.log(`got embeddings, ${similarPosts}`)
+      .limit(20);
     const postIds = similarPosts.map(({postId}) => postId)
     similarPosts.forEach((item)=> {console.log(`${item.postId} and sim: ${item.similarity}`)})
     const result = await db
@@ -104,8 +103,58 @@ export abstract class Search {
       })
       .from(jobPosts)
       .where(inArray(jobPosts.id,postIds))
-      .limit(5)
+      .limit(20)
     return result
+  }
+  static async recommendJobs(userId: string){
+    const profileEmbedding = await getUserEmbedding(userId)
+    const similarPosts = await db
+      .select({
+        id: jobPostEmbedding.id,
+        postId: jobPostEmbedding.postid,
+        similarity: sql<number>`1 - (${cosineDistance(jobPostEmbedding.postEmbedding, profileEmbedding.embedding)})`.as('similarity'),
+      })
+      .from(jobPostEmbedding)
+      .leftJoin(jobPosts, eq(jobPostEmbedding.postid,jobPosts.id))
+      .where(eq(jobPosts.status,"active"))
+    const sorted = [...similarPosts].sort((a,b) => b.similarity - a.similarity)
+    const postIds = sorted.map(({postId}) => postId)
+    const result = await db
+    .select({
+        id: jobPosts.id,
+        businessId: jobPosts.businessId,
+        title: jobPosts.title,
+        city: jobPosts.city,
+        description: jobPosts.description, 
+        salaryMinimum: jobPosts.salaryMinimum,
+        employmentType: jobPosts.employmentType,
+        tags: jobPosts.tags,
+        schedule: jobPosts.schedule,
+        businessName: businessProfile.name,
+      })
+      .from(jobPosts)
+      .innerJoin(businessProfile, eq(jobPosts.businessId,businessProfile.id))
+      .where(and(inArray(jobPosts.id,postIds),eq(jobPosts.status,"active")))
+      .limit(20)
+    
+    const similaritymap = new Map(sorted.map(item => [item.postId, item.similarity]))
+    console.log(sorted)
+    const combined = result.map( item => ({
+      id: item.id,
+      title: item.title,
+      city: item.city,
+      description: item.description,
+      salaryMinimum: item.salaryMinimum,
+      employmentType: item.employmentType,
+      tags: item.tags,
+      schedule: item.schedule,
+      businessName: item.businessName,
+      businessId: item.businessId,
+      similarity: similaritymap.get(item.id)!
+    }))
+    const combinedSorted = [...combined].sort((a,b) => b.similarity - a.similarity)
+
+    return combinedSorted
   }
   static async findSeeker(search: searchModel.searchUserQuery) {
     const filters: SQL[] = [];

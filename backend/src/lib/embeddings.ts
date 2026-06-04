@@ -62,6 +62,7 @@ import { notExists, eq, and, exists } from "drizzle-orm";
 if (import.meta.main) {
     createjobembeddings()
     createjobtitleembeddings()
+    createuserembeddings()
 }
 
 

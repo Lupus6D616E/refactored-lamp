@@ -40,7 +40,8 @@ function App() {
             <div className="flex gap-4 items-start">
                 <UserProfileCard />
                 <Recojob />
-            </div>
+            </div>  
+            <ThemeSwitcherCard />
             
             <ResumeUpload />
             <ResumeDownload />
