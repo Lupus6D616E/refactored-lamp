@@ -7,6 +7,8 @@ import { useEffect } from 'react'
 import { themeChange } from 'theme-change'
 import NavBar from '@components/auxilliary/navbar'
 import Recojob from './user/info/recojob'
+import ResumeUpload from '@components/dashboard/user/upload/ResumeUpload'
+import { ResumeDownload } from '@components/dashboard/user/info/downloadresume'
 
 function App() {
     useEffect(() => {
@@ -25,10 +27,12 @@ function App() {
     return (
         <main>
             <NavBar />
-            <div className="flex gap-4 items-start">
+            <div className="flex gap-4 items-start mb-4">
                 <UserProfileCard />
                 <Recojob />
             </div>
+            <ResumeUpload />
+            <ResumeDownload />
         </main>
     )
     }

@@ -119,7 +119,6 @@ export default function NavBar() {
                 </div>
 
                 <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow border border-base-200">
-                  <li><a href="/public/userprofile.html">Profile</a></li>
                   
                   {/* BINAGO: Pinalitan ang <a> ng <label> para bumukas ang drawer */}
                   <li>

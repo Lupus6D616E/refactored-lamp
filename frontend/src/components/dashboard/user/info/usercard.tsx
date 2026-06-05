@@ -11,22 +11,28 @@ export default function UserProfileCard() {
   const [education, setEducation] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<string[]>([]);
+  
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const getProfileDetails = async () => {
-      
       if (!session?.user) return;
 
       const res = await edenTreatyApi.user.myprofile.get();
+
       if (res.data) {
-        const userprofile = res.data;
+        const userprofile = res.data as any;
         setDescription(userprofile.description ?? "");
         setAddress(userprofile.address ?? "");
         setEducation(userprofile.education ?? "");
         setSkills(userprofile.skills ?? []);
         setSchedule(userprofile.schedule ?? []);
+        
+        // Gamitin ang image flag mula sa DB o session para malaman kung may upload na ba
+        setProfileImage(userprofile.image || session.user.image || null);
       }
     };
     getProfileDetails();
@@ -76,8 +82,10 @@ export default function UserProfileCard() {
         <h2 className="card-title self-center">My Profile</h2>
         
         <div className="flex flex-col items-center text-center space-y-4">
-          {!user.image ? (
-            <div className="avatar placeholder">
+          
+          {/* LIGTAS NA AVATAR CONDITIONAL RENDERING */}
+          {!profileImage ? (
+             <div className="avatar placeholder">
               <div className="bg-neutral text-neutral-content rounded-full w-24">
                 <span className="text-3xl uppercase">
                   {user.name?.[0] ?? user.email[0]}
@@ -91,8 +99,6 @@ export default function UserProfileCard() {
               </div>
             </div>
           )}
-
-          <div className="w-full space-y-1">
             <p className="text-xl font-bold">{user.name}</p>
             <p className="text-sm opacity-60">{user.email}</p>
             <div className="badge badge-outline">{user.role}</div>
@@ -143,6 +149,5 @@ export default function UserProfileCard() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

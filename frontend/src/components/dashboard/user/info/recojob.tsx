@@ -73,7 +73,7 @@ const JobCard = ({ job, isApplied, onApply }: JobCardProps) => (
         <div className="text-lg font-bold text-success">{job.salaryMinimum} Php</div>
         {/* Dynamic button styling based on isApplied state */}
         
-            <a  className="btn btn-lg" href={`viewpost.html?id=${job.id}`} > Go to post </a>
+            <a  className="btn btn-primary btn-sm w-full mt-2" href={`viewpost.html?id=${job.id}`} > Go to post </a>
       </div>
     </div>
   </div>
@@ -143,7 +143,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 font-sans" data-theme="light">
+    <div className="min-h-screen bg-base-100 font-sans">
       <main className="p-4 md:p-10 max-w-7xl mx-auto">
         
         {/* Recommended Jobs Section */}

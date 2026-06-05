@@ -1,10 +1,8 @@
 import { createRoot } from "react-dom/client";
 import { UserProfile } from "./profile";
 import React from "react";
-import NavBar from '@components/auxilliary/navbar'
-import ResumeUpload from '@components/dashboard/user/upload/ResumeUpload'
-import { ResumeDownload } from '@components/dashboard/user/info/downloadresume'
 
+const ApplyTheme = () => null;
 
 function App() {
   // Kinukuha ang 'id' mula sa URL, kung wala ay magiging null/empty string
@@ -13,13 +11,18 @@ function App() {
 
   return (
     <main >
-      <NavBar />
+      <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+              <ApplyTheme />
+              <div className="flex-1">
+                <a href="/public/dashboard.html" className="text-3xl font-black font-brand tracking-tighter bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">
+                  FlexiHire
+                </a>
+              </div>
+    
+            </div>
         <div className="bg-base-200 min-h-screen py-5">
             <UserProfile id={userId} /> 
-            <ResumeUpload />
-            <ResumeDownload />
-        </div>
-      
+        </div>   
     </main>
   );
 }
