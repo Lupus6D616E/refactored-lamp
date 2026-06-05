@@ -104,7 +104,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
         education: editData.education,
         skills: editData.skills.split(",").map(s => s.trim()).filter(s => s !== ""),
       });
-
       if (!res.error) {
         setIsEditing(false);
         if (effectiveId) await fetchProfile(effectiveId); // Refresh data
