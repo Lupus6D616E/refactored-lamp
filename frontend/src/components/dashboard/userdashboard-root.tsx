@@ -30,16 +30,6 @@ function App() {
                 <Recojob />
             </div>
             
-            <ResumeUpload />
-            <ResumeDownload />
-            <AddCertificationCard />
-            <CertificationList />
-            <AddExperienceCard />
-            <ExperienceList />
-            <UpdateProfile />
-            <ApplicationList />
-            <MessageList />
-            <UploadProfilePicture />
         </main>
     )
     }
