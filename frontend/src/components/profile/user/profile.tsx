@@ -11,6 +11,7 @@ type ExperienceItem = {
   id: number;
   experience: string;
   position: string;
+  duration: string;
 };
 
 type CertificateItem = {
@@ -61,9 +62,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
     try {
       setLoading(true);
       
-      const res = id 
-        ? await edenTreatyApi.user.userprofile({ id: targetId }).get()
-        : await edenTreatyApi.user.myprofile.get();
+      const res = await edenTreatyApi.user.userprofile({ id: targetId }).get()
 
       if (res.data) {
         const userprofile = res.data as any;
@@ -86,8 +85,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
           description: userprofile.description || "",
           skills: Array.isArray(userprofile.skills) ? userprofile.skills : [],
           schedule: Array.isArray(userprofile.schedule) ? userprofile.schedule : [],
-          certificateArray: userprofile.certificateArray || [],
-          experienceArray: userprofile.experienceArray || [],
+          certificateArray: userprofile.certificateArray,
+          experienceArray: userprofile.experienceArray,
         };
 
         setProfile(fetchedProfile);
@@ -282,14 +281,43 @@ export const UserProfile: React.FC<UserProfileProps> = ({ id }) => {
               )}
             </div>
           </div>
+           <div className="grid gap-4">
+        {profile.certificateArray.map((item) => (
+          <div 
+            key={item.id}
+            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-300"
+          >
+            <div className="card-body flex-row items-center gap-4">
+     
+              
+              <div>
+                <h3 className="card-title text-lg">{item.certification}</h3>
+              </div>
 
-          <div className="hide-delete-btn">
-            <CertificationList />
+            </div>
           </div>
+        ))}
+      </div>
 
-          <div className="hide-delete-btn">
-            <ExperienceList />
+          <div className="grid gap-4">
+        {profile.experienceArray.map((item) => (
+          <div 
+            key={item.id}
+            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-300"
+          >
+            <div className="card-body flex-row items-center gap-4">
+     
+              
+              <div>
+                <h3 className="card-title text-lg">{item.experience}</h3>
+                <h4> {item.position}</h4>
+                <p className="text-base-content/70">{item.duration}</p>
+              </div>
+
+            </div>
           </div>
+        ))}
+      </div>
 
           {session?.user?.role !== "user" && session !== null && (
             <div className="card bg-base-100 shadow-md p-8 border border-base-200">
