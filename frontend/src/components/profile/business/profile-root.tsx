@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import UserProfile from "./profile";
 import NavBar from "@components/auxilliary/navbar";
+import AccessibilityWidget from "@components/auxilliary/accessability";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           </ul>
         <UserProfile id={getPostId()} /> 
         </div>
+        <AccessibilityWidget />
     </main>
   );
 }

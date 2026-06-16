@@ -7,6 +7,7 @@ import { SearchResult } from "./types";
 import ResultsList from "./results";
 import { ApplyTheme } from "@components/auxilliary/ApplyTheme";
 import NavBar from '@components/auxilliary/navbar';
+import AccessibilityWidget from "@components/auxilliary/accessability";
 
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
         <AdvancedSearchBar onResults={setResults} />
         <ResultsList results={results} />
       </div>
+      <AccessibilityWidget />
     </main>
   );
 }

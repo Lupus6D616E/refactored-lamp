@@ -9,6 +9,7 @@ import NavBar from '@components/auxilliary/navbar'
 import Recojob from './user/info/recojob'
 import ResumeUpload from '@components/dashboard/user/upload/ResumeUpload'
 import { ResumeDownload } from '@components/dashboard/user/info/downloadresume'
+import AccessibilityWidget from '@components/auxilliary/accessability'
 
 function App() {
     useEffect(() => {
@@ -33,6 +34,7 @@ function App() {
             </div>
             <ResumeUpload />
             <ResumeDownload />
+            <AccessibilityWidget />
         </main>
     )
     }
