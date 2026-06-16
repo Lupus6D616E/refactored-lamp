@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { AIComparison } from "./compare";
 import { authClient } from "@lib/auth-client";
 import { LatLngLiteral } from "leaflet";
+import { themeChange } from 'theme-change'
+import NavBar from '@components/auxilliary/navbar'
 
 function App() {
   const [title, setTitle] = useState("");
@@ -134,6 +136,7 @@ function App() {
 
   return (
     <main>
+      <NavBar /> 
       <div className="min-h-screen bg-base-200 py-12">
         <PostCard
           id={getPostId()}
@@ -158,6 +161,7 @@ function App() {
         />
         {session?.user.role === "user" && <AIComparison id={getPostId()} />}
       </div>
+      
     </main>
   );
 }

@@ -64,7 +64,7 @@ export function AdminDashboard() {
       {/* Navbar */}
       <div className="navbar bg-base-100 shadow">
         <div className="flex-1">
-          <span className="text-xl font-bold">Admin Dashboard</span>
+          <span className="text-xl font-bold">FlexiHire Admin Dashboard</span>
         </div>
         <div className="flex-none">
           {loading && <span className="loading loading-spinner loading-sm" />}
