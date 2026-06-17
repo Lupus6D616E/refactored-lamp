@@ -1,12 +1,12 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
 import ThemeSwitcherCard from './ThemesSwitcherCard';
 
-
-// Type definitions para sa Google Translate Window object
+// Type definitions para sa Google Translate Window object at custom safety check
 declare global {
   interface Window {
     googleTranslateElementInit: () => void;
     google: any;
+    __googleTranslateExtensionLoaded?: boolean;
   }
 }
 
@@ -23,60 +23,86 @@ export default function AccessibilityWidget(): React.JSX.Element {
   const [isReadingGuide, setIsReadingGuide] = useState<boolean>(() => 
     localStorage.getItem('a11y-guide') === 'true'
   );
-  const [isReaderMode, setIsReaderMode] = useState<boolean>(() => 
-    localStorage.getItem('a11y-reader') === 'true'
+  const [isDyslexiaMode, setIsDyslexiaMode] = useState<boolean>(() => 
+    localStorage.getItem('a11y-dyslexia') === 'true'
   );
 
   // Text-To-Speech (Reader) States
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [mouseY, setMouseY] = useState<number>(0);
 
-  // 1. Google Translate Initializer Protection
+  // TSX RE-RENDER TRANSLATION ENGINE (Ligtas sa Virtual DOM)
   useEffect(() => {
-    if (isOpen && window.google && window.google.translate && !document.querySelector('.goog-te-combo')) {
-      try {
-        new window.google.translate.TranslateElement(
-          { pageLanguage: 'en', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE },
-          'google_translate_element'
-        );
-      } catch (error) {
-        console.error("Google Translate script failed to initialize layout:", error);
+    // I-define ang global script loader para sa Google API
+    window.googleTranslateElementInit = () => {
+      // Pinupwersa natin ang 'auto' o 'en' source language para gumana ang translation sa Tagalog (tl)
+      if (window.google && window.google.translate && !window.__googleTranslateExtensionLoaded) {
+        try {
+          new window.google.translate.TranslateElement(
+            { 
+              pageLanguage: 'auto', // Hayaan ang Google na mag-detect para gumana ang Tagalog target conversion
+              includedLanguages: 'tl,en,es,ja,zh-CN', // Nilimita sa Tagalog at iba pa para malinis
+              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false
+            },
+            'google_translate_element'
+          );
+          window.__googleTranslateExtensionLoaded = true;
+        } catch (e) {
+          console.error("TSX Engine: Google Translate initialization skipped.", e);
+        }
       }
+    };
+
+    // Kusang i-inject ang external element handler sa body ng TSX
+    if (!document.querySelector('script[src*="translate.google.com"]')) {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  // Monitor panel state para siguruhing buhay ang dropdown container kapag pinindot ang ♿ button
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        if (window.google && window.google.translate && window.googleTranslateElementInit) {
+          const container = document.getElementById('google_translate_element');
+          if (container && container.children.length === 0) {
+            window.__googleTranslateExtensionLoaded = false; // Reset lock
+            window.googleTranslateElementInit();
+          }
+        }
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
-  // 2. LocalStorage & DOM Effect Updates
+  // LocalStorage & DOM Style Updates
   useEffect(() => {
     localStorage.setItem('a11y-font', fontMultiplier.toString());
     localStorage.setItem('a11y-cursor', isBigCursor.toString());
     localStorage.setItem('a11y-guide', isReadingGuide.toString());
-    localStorage.setItem('a11y-reader', isReaderMode.toString());
+    localStorage.setItem('a11y-dyslexia', isDyslexiaMode.toString());
 
-    // Cursor Styling Toggle
-    if (isBigCursor) {
-      document.body.classList.add('a11y-big-cursor');
-    } else {
-      document.body.classList.remove('a11y-big-cursor');
-    }
+    if (isBigCursor) document.body.classList.add('a11y-big-cursor');
+    else document.body.classList.remove('a11y-big-cursor');
 
-    // Reader Mode Classes
-    if (isReaderMode) {
-      document.body.classList.add('a11y-reader-active');
-    } else {
-      document.body.classList.remove('a11y-reader-active');
-    }
-  }, [fontMultiplier, isBigCursor, isReadingGuide, isReaderMode]);
+    if (isDyslexiaMode) document.body.classList.add('a11y-dyslexia-active');
+    else document.body.classList.remove('a11y-dyslexia-active');
+  }, [fontMultiplier, isBigCursor, isReadingGuide, isDyslexiaMode]);
 
-  // 3. Reading Guide Mouse Listener
+  // Reading Guide Mouse Listener
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent): void => setMouseY(e.clientY);
-    if (isReadingGuide) {
-      window.addEventListener('mousemove', handleMouseMove);
-    }
+    if (isReadingGuide) window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [isReadingGuide]);
 
-  // 4. Audio Reader (Text-to-Speech) Logic
+  // Audio Reader (Text-to-Speech) Logic
   const toggleSpeechReader = (): void => {
     if (isSpeaking) {
       window.speechSynthesis.cancel();
@@ -92,18 +118,24 @@ export default function AccessibilityWidget(): React.JSX.Element {
     }
   };
 
-  // Reset All Settings
   const resetAll = (): void => {
     setFontMultiplier(1);
     setIsBigCursor(false);
     setIsReadingGuide(false);
-    setIsReaderMode(false);
+    setIsDyslexiaMode(false);
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
+    
+    // I-reset din ang translation pabalik sa orihinal na wika kung meron
+    const googleCombo = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (googleCombo) {
+      googleCombo.value = '';
+      googleCombo.dispatchEvent(new Event('change'));
+    }
   };
 
   return (
-    <> 
+    <>
       {/* READING GUIDE LINE */}
       {isReadingGuide && (
         <div 
@@ -150,7 +182,7 @@ export default function AccessibilityWidget(): React.JSX.Element {
           <div style={{ ...cardStyle, marginBottom: '20px' }}>
             <ThemeSwitcherCard />
           </div>
-        
+
           {/* CONTROLS HUB */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
@@ -164,7 +196,7 @@ export default function AccessibilityWidget(): React.JSX.Element {
               </div>
             </div>
 
-            {/* FEATURE 2: TOGGLES (Cursor, Ruler, Reader) */}
+            {/* FEATURE 2: TOGGLES */}
             <div style={cardStyle}>
               <span style={sectionTitleStyle}>Screen Enhancements</span>
               
@@ -180,8 +212,8 @@ export default function AccessibilityWidget(): React.JSX.Element {
                 </label>
 
                 <label style={rowToggleStyle}>
-                  <span>Reader Mode (Sepia) 📖</span>
-                  <input type="checkbox" style={checkboxStyle} checked={isReaderMode} onChange={() => setIsReaderMode(!isReaderMode)} />
+                  <span>Dyslexia Friendly 🧠</span>
+                  <input type="checkbox" style={checkboxStyle} checked={isDyslexiaMode} onChange={() => setIsDyslexiaMode(!isDyslexiaMode)} />
                 </label>
               </div>
             </div>
@@ -190,7 +222,6 @@ export default function AccessibilityWidget(): React.JSX.Element {
             <div style={cardStyle}>
               <span style={sectionTitleStyle}>Assistance & Translation</span>
               
-              {/* Voice Reader */}
               <button 
                 onClick={toggleSpeechReader} 
                 style={{
@@ -202,7 +233,7 @@ export default function AccessibilityWidget(): React.JSX.Element {
                 {isSpeaking ? "Stop Audio Reader ⏹️" : "Listen to Screen (Audio) 🔊"}
               </button>
 
-              {/* Language Translate Dropdown */}
+              {/* DYNAMIC TSX GOOGLE ELEMENT CONTAINER */}
               <div style={{ marginTop: '12px' }}>
                 <div id="google_translate_element" className="modern-translate-container"></div>
               </div>
@@ -217,7 +248,7 @@ export default function AccessibilityWidget(): React.JSX.Element {
         </div>
       )}
 
-      {/* FIXED GLOBAL STYLE INJECTOR WITH PX OVERRIDE */}
+      {/* TSX GLOBAL INJECTOR OVERRIDES */}
       <style>{`
         body {
           transition: background-color 0.3s ease, color 0.3s ease;
@@ -234,37 +265,42 @@ export default function AccessibilityWidget(): React.JSX.Element {
           font-size: initial !important;
         }
 
+        /* PINALITANG CURSOR: Modern at malaking black arrow vector na may white border */
         .a11y-big-cursor, .a11y-big-cursor * {
-          cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' style='font-size:40px'><text y='40'>🖱️</text></svg>"), auto !important;
+          cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'><path d='M4.5 3V19l4.5-4.5h6.5L4.5 3z' fill='black' stroke='white' stroke-width='2' stroke-linejoin='round'/></svg>"), auto !important;
         }
         
-        .a11y-reader-active {
-          background-color: #fcf8f2 !important;
-          color: #1e293b !important;
-          line-height: 1.8 !important;
-          word-spacing: 0.12em !important;
+        .a11y-dyslexia-active, .a11y-dyslexia-active * {
+          font-family: "Comic Sans MS", "Chalkboard SE", cursive, sans-serif !important;
+          line-height: 2 !important;
+          letter-spacing: 0.15em !important;
+          word-spacing: 0.3em !important;
         }
         
-        .goog-te-banner-frame, .goog-te-balloon-frame, #goog-gt-tt, .goog-banner-frame { display: none !important; }
-        .goog-te-gadget { font-family: inherit !important; color: transparent !important; }
+        /* Tinatago ang pangit na Google layout wrappers para manatiling modern ang TSX app */
+        .goog-te-banner-frame, .goog-te-balloon-frame, #goog-gt-tt, .goog-banner-frame, .skiptranslate, #goog-gt-hoverable { 
+          display: none !important; 
+          visibility: hidden !important;
+        }
+        .goog-te-gadget { font-family: inherit !important; color: transparent !important; font-size: 0px !important; }
+        
+        /* Modernized Styles para sa Google Selector Dropdown Select */
         .goog-te-gadget .goog-te-combo {
-          width: 100%;
-          padding: 8px;
-          border-radius: 8px;
-          border: 1px solid #e2e8f0;
-          background-color: #f8fafc;
-          color: #334155;
+          width: 100% !important;
+          padding: 10px !important;
+          border-radius: 8px !important;
+          border: 1px solid #e2e8f0 !important;
+          background-color: #ffffff !important;
+          color: #334155 !important;
           font-size: 14px !important;
+          font-weight: 500 !important;
+          outline: none !important;
         }
-        body { top: 0px !important; }
+        body { top: 0px !important; position: static !important; }
       `}</style>
     </>
   );
 }
-
-/* ==========================================================================
-   INAYOS NA MGA CSS STYLES (May Scrollbar at Solid Background Protection)
-   ========================================================================== */
 
 const floatingBtnStyle: CSSProperties = {
   position: 'fixed',
@@ -289,14 +325,11 @@ const panelContainerStyle: CSSProperties = {
   bottom: '96px',
   right: '24px',
   zIndex: 99999,
-  backgroundColor: '#ffffff', // GINAWANG SOLID WHITE para iwas-hidden bug sa Firefox/Safari
+  backgroundColor: '#ffffff',
   color: '#334155',
   width: '320px',
-  
-  // INAYOS DITO: Naglagay ng max-height at auto scroll para sa maliliit na screen (Mobile Protection)
   maxHeight: 'calc(100vh - 140px)', 
   overflowY: 'auto', 
-  
   borderRadius: '20px',
   boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
   padding: '24px',
@@ -341,6 +374,7 @@ const activeBtnStyle: CSSProperties = {
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   transition: 'all 0.2s'
 };
 
@@ -377,5 +411,5 @@ const resetBtnStyle: CSSProperties = {
   cursor: 'pointer',
   alignSelf: 'center',
   marginTop: '5px',
-  marginBottom: '5px' // Kaunting padding sa pinakailalim ng scroll list
+  marginBottom: '5px'
 };
