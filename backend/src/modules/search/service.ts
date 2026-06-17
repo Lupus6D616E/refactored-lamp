@@ -60,7 +60,8 @@ export abstract class Search {
         filters.push(arrayOverlaps(jobPosts.schedule, search.schedule));
       }
     }
-    const result = await db
+      if (search.title === undefined) {
+         const result   = await db
       .select({
         id: jobPosts.id,
         title: jobPosts.title,
@@ -72,7 +73,24 @@ export abstract class Search {
         schedule: jobPosts.schedule,
       })
       .from(jobPosts)
-      .where(and(...filters)) // fast pre-filter (~0.3–0.4 threshold)
+      .where(and(eq(jobPosts.status,"active"),...filters)) // fast pre-filter (~0.3–0.4 threshold)
+      .orderBy(desc(jobPosts.postedAt)) // precise ordering
+      .limit(20);
+    return result;
+    }
+    const result   = await db
+      .select({
+        id: jobPosts.id,
+        title: jobPosts.title,
+        city: jobPosts.city,
+        description: jobPosts.description,
+        salaryMinimum: jobPosts.salaryMinimum,
+        employmentType: jobPosts.employmentType,
+        tags: jobPosts.tags,
+        schedule: jobPosts.schedule,
+      })
+      .from(jobPosts)
+      .where(and(eq(jobPosts.status,"active"),...filters)) // fast pre-filter (~0.3–0.4 threshold)
       .orderBy(sql`levenshtein(${jobPosts.title}, ${search.title})`) // precise ordering
       .limit(20);
     return result;
@@ -102,7 +120,7 @@ export abstract class Search {
         schedule: jobPosts.schedule,
       })
       .from(jobPosts)
-      .where(inArray(jobPosts.id,postIds))
+      .where(and(inArray(jobPosts.id,postIds),eq(jobPosts.status,"active")))
       .limit(20)
     return result
   }
