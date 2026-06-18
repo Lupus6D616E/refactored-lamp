@@ -6,6 +6,7 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     await authClient.signOut();
+    window.location.href = "/public/dashboard.html"
   };
 
   return (

@@ -14,9 +14,10 @@ function App() {
 
   const [results, setResults] = useState<SearchResult[]>([]);
   const { data: session, isPending } = authClient.useSession();
-  if (!session?.user) {
+  if (!session?.user && !isPending) {
     return (
       <>
+      
         <p> You are not logged in! </p>
         <p>
           {" "}
