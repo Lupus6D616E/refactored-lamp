@@ -7,6 +7,7 @@ import { edenTreatyApi } from "@lib/eden";
 import { MessageCards } from "./messageCards";
 import { NoBusinessPage } from "./NoVerifiedBusinesses";
 import UploadBusinessProfilePictures from "./UploadPictureCard";
+import { ApplyTheme } from "@components/auxilliary/ApplyTheme";
 
 export function DashboardPage() {
   const [dashboards, setDashboards] = useState<BusinessSelect[]>([]);
@@ -67,6 +68,7 @@ export function DashboardPage() {
   }
   return (
     <div className="min-h-screen bg-base-200">
+      <ApplyTheme/>
       <DashboardNavbar
         dashboards={dashboards}
         selectedId={selectedId}
@@ -77,7 +79,9 @@ export function DashboardPage() {
       <main className="p-6">
         <div className="card w-min-screen bg-base-300 card-sm shadow-sm">
           <div className="card-body">
-            <h2 className="card-title">Job Posts</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-base-content">
+              Job Posts
+            </h2>
             <JobPostCards data={jobPostData} loading={loadingData} />
           </div>
         </div>

@@ -41,7 +41,6 @@ function App() {
     else if(session.user.role === "business"){
     return (
         <main>
-            <NavBar />
             <DashboardPage />
         </main>
     )
