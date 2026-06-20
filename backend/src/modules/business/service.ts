@@ -12,6 +12,20 @@ export abstract class Business {
         status: "filled",
       })
       .where(eq(jobPosts.id, postId));
+
+       const result = await db
+        .update(jobApplications)
+        .set({
+            status: 'rejected',
+            message: 'this position has been filled by another applicant'
+        })
+        .where(
+            and(
+                eq(jobApplications.status,'pending'),
+                eq(jobApplications.jobId,postId)
+            )
+        ).returning()
+    
   }
   static async decideApplication(userId: string, postId: number, message: string, decision: businessModel.applicationDecision['decision']) {
     const result = await db

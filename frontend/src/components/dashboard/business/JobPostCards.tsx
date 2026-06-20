@@ -61,9 +61,9 @@ export const JobPostCards = ({ data, loading }: Props) => {
             </p>
             <a  className="btn btn-lg" href={`viewpost.html?id=${stat.id}`} > Go to post </a>
             <a  className="btn btn-lg" href={`viewapplications.html?id=${stat.id}`} > Go to Applications </a>
-            <button onClick={() => handleDecision(stat.id!)} className="btn btn-lg">
+            {(stat.status === "active") &&<button onClick={() => handleDecision(stat.id!)} className="btn btn-lg">
               Mark Filled
-            </button>
+            </button>}
             {isSubmitting && <p>Marking.....</p>}
           </div>
         </div>

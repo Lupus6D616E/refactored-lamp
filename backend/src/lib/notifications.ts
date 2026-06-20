@@ -3,7 +3,6 @@ import { notifications } from "@db/schema";
 
 export async function createNotification(userId: string,type: string, title: string, message: string, data: object){
 
-    
         const res = await db
         .insert(notifications)
         .values({
