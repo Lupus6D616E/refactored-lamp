@@ -49,35 +49,33 @@ function App() {
             )
         }
     }
-<<<<<<< HEAD
-    else if(session.user.role === "admin"){
+    else if (session?.user?.role === "admin") {
         window.location.href = "admin.html"
+        return null
     }
-    else if(session.user.role === "user"){
-    return (
-        <main>
-            <NavBar />
-            <div className="flex gap-4 items-start mb-4">
-                <UserProfileCard />
-                <Recojob />
-            </div>
-            <ResumeUpload />
-            <ResumeDownload />
-            <AccessibilityWidget />
-        </main>
-    )
+    else if (session?.user?.role === "user") {
+        return (
+            <main>
+                <NavBar />
+                <div className="flex gap-4 items-start mb-4">
+                    <UserProfileCard />
+                    <Recojob />
+                </div>
+                <ResumeUpload />
+                <ResumeDownload />
+                <AccessibilityWidget />
+            </main>
+        )
     }
-    else if(session.user.role === "business"){
-    return (
-        <main>
-            <DashboardPage />
-        </main>
-    )
+    else if (session?.user?.role === "business") {
+        return (
+            <main>
+                <DashboardPage />
+            </main>
+        )
     }
-}   
-=======
+    return null
 }
->>>>>>> d90cb091e2e5ef3f2859bb9cc1fe462552e3940f
 
 const root = createRoot(document.getElementById('root')!)
 root.render(<App />)
