@@ -3,6 +3,7 @@
 import { edenTreatyApi } from "@lib/eden";
 import { useState, useRef, KeyboardEvent } from "react";
 import { SearchResult } from "./types";
+import { authClient } from "@backend/src/lib/auth-client";
 
 
 const cities = [
@@ -59,6 +60,7 @@ interface Props {
 
 export function AdvancedSearchBar({ onResults }: Props) {
 
+  const { data: session, isPending } = authClient.useSession();
   const [filters, setFilters] = useState<SearchFilters>({
 
     searchText: "",
@@ -413,6 +415,7 @@ export function AdvancedSearchBar({ onResults }: Props) {
     {/* Section 3: Action Submission Control Panel */}
 
     <div className="mt-8 pt-4 border-t border-base-200 flex flex-col-reverse sm:flex-row justify-end gap-3">
+    { !isPending && session?.user.role === "user" &&
 
       <button
         className="btn btn-outline btn-primary px-8 shadow-sm group"
@@ -423,7 +426,7 @@ export function AdvancedSearchBar({ onResults }: Props) {
         </svg>
         Personalized
       </button>
-
+}
       <button
         className="btn btn-primary px-10 shadow-md shadow-primary/20"
         onClick={handleSearch}

@@ -3,6 +3,7 @@ import { authClient } from '@lib/auth-client';
 import { createRoot } from 'react-dom/client'
 import { BootstrapCard } from './bootstrapcard';
 import { AdminDashboard } from './dashboard';
+import NavBar from '@components/auxilliary/navbar';
 
 function App() {
     const { data: session, isPending } = authClient.useSession();
@@ -30,6 +31,7 @@ function App() {
     else if(session.user.role === "user"){
     return (
          <main>
+            <NavBar />
              <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
                         <div className="card-body">
                             return to user dashboard: 
@@ -53,7 +55,10 @@ function App() {
     }
     else if(session.user.role === "admin"){
         return(
+            <div>
+            <NavBar />
             <AdminDashboard />
+            </div>
         )
     }
     
