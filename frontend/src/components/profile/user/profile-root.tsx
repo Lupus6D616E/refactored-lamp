@@ -11,7 +11,7 @@ function App() {
 
   return (
     <main >
-      <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+      <div className="navbar bg-base-200 shadow-sm sticky top-0 z-50">
               <ApplyTheme />
               <div className="flex-1">
                 <a href="/public/dashboard.html" className="text-3xl font-black font-brand tracking-tighter bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">

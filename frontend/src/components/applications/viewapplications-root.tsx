@@ -2,6 +2,10 @@
 import { createRoot } from 'react-dom/client'
 import { DashboardPage } from './dashboard'
 import { authClient } from '@lib/auth-client';
+import { themeChange } from 'theme-change'
+import { ApplyTheme } from '@components/auxilliary/ApplyTheme';
+
+
 function App() {
     const { data: session, isPending } = authClient.useSession();
     if (!session?.user) {
@@ -11,12 +15,14 @@ function App() {
     }
     else if(session.user.role === "user"){
     return (
-        <p>this is a page for businesses to view job applications, scram!</p>
+        <p>This is a page for businesses to view job applications, scram!</p>
     )
     }
     else if(session.user.role === "business"){
     return (
+        
         <main>
+            <ApplyTheme/>
             <DashboardPage />
         </main>
     )

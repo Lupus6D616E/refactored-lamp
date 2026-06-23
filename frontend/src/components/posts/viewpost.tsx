@@ -80,26 +80,6 @@ export const PostCard: React.FC<CardProps> = ({
   return (
     
     <div className="card w-full max-w-4xl bg-base-100 shadow-xl border border-primary/20 mx-auto">
-      <ul className="menu menu-horizontal px-1 items-center gap-2">
-            <li>
-              <button 
-                 onClick={() => window.history.back()} 
-                 className="btn btn-ghost btn-sm gap-2 hover:bg-base-200 transition-all duration-200 group"
-                >
-               <svg 
-                 xmlns="http://www.w3.org/2000/svg" 
-                 fill="none" 
-                 viewBox="0 0 24 24" 
-                 strokeWidth={2.5} 
-                 stroke="currentColor" 
-                 className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
-               >
-               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-               </svg>
-               <span className="font-medium">Back</span>
-              </button>
-            </li>
-          </ul>
       <div className="card-body gap-6">
         {/* Cool Title Placeholder */}
         <h2 className="card-title text-3xl font-black italic tracking-tighter text-secondary uppercase italic">

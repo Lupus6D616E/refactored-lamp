@@ -8,6 +8,7 @@ import { MessageCards } from "./messageCards";
 import { NoBusinessPage } from "./NoVerifiedBusinesses";
 import UploadBusinessProfilePictures from "./UploadPictureCard";
 import { ApplyTheme } from "@components/auxilliary/ApplyTheme";
+import AccessibilityWidget from '@components/auxilliary/accessability'
 
 export function DashboardPage() {
   const [dashboards, setDashboards] = useState<BusinessSelect[]>([]);
@@ -100,6 +101,7 @@ export function DashboardPage() {
           </div>
         </div>
       </main>
+      <AccessibilityWidget />
     </div>
   );
 }
