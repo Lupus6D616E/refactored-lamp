@@ -1,19 +1,10 @@
-import React, { useState, useEffect, CSSProperties } from 'react';
+import React, { useState, useEffect, CSSProperties, useRef } from 'react';
 import ThemeSwitcherCard from './ThemesSwitcherCard';
-
-// Type definitions para sa Google Translate Window object at custom safety check
-declare global {
-  interface Window {
-    googleTranslateElementInit: () => void;
-    google: any;
-    __googleTranslateExtensionLoaded?: boolean;
-  }
-}
 
 export default function AccessibilityWidget(): React.JSX.Element {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const widgetRef = useRef<HTMLDivElement>(null);
   
-  // States na may LocalStorage backup para sa Persistence
   const [fontMultiplier, setFontMultiplier] = useState<number>(() => 
     Number(localStorage.getItem('a11y-font')) || 1
   );
@@ -26,59 +17,37 @@ export default function AccessibilityWidget(): React.JSX.Element {
   const [isDyslexiaMode, setIsDyslexiaMode] = useState<boolean>(() => 
     localStorage.getItem('a11y-dyslexia') === 'true'
   );
+  
+  // DYSLEXIA FONT STYLE STATE ('opendyslexic' | 'comicsans' | 'verdana')
+  const [dyslexiaFont, setDyslexiaFont] = useState<string>(() => 
+    localStorage.getItem('a11y-dyslexia-font') || 'opendyslexic'
+  );
 
-  // Text-To-Speech (Reader) States
+  // Dyslexia Friendly Tint Mode ('none' | 'cream' | 'blue')
+  const [dyslexiaTint, setDyslexiaTint] = useState<'none' | 'cream' | 'blue'>(() => 
+    (localStorage.getItem('a11y-dyslexia-tint') as 'none' | 'cream' | 'blue') || 'none'
+  );
+
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [mouseY, setMouseY] = useState<number>(0);
 
-  // TSX RE-RENDER TRANSLATION ENGINE (Ligtas sa Virtual DOM)
+  // 1. CLICK OUTSIDE TO CLOSE ENGINE
   useEffect(() => {
-    // I-define ang global script loader para sa Google API
-    window.googleTranslateElementInit = () => {
-      // Pinupwersa natin ang 'auto' o 'en' source language para gumana ang translation sa Tagalog (tl)
-      if (window.google && window.google.translate && !window.__googleTranslateExtensionLoaded) {
-        try {
-          new window.google.translate.TranslateElement(
-            { 
-              pageLanguage: 'auto', // Hayaan ang Google na mag-detect para gumana ang Tagalog target conversion
-              includedLanguages: 'tl,en,es,ja,zh-CN', // Nilimita sa Tagalog at iba pa para malinis
-              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-              autoDisplay: false
-            },
-            'google_translate_element'
-          );
-          window.__googleTranslateExtensionLoaded = true;
-        } catch (e) {
-          console.error("TSX Engine: Google Translate initialization skipped.", e);
-        }
-      }
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (widgetRef.current && !widgetRef.current.contains(target)) setIsOpen(false);
     };
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
-    // Kusang i-inject ang external element handler sa body ng TSX
-    if (!document.querySelector('script[src*="translate.google.com"]')) {
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    }
-  }, []);
-
-  // Monitor panel state para siguruhing buhay ang dropdown container kapag pinindot ang ♿ button
+  // 2. ESCAPE KEY TO CLOSE
   useEffect(() => {
-    if (isOpen) {
-      const timer = setTimeout(() => {
-        if (window.google && window.google.translate && window.googleTranslateElementInit) {
-          const container = document.getElementById('google_translate_element');
-          if (container && container.children.length === 0) {
-            window.__googleTranslateExtensionLoaded = false; // Reset lock
-            window.googleTranslateElementInit();
-          }
-        }
-      }, 200);
-      return () => clearTimeout(timer);
-    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+    if (isOpen) window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
   // LocalStorage & DOM Style Updates
@@ -87,13 +56,25 @@ export default function AccessibilityWidget(): React.JSX.Element {
     localStorage.setItem('a11y-cursor', isBigCursor.toString());
     localStorage.setItem('a11y-guide', isReadingGuide.toString());
     localStorage.setItem('a11y-dyslexia', isDyslexiaMode.toString());
+    localStorage.setItem('a11y-dyslexia-font', dyslexiaFont);
+    localStorage.setItem('a11y-dyslexia-tint', dyslexiaTint);
 
     if (isBigCursor) document.body.classList.add('a11y-big-cursor');
     else document.body.classList.remove('a11y-big-cursor');
 
-    if (isDyslexiaMode) document.body.classList.add('a11y-dyslexia-active');
-    else document.body.classList.remove('a11y-dyslexia-active');
-  }, [fontMultiplier, isBigCursor, isReadingGuide, isDyslexiaMode]);
+    // Font Styles Cleanups & Toggle
+    document.body.classList.remove('a11y-dyslexia-active', 'font-variant-opendyslexic', 'font-variant-comicsans', 'font-variant-verdana');
+    if (isDyslexiaMode) {
+      document.body.classList.add('a11y-dyslexia-active');
+      document.body.classList.add(`font-variant-${dyslexiaFont}`);
+    }
+
+    // Tint Management
+    document.body.classList.remove('a11y-tint-cream', 'a11y-tint-blue');
+    if (dyslexiaTint === 'cream') document.body.classList.add('a11y-tint-cream');
+    if (dyslexiaTint === 'blue') document.body.classList.add('a11y-tint-blue');
+
+  }, [fontMultiplier, isBigCursor, isReadingGuide, isDyslexiaMode, dyslexiaFont, dyslexiaTint]);
 
   // Reading Guide Mouse Listener
   useEffect(() => {
@@ -102,17 +83,26 @@ export default function AccessibilityWidget(): React.JSX.Element {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [isReadingGuide]);
 
-  // Audio Reader (Text-to-Speech) Logic
+  // Audio Reader Logic (FIXED)
   const toggleSpeechReader = (): void => {
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     } else {
-      const mainText = document.querySelector('main')?.innerText || document.body.innerText;
-      const cleanText = mainText.replace(/Accessibility[\s\S]*/g, ''); 
-      
+      const mainElement = document.querySelector('main');
+      let cleanText = mainElement ? mainElement.innerText : document.body.innerText;
+
+      // Kung walang <main> tag, linisin lang ang salitang Accessibility para hindi madamay ang buong page
+      if (!mainElement) {
+        cleanText = cleanText.replace(/Accessibility[\s\S]*Customize your view preference/g, '');
+      }
+
+      if (!cleanText.trim()) return;
+
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      
       window.speechSynthesis.speak(utterance);
       setIsSpeaking(true);
     }
@@ -123,50 +113,25 @@ export default function AccessibilityWidget(): React.JSX.Element {
     setIsBigCursor(false);
     setIsReadingGuide(false);
     setIsDyslexiaMode(false);
+    setDyslexiaFont('opendyslexic');
+    setDyslexiaTint('none');
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
-    
-    // I-reset din ang translation pabalik sa orihinal na wika kung meron
-    const googleCombo = document.querySelector('.goog-te-combo') as HTMLSelectElement;
-    if (googleCombo) {
-      googleCombo.value = '';
-      googleCombo.dispatchEvent(new Event('change'));
-    }
   };
 
   return (
-    <>
+    <div ref={widgetRef}>
       {/* READING GUIDE LINE */}
       {isReadingGuide && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: `${mouseY}px`,
-            left: 0,
-            width: '100%',
-            height: '20px',
-            backgroundColor: 'rgba(59, 130, 246, 0.25)', 
-            borderTop: '2px dashed #3b82f6',
-            borderBottom: '2px dashed #3b82f6',
-            pointerEvents: 'none',
-            zIndex: 100000,
-            transform: 'translateY(-50%)',
-            transition: 'top 0.05s ease-out'
-          }}
-        />
+        <div style={{ position: 'fixed', top: `${mouseY}px`, left: 0, width: '100%', height: '20px', backgroundColor: 'rgba(59, 130, 246, 0.25)', borderTop: '2px dashed #3b82f6', borderBottom: '2px dashed #3b82f6', pointerEvents: 'none', zIndex: 100000, transform: 'translateY(-50%)', transition: 'top 0.05s ease-out' }} />
       )}
 
       {/* FLOATING ACTION TRIGGER BUTTON */}
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle Accessibility Menu"
-        aria-expanded={isOpen}
-        style={floatingBtnStyle}
-      >
+      <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle Accessibility Menu" aria-expanded={isOpen} style={floatingBtnStyle}>
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
       </button>
 
-      {/* MODAL / PANEL PANEL */}
+      {/* MODAL / PANEL */}
       {isOpen && (
         <div role="dialog" aria-label="Accessibility Options" style={panelContainerStyle}>
           
@@ -176,7 +141,7 @@ export default function AccessibilityWidget(): React.JSX.Element {
               <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Accessibility</h3>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>Customize your view preference</p>
             </div>
-            <button onClick={() => setIsOpen(false)} style={closeBtnStyle}>✕</button>
+            <button type="button" onClick={() => setIsOpen(false)} style={closeBtnStyle}>✕</button>
           </div>
 
           <div style={{ ...cardStyle, marginBottom: '20px' }}>
@@ -196,10 +161,9 @@ export default function AccessibilityWidget(): React.JSX.Element {
               </div>
             </div>
 
-            {/* FEATURE 2: TOGGLES */}
+            {/* FEATURE 2: SCREEN ENHANCEMENTS & DYSLEXIA TOGGLE */}
             <div style={cardStyle}>
               <span style={sectionTitleStyle}>Screen Enhancements</span>
-              
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
                 <label style={rowToggleStyle}>
                   <span>Big Pointer 🖱️</span>
@@ -216,40 +180,58 @@ export default function AccessibilityWidget(): React.JSX.Element {
                   <input type="checkbox" style={checkboxStyle} checked={isDyslexiaMode} onChange={() => setIsDyslexiaMode(!isDyslexiaMode)} />
                 </label>
               </div>
+
+              {/* DYNAMIC DYSLEXIA FONT CHANGER */}
+              {isDyslexiaMode && (
+                <div style={{ marginTop: '14px', borderTop: '1px dashed #cbd5e1', paddingTop: '10px' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>Select Dyslexia Font Type:</span>
+                  <select 
+                    value={dyslexiaFont} 
+                    onChange={(e) => setDyslexiaFont(e.target.value)}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', marginTop: '6px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none' }}
+                  >
+                    <option value="opendyslexic">OpenDyslexic (Heavy Bottoms)</option>
+                    <option value="comicsans">Comic Sans (Distinct Shapes)</option>
+                    <option value="verdana">Verdana (Wide Sans-Serif)</option>
+                  </select>
+                </div>
+              )}
             </div>
 
-            {/* FEATURE 3: AUDIO READER & TRANSLATE */}
+            {/* FEATURE 3: VISUAL STRESS OVERLAYS (TINTS) */}
             <div style={cardStyle}>
-              <span style={sectionTitleStyle}>Assistance & Translation</span>
-              
-              <button 
-                onClick={toggleSpeechReader} 
-                style={{
-                  ...activeBtnStyle, 
-                  backgroundColor: isSpeaking ? '#ef4444' : '#10b981', 
-                  marginTop: '10px', width: '100%', justifyContent: 'center'
-                }}
-              >
-                {isSpeaking ? "Stop Audio Reader ⏹️" : "Listen to Screen (Audio) 🔊"}
-              </button>
-
-              {/* DYNAMIC TSX GOOGLE ELEMENT CONTAINER */}
-              <div style={{ marginTop: '12px' }}>
-                <div id="google_translate_element" className="modern-translate-container"></div>
+              <span style={sectionTitleStyle}>Visual Stress Overlays (Tints)</span>
+              <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                <button style={dyslexiaTint === 'none' ? activeBtnStyle : inactiveBtnStyle} onClick={() => setDyslexiaTint('none')}>Default</button>
+                <button style={dyslexiaTint === 'cream' ? { ...activeBtnStyle, backgroundColor: '#fdf6e3', color: '#586e75', border: '1px solid #93a1a1' } : inactiveBtnStyle} onClick={() => setDyslexiaTint('cream')}>Cream 🍦</button>
+                <button style={dyslexiaTint === 'blue' ? { ...activeBtnStyle, backgroundColor: '#e0f2fe', color: '#0369a1', border: '1px solid #7dd3fc' } : inactiveBtnStyle} onClick={() => setDyslexiaTint('blue')}>Soft Blue 🌊</button>
               </div>
             </div>
 
-            {/* RESET BUTTON */}
-            <button onClick={resetAll} style={resetBtnStyle}>
-              Reset All Defaults
-            </button>
+            {/* FEATURE 4: AUDIO READER */}
+            <div style={cardStyle}>
+              <span style={sectionTitleStyle}>Screen Assistance</span>
+              <button type="button" onClick={toggleSpeechReader} style={{ ...activeBtnStyle, backgroundColor: isSpeaking ? '#ef4444' : '#10b981', marginTop: '10px', width: '100%', justifyContent: 'center' }}>
+                {isSpeaking ? "Stop Audio Reader ⏹️" : "Listen to Screen (Audio) 🔊"}
+              </button>
+            </div>
 
+            {/* RESET BUTTON */}
+            <button type="button" onClick={resetAll} style={resetBtnStyle}>Reset All Defaults</button>
           </div>
         </div>
       )}
 
       {/* TSX GLOBAL INJECTOR OVERRIDES */}
       <style>{`
+        @font-face {
+          font-family: 'OpenDyslexic';
+          src: url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/font/OpenDyslexic-Regular.woff2') format('woff2');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+
         body {
           transition: background-color 0.3s ease, color 0.3s ease;
         }
@@ -265,151 +247,61 @@ export default function AccessibilityWidget(): React.JSX.Element {
           font-size: initial !important;
         }
 
-        /* PINALITANG CURSOR: Modern at malaking black arrow vector na may white border */
         .a11y-big-cursor, .a11y-big-cursor * {
           cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'><path d='M4.5 3V19l4.5-4.5h6.5L4.5 3z' fill='black' stroke='white' stroke-width='2' stroke-linejoin='round'/></svg>"), auto !important;
         }
         
         .a11y-dyslexia-active, .a11y-dyslexia-active * {
+          line-height: 2.0 !important;
+          letter-spacing: 0.16em !important;
+          word-spacing: 0.32em !important;
+          text-align: left !important;
+          hyphens: none !important;
+          word-break: keep-all !important;
+          overflow-wrap: break-word !important;
+        }
+
+        .font-variant-opendyslexic, .font-variant-opendyslexic * {
+          font-family: "OpenDyslexic", sans-serif !important;
+        }
+        .font-variant-comicsans, .font-variant-comicsans * {
           font-family: "Comic Sans MS", "Chalkboard SE", cursive, sans-serif !important;
-          line-height: 2 !important;
-          letter-spacing: 0.15em !important;
-          word-spacing: 0.3em !important;
         }
-        
-        /* Tinatago ang pangit na Google layout wrappers para manatiling modern ang TSX app */
-        .goog-te-banner-frame, .goog-te-balloon-frame, #goog-gt-tt, .goog-banner-frame, .skiptranslate, #goog-gt-hoverable { 
-          display: none !important; 
-          visibility: hidden !important;
+        .font-variant-verdana, .font-variant-verdana * {
+          font-family: "Verdana", Geneva, sans-serif !important;
         }
-        .goog-te-gadget { font-family: inherit !important; color: transparent !important; font-size: 0px !important; }
-        
-        /* Modernized Styles para sa Google Selector Dropdown Select */
-        .goog-te-gadget .goog-te-combo {
-          width: 100% !important;
-          padding: 10px !important;
-          border-radius: 8px !important;
-          border: 1px solid #e2e8f0 !important;
-          background-color: #ffffff !important;
+
+        .a11y-dyslexia-active p, .a11y-dyslexia-active li {
+          margin-bottom: 2rem !important;
+        }
+
+        .a11y-dyslexia-active ::selection {
+          background-color: #fef08a !important;
+          color: #0f172a !important;
+        }
+
+        .a11y-tint-cream, .a11y-tint-cream main, .a11y-tint-cream div:not([role="dialog"]), .a11y-tint-cream section, .a11y-tint-cream article {
+          background-color: #fdf6e3 !important;
           color: #334155 !important;
-          font-size: 14px !important;
-          font-weight: 500 !important;
-          outline: none !important;
         }
-        body { top: 0px !important; position: static !important; }
+
+        .a11y-tint-blue, .a11y-tint-blue main, .a11y-tint-blue div:not([role="dialog"]), .a11y-tint-blue section, .a11y-tint-blue article {
+          background-color: #e0f2fe !important;
+          color: #0f172a !important;
+        }
       `}</style>
-    </>
+    </div>
   );
 }
 
-const floatingBtnStyle: CSSProperties = {
-  position: 'fixed',
-  bottom: '24px',
-  right: '24px',
-  zIndex: 99999,
-  backgroundColor: '#1e40af',
-  color: '#ffffff',
-  border: 'none',
-  borderRadius: '9999px',
-  width: '56px',
-  height: '56px',
-  boxShadow: '0 10px 25px -5px rgba(30, 64, 175, 0.5)',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-};
-
-const panelContainerStyle: CSSProperties = {
-  position: 'fixed',
-  bottom: '96px',
-  right: '24px',
-  zIndex: 99999,
-  backgroundColor: '#ffffff',
-  color: '#334155',
-  width: '320px',
-  maxHeight: 'calc(100vh - 140px)', 
-  overflowY: 'auto', 
-  borderRadius: '20px',
-  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
-  padding: '24px',
-  fontFamily: 'system-ui, -apple-system, sans-serif',
-  border: '1px solid #e2e8f0'
-};
-
-const cardStyle: CSSProperties = {
-  backgroundColor: '#f8fafc',
-  padding: '14px',
-  borderRadius: '12px',
-  border: '1px solid #f1f5f9'
-};
-
-const sectionTitleStyle: CSSProperties = {
-  fontSize: '0.85rem',
-  fontWeight: 700,
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  color: '#64748b'
-};
-
-const rowToggleStyle: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  fontSize: '0.95rem',
-  fontWeight: 500,
-  color: '#334155',
-  cursor: 'pointer'
-};
-
-const activeBtnStyle: CSSProperties = {
-  flex: 1,
-  padding: '10px',
-  border: 'none',
-  backgroundColor: '#2563eb',
-  color: '#ffffff',
-  borderRadius: '8px',
-  fontWeight: 600,
-  fontSize: '0.85rem',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  transition: 'all 0.2s'
-};
-
-const inactiveBtnStyle: CSSProperties = {
-  ...activeBtnStyle,
-  backgroundColor: '#ffffff',
-  color: '#475569',
-  border: '1px solid #e2e8f0',
-};
-
-const checkboxStyle: CSSProperties = {
-  width: '18px',
-  height: '18px',
-  cursor: 'pointer',
-  accentColor: '#2563eb'
-};
-
-const closeBtnStyle: CSSProperties = {
-  background: 'none',
-  border: 'none',
-  color: '#94a3b8',
-  fontSize: '18px',
-  cursor: 'pointer',
-  padding: '4px'
-};
-
-const resetBtnStyle: CSSProperties = {
-  background: 'none',
-  border: 'none',
-  color: '#ef4444',
-  textDecoration: 'underline',
-  fontSize: '0.85rem',
-  fontWeight: 600,
-  cursor: 'pointer',
-  alignSelf: 'center',
-  marginTop: '5px',
-  marginBottom: '5px'
-};
+// STYLES OBJECTS
+const floatingBtnStyle: CSSProperties = { position: 'fixed', bottom: '24px', right: '24px', zIndex: 99999, backgroundColor: '#1e40af', color: '#ffffff', border: 'none', borderRadius: '9999px', width: '56px', height: '56px', boxShadow: '0 10px 25px -5px rgba(30, 64, 175, 0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const panelContainerStyle: CSSProperties = { position: 'fixed', bottom: '96px', right: '24px', zIndex: 99999, backgroundColor: '#ffffff', color: '#334155', width: '320px', maxHeight: 'calc(100vh - 140px)', overflowY: 'auto', borderRadius: '20px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1)', padding: '24px', fontFamily: 'system-ui, -apple-system, sans-serif', border: '1px solid #e2e8f0' };
+const cardStyle: CSSProperties = { backgroundColor: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #f1f5f9' };
+const sectionTitleStyle: CSSProperties = { fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' };
+const rowToggleStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.95rem', fontWeight: 500, color: '#334155', cursor: 'pointer' };
+const activeBtnStyle: CSSProperties = { flex: 1, padding: '10px', border: 'none', backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '8px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' };
+const inactiveBtnStyle: CSSProperties = { ...activeBtnStyle, backgroundColor: '#ffffff', color: '#475569', border: '1px solid #e2e8f0' };
+const checkboxStyle: CSSProperties = { width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563eb' };
+const closeBtnStyle: CSSProperties = { background: 'none', border: 'none', color: '#94a3b8', fontSize: '18px', cursor: 'pointer', padding: '4px' };
+const resetBtnStyle: CSSProperties = { background: 'none', border: 'none', color: '#ef4444', textDecoration: 'underline', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', alignSelf: 'center', marginTop: '5px', marginBottom: '5px' };

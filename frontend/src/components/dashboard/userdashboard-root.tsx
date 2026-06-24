@@ -10,6 +10,7 @@ import Recojob from './user/info/recojob'
 import ResumeUpload from '@components/dashboard/user/upload/ResumeUpload'
 import { ResumeDownload } from '@components/dashboard/user/info/downloadresume'
 import AccessibilityWidget from '@components/auxilliary/accessability'
+import { ApplyTheme } from '@components/auxilliary/ApplyTheme'
 
 function App() {
     useEffect(() => {
@@ -29,6 +30,7 @@ function App() {
         else if (session.user.role === "user") {
             return (
                 <main>
+                    <ApplyTheme />
                     <NavBar />
                     <div className="flex gap-4 items-start mb-4">
                         <UserProfileCard />
@@ -43,7 +45,7 @@ function App() {
         else if (session.user.role === "business") {
             return (
                 <main>
-                    <NavBar />
+                    <ApplyTheme />
                     <DashboardPage />
                 </main>
             )
@@ -56,6 +58,7 @@ function App() {
     else if (session?.user?.role === "user") {
         return (
             <main>
+                <ApplyTheme />  
                 <NavBar />
                 <div className="flex gap-4 items-start mb-4">
                     <UserProfileCard />
@@ -70,6 +73,7 @@ function App() {
     else if (session?.user?.role === "business") {
         return (
             <main>
+                <ApplyTheme />
                 <DashboardPage />
             </main>
         )

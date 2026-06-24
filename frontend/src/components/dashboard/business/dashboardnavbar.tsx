@@ -1,6 +1,7 @@
 // DashboardNavbar.tsx
 import LogoutButton from "@components/auth/logout"
 import { BusinessSelect } from "./types"
+import ThemeSwitcherCard from "@components/auxilliary/ThemesSwitcherCard"
 
 interface Props {
   dashboards: BusinessSelect[]
@@ -25,17 +26,32 @@ export const DashboardNavbar = ({
           </a>
         </div>
 
+        <button className="btn btn-ghost mr-4">
+          <a href="/public/createjob.html" className="w-full h-full flex items-center">
+          <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    fill="none" 
+    viewBox="0 0 24 24" 
+    strokeWidth="2.5" 
+    stroke="currentColor" 
+    className="w-4 h-4"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+  </svg>Create Post</a>
+        </button>
+
       <div className="flex-none">
   {loading ? (
     <div className="skeleton h-10 w-40" />
   ) : (
+    
     <div className="dropdown dropdown-end">
       <div 
         tabIndex={0} 
         role="button" 
         className="select select-bordered flex items-center justify-between min-w-[160px]"
       >
-        {dashboards.find((d) => d.id === selectedId)?.name || "Pumili ng Dashboard"}
+        {dashboards.find((d) => d.id === selectedId)?.name || "Menu"}
       </div>
 
       <ul 
@@ -61,10 +77,12 @@ export const DashboardNavbar = ({
         <li className="text-error font-semibold w-full">
           <LogoutButton />
         </li>
+
       </ul>
     </div>
   )}
 </div>
+
     </div>
   )
 }

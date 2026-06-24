@@ -56,7 +56,7 @@ export const DashboardCards = ({ data, loading }: Props) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {data?.info.map((stat, i) => (
-        <div key={i} className="card bg-base-100 shadow">
+        <div key={i} className="card bg-base-100 shadow-md">
           <div className="card-body">
             <h2 className="badge badge-secondary">{stat.email}</h2>
             <h2 className="badge badge-secondary">{stat.status}</h2>

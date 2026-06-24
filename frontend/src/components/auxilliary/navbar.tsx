@@ -26,36 +26,34 @@ export default function NavBar() {
   const profileSrc = user?.id ? `/static/images/profilepicture/user/${user.id}` : undefined;
   const [notifications, setNotifications] = useState<NotificationResponse[]>([])
 
-  useEffect(() => {
-    const fetchnotifications = async () => {
+  
+useEffect(() => {
+  const fetchnotifications = async () => {
+    try {
+      const res = await edenTreatyApi.notifications.mynotifications.get()
+      
 
-      try {
+      console.log("Notification Response Data:", res.data);
 
-        const res = await edenTreatyApi.notifications.mynotifications.get()
-
-        if (res.data) {
-          setNotifications(res.data)
-        }
-        else {
-          throw new Error("failed to fetch notifications")
-        }
+      if (res.data && Array.isArray(res.data)) {
+        setNotifications(res.data)
+      } else if (res.data && typeof res.data === 'object') {
+  
+        setNotifications([]) 
+      } else {
+        throw new Error("failed to fetch notifications")
       }
-
-      catch (e) {
-        console.log(e)
-      }
+    } catch (e) {
+      console.log(e)
     }
-
-    fetchnotifications()
-
-  }, [])
-
-  async function markread(id:number){
-
-   const res =  await edenTreatyApi.notifications.markread({id:id}).get()
-
   }
 
+  fetchnotifications()
+}, [])
+
+  const markread = (id: number) => {
+    setNotifications((prevNotifications) => prevNotifications.filter((item) => item.id !== id))
+  }
 
   return (
   /* 1. Ang main drawer container */
@@ -64,7 +62,7 @@ export default function NavBar() {
     
     <div className="drawer-content flex flex-col">
       {/* --- START NG NAVBAR (Yung info na binigay mo) --- */}
-      <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+      <div className="navbar bg-base-200 shadow-sm sticky top-0 z-50">
         <ApplyTheme />
         <div className="flex-1">
           <a href="/public/dashboard.html" className="text-3xl font-black font-brand tracking-tighter bg-gradient-to-r from-[#0038a8] to-[#00ced1] bg-clip-text text-transparent cursor-pointer">

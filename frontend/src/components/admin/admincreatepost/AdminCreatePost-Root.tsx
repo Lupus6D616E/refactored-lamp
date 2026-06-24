@@ -3,12 +3,16 @@ import { authClient } from '@lib/auth-client';
 import { createRoot } from 'react-dom/client'
 import { ForbiddenPage } from '@components/auxilliary/Forbidden';
 import CreatePost from './AdminCreatePost';
+import { ApplyTheme } from '@components/auxilliary/ApplyTheme';
 
 function App() {
     const { data: session, isPending } = authClient.useSession();
   if(session?.user.role === "admin"){
         return(
-            <CreatePost />
+            <main> 
+                <ApplyTheme/>
+                <CreatePost />
+            </main>
         )
     }
     else{

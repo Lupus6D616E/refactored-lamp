@@ -45,7 +45,7 @@ interface JobCardProps {
 
 const JobCard = ({ job, isApplied, onApply }: JobCardProps) => (
 
-  <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-base-300">
+  <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-base-300">
     <div className="card-body p-6">
       <div className="flex justify-between items-start mb-4">
         <div className="avatar placeholder">

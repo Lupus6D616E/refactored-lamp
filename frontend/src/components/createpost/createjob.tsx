@@ -140,197 +140,243 @@ export function CreateJobForm() {
     } else {
       const message = res.data;
       if (message.message === "no") {
-        setError("job posted");
+        setError("JOB POSTED");
       } else {
-        setError("an error occurred");
+        setError("An Error Occurred");
       }
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
-      <h1 className="text-xl font-semibold">Create a post</h1>
-      <Map onAddressSelect={handleAddressUpdate} />
-      <p>
-        lat{position.lat} lng:{position.lng}
-      </p>  
+<form onSubmit={handleSubmit} className="space-y-5 w-full">
+  <div>
+    <h2 className="text-xl font-bold mb-1">Job Details</h2>
+    <p className="text-xs text-base-content/60">Provide the core information about the job opening.</p>
+  </div>
+
+  {/* Map Section */}
+  <div className="form-control w-full bg-base-200 p-3 rounded-xl border border-base-300">
+    <span className="label-text font-semibold mb-2 block text-xs">Job Location (Map)</span>
+    <Map onAddressSelect={handleAddressUpdate} />
+    <div className="mt-2 text-xs badge badge-ghost gap-1 p-2">
+      <span className="font-semibold text-primary">Lat:</span> {position.lat}
+      <span className="font-semibold text-primary ml-2">Lng:</span> {position.lng}
+    </div>
+  </div>
+
+  {/* 2 Columns: Business & Title */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Business</span></label>
       <select
         required={true}
         value={selectedBusiness}
         onChange={(e) => setSelectedBusiness(e.target.value)}
+        className="select select-bordered select-sm w-full"
       >
-        <option disabled={true} value="">
-          -- Select a business --
-        </option>
+        <option disabled={true} value="">-- Select a business --</option>
         {businesses.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.name}
-          </option>
+          <option key={item.id} value={item.id}>{item.name}</option>
         ))}
       </select>
+    </div>
 
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Job Title</span></label>
       <input
         type="text"
-        placeholder="title"
+        placeholder="e.g. Driver, Clerk"
         required
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="input input-bordered input-sm w-full"
       />
+    </div>
+  </div>
+
+  {/* 2 Columns: Email & Address */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Contact Email</span></label>
       <input
         type="email"
-        placeholder="contact email"
+        placeholder="recruitment@email.com"
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="input input-bordered input-sm w-full"
       />
-          <input
+    </div>
+
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Full Address</span></label>
+      <input
         type="text"
-        placeholder="address"
+        placeholder="Street, Barangay, City"
         required
         value={address}
         onChange={(e) => setAddress(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="input input-bordered input-sm w-full"
       />
-      <textarea
-        placeholder="description"
-        required
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="w-full border p-2 rounded"
-      ></textarea>
+    </div>
+  </div>
 
+  <div className="form-control w-full">
+    <label className="label py-1"><span className="label-text text-xs font-semibold">Job Description</span></label>
+    <textarea
+      placeholder="Brief description of the role..."
+      required
+      value={description}
+      onChange={(e) => setDescription(e.target.value)}
+      className="textarea textarea-bordered textarea-sm h-20 w-full"
+    ></textarea>
+  </div>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Requirements</span></label>
       <textarea
-        placeholder="requirements"
+        placeholder="Skills or experience needed..."
         required
         value={requirements}
         onChange={(e) => setRequirements(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="textarea textarea-bordered textarea-sm h-20 w-full"
       ></textarea>
+    </div>
+
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Responsibilities</span></label>
       <textarea
-        placeholder="responsibilities"
+        placeholder="Key duties..."
         required
         value={responsibilities}
         onChange={(e) => setResponsibilities(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="textarea textarea-bordered textarea-sm h-20 w-full"
       ></textarea>
+    </div>
+  </div>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">City</span></label>
       <select
         required={true}
         value={city}
         onChange={(e) => setCity(e.target.value)}
+        className="select select-bordered select-sm w-full"
       >
-        <option disabled={true} value="">
-          -- Select a city --
-        </option>
+        <option disabled={true} value="">-- Select a city --</option>
         {sortedItems.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
+          <option key={item} value={item}>{item}</option>
         ))}
       </select>
+    </div>
+
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Employment Type</span></label>
       <select
         required={true}
         value={employmentType}
         onChange={(e) => setEmploymentType(e.target.value)}
+        className="select select-bordered select-sm w-full"
       >
-        <option disabled={true} value="">
-          -- Select employment type --
-        </option>
+        <option disabled={true} value="">-- Select type --</option>
         {employments.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
+          <option key={item} value={item}>{item}</option>
         ))}
       </select>
-      <label className="label">
-        <span className="label-text">
-          Choose an expiry date (at least 1 week ahead)
-        </span>
-      </label>
+    </div>
+  </div>
+
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Expiry Date</span></label>
       <input
         type="date"
-        className="input input-bordered"
+        className="input input-bordered input-sm w-full"
         min={minDate}
         value={expireDate}
         onChange={(e) => setExpireDate(e.target.value)}
         required
       />
+    </div>
+
+    <div className="form-control w-full">
+      <label className="label py-1"><span className="label-text text-xs font-semibold">Minimum Salary</span></label>
       <input
         type="number"
-        placeholder="minimum salary"
+        placeholder="₱ 0.00"
         min={0}
         required
         value={minimumSalary}
         onChange={(e) => setSalary(e.target.value)}
-        className="w-full border p-2 rounded"
+        className="input input-bordered input-sm w-full"
       />
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          value={inputTag}
-          onChange={(e) => setInputTag(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Enter a tag..."
-          className="input input-bordered flex-1"
-          disabled={loading}
-        />
-        <button
-          type="button"
-          onClick={handleAddTag}
-          className="btn btn-primary"
-          disabled={!inputTag.trim() || loading}
-        >
-          Add Tag
-        </button>
-      </div>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {tags.length === 0 ? (
-          <p className="text-base-content/60">No tags added yet.</p>
-        ) : (
-          tags.map((tag) => (
-            <div key={tag} className="badge badge-lg badge-primary gap-2">
-              {tag}
-              <button
-                onClick={() => handleRemoveTag(tag)}
-                className="text-white hover:text-red-300"
-                disabled={loading}
-              >
-                ✕
-              </button>
-            </div>
-          ))
-        )}
-      </div>
-      <div className="form-control gap-2">
-        <span className="label-text font-semibold">Select days</span>
+    </div>
+  </div>
 
-        {DAYS_OF_WEEK.map((day) => (
-          <label key={day} className="label cursor-pointer justify-start gap-3">
-            <input
-              type="checkbox"
-              className="checkbox checkbox-primary"
-              checked={selectedDays.includes(day)}
-              onChange={() => toggleDay(day)}
-            />
-            <span className="label-text">{day}</span>
-          </label>
-        ))}
+  <div className="divider my-2"></div>
 
-        {/* Debug / preview */}
-        <div className="mt-2 text-sm opacity-70">
-          Selected: {selectedDays.join(", ") || "None"}
-        </div>
-      </div>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      <button
-        type="submit"
+  <div className="form-control w-full">
+    <label className="label py-1"><span className="label-text text-xs font-semibold">Job Tags</span></label>
+    <div className="flex gap-2">
+      <input
+        type="text"
+        value={inputTag}
+        onChange={(e) => setInputTag(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="e.g. Urgent"
+        className="input input-bordered input-sm flex-1"
         disabled={loading}
-        className="w-full bg-black text-white p-2 rounded"
+      />
+      <button
+        type="button"
+        onClick={handleAddTag}
+        className="btn btn-neutral btn-sm"
+        disabled={!inputTag.trim() || loading}
       >
-        {loading ? "Creating Job Post..." : "Post Job"}
+        Add
       </button>
-    </form>
+    </div>
+    <div className="flex flex-wrap gap-1.5 mt-2 p-2 bg-base-200/50 rounded-lg min-h-[40px] items-center">
+      {tags.length === 0 ? (
+        <p className="text-xs text-base-content/50 px-1">No tags.</p>
+      ) : (
+        tags.map((tag) => (
+          <div key={tag} className="badge badge-sm badge-primary gap-1 py-2">
+            {tag}
+            <button type="button" onClick={() => handleRemoveTag(tag)} className="font-bold text-xs">✕</button>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+
+ 
+  <div className="form-control w-full bg-base-200/50 p-3 rounded-xl border border-base-300">
+    <span className="label-text text-xs font-semibold mb-2 block">Work Days</span>
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+      {DAYS_OF_WEEK.map((day) => (
+        <label key={day} className="label cursor-pointer justify-start gap-2 bg-base-100 p-1.5 rounded border border-base-300">
+          <input
+            type="checkbox"
+            className="checkbox checkbox-primary checkbox-xs"
+            checked={selectedDays.includes(day)}
+            onChange={() => toggleDay(day)}
+          />
+          <span className="label-text text-xs">{day}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+
+  {error && <p className="text-red-500 text-xs">{error}</p>}
+
+  <button type="submit" disabled={loading} className="btn btn-primary btn-sm w-full mt-2">
+    {loading ? "Posting..." : "Post Job"}
+  </button>
+</form>
   );
 }
