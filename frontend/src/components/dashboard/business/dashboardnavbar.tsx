@@ -70,6 +70,7 @@ export const DashboardNavbar = ({
                 }
               }}
             >
+              {d.name}
             </button>
           </li>
         ))}
