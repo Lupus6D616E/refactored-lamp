@@ -76,7 +76,7 @@ export function AdminDashboard() {
 <div className="flex items-center gap-3">
   {/* 1. Create Post Button */}
   <a 
-    href="/admincreatepost.html" 
+    href="/public/admincreatepost.html" 
     className="btn btn-sm btn-ghost gap-2 normal-case flex items-center"
   >
     <svg 
