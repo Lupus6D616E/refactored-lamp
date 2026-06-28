@@ -12,11 +12,25 @@ export namespace verificationModel{
                 type: ['application/pdf', 'application/msword']
             }),
         })
+    export const disabilityVerificationBody = t.Object({
+       document:  t.File(),
+       disabilities: t.Array(t.String())
+    })
+
+    export const studentVerificationBody = t.Object({
+       document:  t.File(),
+    })
     export const businessVerificationReturn = t.Object({
         success: t.Boolean(),
         message: t.String()
 
     })
+    export type seekerVerificationStatusReturn =  {
+        disability: "Pending" | "Verified" | "Unverified"
+        student:"Pending" | "Verified" | "Unverified"
+    }
+    export type studentVerificationBody = typeof studentVerificationBody.static
+    export type disabilityVerificationBody = typeof disabilityVerificationBody.static
     export type businessVerificationReturn = typeof businessVerificationReturn.static
     export type businessVerificationBody = typeof businessVerificationBody.static
 }

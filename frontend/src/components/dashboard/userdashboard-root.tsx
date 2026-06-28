@@ -11,6 +11,7 @@ import ResumeUpload from '@components/dashboard/user/upload/ResumeUpload'
 import { ResumeDownload } from '@components/dashboard/user/info/downloadresume'
 import AccessibilityWidget from '@components/auxilliary/accessability'
 import { ApplyTheme } from '@components/auxilliary/ApplyTheme'
+import { VerificationUpload } from './user/upload/VerificationUpload'
 
 function App() {
     useEffect(() => {
@@ -38,6 +39,7 @@ function App() {
                     </div>
                     <ResumeUpload />
                     <ResumeDownload />
+                    <VerificationUpload />
                     <AccessibilityWidget />
                 </main>
             )

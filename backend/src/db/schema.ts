@@ -130,9 +130,40 @@ export const seekerProfile = pgTable("seeker_profile", {
     .array()
     .notNull()
     .default(sql`'{}'::text[]`),
+  disabilityVerified: boolean("disabilityVerified").notNull().default(false),
+  studentVerified: boolean("studentVerified").notNull().default(false),
+  studentVerifiedDate: timestamp('date_verified'),
+  disabilities: text("disabilities")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
   address: text("address"),
   location: point('location', { mode: 'xy' }),
   education: text("education"),
+}).enableRLS()
+
+export const disabilityVerification = pgTable("disability_verification", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" })
+    .unique(),
+  disabilities: text("disabilities")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
+  documentUrl: text("document_url").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}).enableRLS()
+
+export const studentVerification = pgTable("student_verification", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" })
+    .unique(),
+  documentUrl: text("document_url").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 }).enableRLS()
 
 export const businessProfile = pgTable("business_profile", {
@@ -473,7 +504,7 @@ export const email = pgTable("email", {
 }).enableRLS()
 export const emailAttachments = pgTable("email_attachments", {
   id: uuid("id").primaryKey(),
-  emailId: uuid("email_id").references(() => email.id, {onDelete: "cascade"}).notNull(),
+  emailId: uuid("email_id").references(() => email.id, { onDelete: "cascade" }).notNull(),
   filename: text("filename").notNull(),
   contentId: text("content_id").notNull(),
   contentType: text("content_type").notNull(),
