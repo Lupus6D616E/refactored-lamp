@@ -570,8 +570,7 @@ export function SignupCard() {
               <div className="leading-relaxed">
                 For concerns, contact:
                 <ul className="list-none mt-2 space-y-1">
-                  <li>📧 flexihire@gmail.com</li>
-                  <li>📍 123 Main Street, City, Country</li>
+                  <li>📧  support@mail.flexihire.link</li>
                 </ul>
               </div>
             </section>
