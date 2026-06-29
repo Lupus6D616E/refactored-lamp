@@ -55,7 +55,7 @@ const JobCard = ({ job, isApplied, onApply }: JobCardProps) => (
         </div>
         <div className="flex flex-col items-end gap-1">
           <div className="badge badge-outline badge-primary font-medium">{job.employmentType}</div>
-          <div className="text-[10px] font-bold text-secondary uppercase tracking-wider">{(Math.round(((1 + job.similarity)/2)*100 ))}% Match</div>
+          <div className="text-[10px] font-bold text-secondary uppercase tracking-wider">{(Math.round(((1 + job.similarity) / 2) * 100))}% Match</div>
         </div>
       </div>
       <h2 className="card-title text-lg">{job.title}</h2>
@@ -72,8 +72,8 @@ const JobCard = ({ job, isApplied, onApply }: JobCardProps) => (
       <div className="card-actions justify-between items-center mt-6 pt-4 border-t border-base-200">
         <div className="text-lg font-bold text-success">{job.salaryMinimum} Php</div>
         {/* Dynamic button styling based on isApplied state */}
-        
-            <a  className="btn btn-primary btn-sm w-full mt-2" href={`viewpost.html?id=${job.id}`} > Go to post </a>
+
+        <a className="btn btn-primary btn-sm w-full mt-2" href={`viewpost.html?id=${job.id}`} > Go to post </a>
       </div>
     </div>
   </div>
@@ -85,13 +85,34 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("New jobs found!");
-
+  const [hasProfile, setHasProfile] = useState<boolean>(false)
   // Dito natin ise-save ang mga IDs ng mga in-apply-an na trabaho
   const [appliedJobIds, setAppliedJobIds] = useState<number[]>([]);
 
   const fetchJobs = async () => {
     setLoading(true);
     try {
+      const other = await edenTreatyApi.user.myprofile.get()
+      if (!other.error) {
+        if (!other.data) {
+          setLoading(false)
+          setToastMessage("please set up profile!");
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+          // Handle error (e.g. toast notification)
+          return;
+        } else {
+          setHasProfile(true)
+        }
+      } else {
+
+        console.error("Search error:", response.error);
+        setLoading(false)
+        setToastMessage("A server error has occurred!");
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        return
+      }
       const response = await edenTreatyApi.user.getrecommendedjobs.get({
       });
       if (response.error) {
@@ -145,7 +166,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-base-100 font-sans">
       <main className="p-4 md:p-10 max-w-7xl mx-auto">
-        
+
         {/* Recommended Jobs Section */}
         <section>
           <div className="flex justify-between items-center mb-8">
