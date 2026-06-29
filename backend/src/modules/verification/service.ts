@@ -20,7 +20,7 @@ export abstract class Verification {
             })
             .from(seekerProfile)
             .where(eq(seekerProfile.userId, userId))
-        if (res[0].studentStatus) {
+        if(res[0].studentStatus) {
             const oneYearAgo = new Date();
             oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
             if (res[0].studentVerifiedDate! < oneYearAgo) {
@@ -40,7 +40,7 @@ export abstract class Verification {
         }
         else {
             const res = await db.select().from(studentVerification).where(eq(studentVerification.userId, userId)).limit(1)
-            if (!!res) {
+            if (res.length === 1) {
                 answer.student = "Pending"
             }
         }
@@ -49,7 +49,7 @@ export abstract class Verification {
         }
         else {
             const res = await db.select().from(disabilityVerification).where(eq(disabilityVerification.userId, userId)).limit(1)
-            if (!!res) {
+            if (res.length === 1) {
                 answer.disability = "Pending"
             }
         }
