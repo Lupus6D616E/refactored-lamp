@@ -346,67 +346,67 @@ export function SignupCard() {
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">2. Description of Service</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 FlexiHire is a community-focused web-based recruitment platform that connects:
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Students</li>
-                <li>Persons with Disabilities (PWDs)</li> 
-                <li>Local employers</li>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>Students</li>
+                  <li>Persons with Disabilities (PWDs)</li> 
+                  <li>Local employers</li>
                 </ul>
-                The platform facilitates <span className="text-black-600 font-bold">job posting, job searching, applicant profiles, and employer communication</span>.
-              </p>
+                The platform facilitates <span className="text-gray-900 font-bold">job posting, job searching, applicant profiles, and employer communication</span>.
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">3. User Eligibility</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 You must:
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Be at least <span className="text-black-600 font-bold"> 18 years old</span></li>
-                <li>Provide <span className="text-black-600 font-bold">accurate and complete information</span></li>
-                <li>Use the platform for <span className="text-black-600 font-bold"> lawful purposes only</span></li>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>Be at least <span className="text-gray-900 font-bold">18 years old</span></li>
+                  <li>Provide <span className="text-gray-900 font-bold">accurate and complete information</span></li>
+                  <li>Use the platform for <span className="text-gray-900 font-bold">lawful purposes only</span></li>
                 </ul>
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">4. User Accounts</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Users are responsible for maintaining account confidentiality.</li>
-                    <li>You are liable for all activities under your account.</li>
-                    <li>FlexiHire may suspend or terminate accounts for violations.</li>
+                  <li>Users are responsible for maintaining account confidentiality.</li>
+                  <li>You are liable for all activities under your account.</li>
+                  <li>FlexiHire may suspend or terminate accounts for violations.</li>
                 </ul>
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">5. Acceptable Use</h3>
-              <p className="leading-relaxed">
-                  You agree NOT to:
+              <div className="leading-relaxed">
+                You agree NOT to:
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Provide false or misleading information.</li>
-                    <li>Engage in discrimination, harassment, or exploitation.</li>
-                    <li>Use the platform for illegal recruitment or scams.</li>
-                    <li>Attempt unauthorized system access.</li>
+                  <li>Provide false or misleading information.</li>
+                  <li>Engage in discrimination, harassment, or exploitation.</li>
+                  <li>Use the platform for illegal recruitment or scams.</li>
+                  <li>Attempt unauthorized system access.</li>
                 </ul>
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">6. Job Listings and Applications</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Employers are responsible for the accuracy of job postings.</li>
-                    <li>FlexiHire does<span className="text-black-600 font-bold">not guarantee employment outcomes.</span></li>
-                    <li>Hiring decisions are solely made by employers.</li>
+                  <li>Employers are responsible for the accuracy of job postings.</li>
+                  <li>FlexiHire does <span className="text-gray-900 font-bold">not guarantee employment outcomes.</span></li>
+                  <li>Hiring decisions are solely made by employers.</li>
                 </ul>
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">7. Communication Rules</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Communication is limited between<span className="text-black-600 font-bold"> employers and applicants only.</span></li>
-                    <li>Peer-to-peer messaging between job seekers is restricted for safety.</li>
+                  <li>Communication is limited between <span className="text-gray-900 font-bold">employers and applicants only.</span></li>
+                  <li>Peer-to-peer messaging between job seekers is restricted for safety.</li>
                 </ul>
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">8. Intellectual Property</h3>
@@ -416,19 +416,19 @@ export function SignupCard() {
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">9. Limitation of Liability</h3>
-              <p className="leading-relaxed">
-                FlexiHire is<span className="text-black-600 font-bold"> not liable</span> for:
+              <div className="leading-relaxed">
+                FlexiHire is <span className="text-gray-900 font-bold">not liable</span> for:
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Employment disputes</li>
-                    <li>Misconduct by users</li>
-                    <li>Accuracy of job listings or applicant information</li>
+                  <li>Employment disputes</li>
+                  <li>Misconduct by users</li>
+                  <li>Accuracy of job listings or applicant information</li>
                 </ul>
-              </p>
+              </div>
             </section>
             <section>
-              <h3 className="font-bold text-gray-900 mb-2 text-lg">10. Termination</h3>
+              <h3 className="font-bold text-gray-900 mb-2 text-lg">10. Account Termination</h3>
               <p className="leading-relaxed">
-                FlexiHire reserves the right to suspend or terminate accounts that violate these terms.
+                We reserve the right to monitor the platform and review user conduct. To maintain the safety and integrity of the platform, the administrator reserves the right to suspend, restrict, or completely delete any user account at any time, with or without prior notice, for any violation of these Terms.
               </p>
             </section>
             <section>
@@ -445,115 +445,115 @@ export function SignupCard() {
               <p className="leading-relaxed">Effective Date: 2026</p>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">1. Introduction</h3>
               <p className="leading-relaxed">
-                FlexiHire is committed to protecting user data in compliance with the<span className="text-black-600 font-bold"> Philippine Data Privacy Act of 2012 (RA 10173).</span>
+                FlexiHire is committed to protecting user data in compliance with the <span className="text-gray-900 font-bold">Philippine Data Privacy Act of 2012 (RA 10173).</span>
               </p>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">2. Information We Collect</h3>
-              <p className="leading-relaxed">
-                <span className="text-black-600 font-bold">a. Personal Information:</span>
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Name</li>
-                <li>Email address</li>
-                <li>Phone number</li>
-                <li>Resume/CV </li>
-              </ul>
-              <span className="text-black-600 font-bold">b. Usage Data:</span>
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Login activity</li>
-                <li>Platform interactions</li>
-                <li>Job applications and postings</li>
-              </ul>
-              <span className="text-black-600 font-bold">c. Optional Information:</span>
-              <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Accessibility needs (to improve inclusivity features)</li>
-              </ul>
-              </p>
+              <div className="leading-relaxed">
+                <span className="text-gray-900 font-bold">a. Personal Information:</span>
+                <ul className="list-disc list-inside mt-2 space-y-2 mb-3">
+                  <li>Name</li>
+                  <li>Email address</li>
+                  <li>Phone number</li>
+                  <li>Resume/CV</li>
+                </ul>
+                <span className="text-gray-900 font-bold">b. Usage Data:</span>
+                <ul className="list-disc list-inside mt-2 space-y-2 mb-3">
+                  <li>Login activity</li>
+                  <li>Platform interactions</li>
+                  <li>Job applications and postings</li>
+                </ul>
+                <span className="text-gray-900 font-bold">c. Optional Information:</span>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>Accessibility needs (to improve inclusivity features)</li>
+                </ul>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">3. How We Use Your Data</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 We use collected data to:  
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Provide recruitment services</li>
-                    <li>Match applicants to job opportunities</li>
-                    <li>Improve platform usability and accessibility</li>
-                    <li>Ensure system security and prevent misuse</li>   
+                  <li>Provide recruitment services</li>
+                  <li>Match applicants to job opportunities</li>
+                  <li>Improve platform usability and accessibility</li>
+                  <li>Ensure system security and prevent misuse</li>   
                 </ul>            
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">4. Data Sharing</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 We may share data with:  
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Employers (for job applications)</li>
-                    <li>Authorized system administrators</li>   
+                  <li>Employers (for job applications)</li>
+                  <li>Authorized system administrators</li>   
                 </ul>   
-                We do<span className="text-black-600 font-bold"> NOT sell personal data</span>.
-              </p>
+                We do <span className="text-gray-900 font-bold">NOT sell personal data</span>.
+              </div>
             </section>
-             <section>
+            <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">5. Data Security</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 FlexiHire implements:  
-                <ul className="list-disc list-inside mt-2 space-y-1 text-black-600 font-bold">
-                    <li>Encrypted database storage (Supabase)</li>
-                    <li>Secure authentication (BetterAuth)</li> 
-                    <li>Access control mechanisms</li>
+                <ul className="list-disc list-inside mt-2 space-y-1 font-bold text-gray-900">
+                  <li>Encrypted database storage (Supabase)</li>
+                  <li>Secure authentication (BetterAuth)</li> 
+                  <li>Access control mechanisms</li>
                 </ul>   
                 Despite safeguards, no system is 100% secure.
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">6. Data Retention</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 User data is retained:  
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>While the account is active</li>
-                    <li>As required for research and system evaluation</li> 
-                    <li>Or until the user requests deletion</li>
+                  <li>While the account is active</li>
+                  <li>As required for research and system evaluation</li> 
+                  <li>Or until the user requests deletion</li>
                 </ul>   
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">7. User Rights</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 You have the right to:  
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Access your personal data</li>
-                    <li>Request corrections</li> 
-                    <li>Request deletion of your account</li>
-                    <li>Withdraw consent</li> 
+                  <li>Access your personal data</li>
+                  <li>Request corrections</li> 
+                  <li>Request deletion of your account</li>
+                  <li>Withdraw consent</li> 
                 </ul>   
-              </p>
+              </div>
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">8. Cookies and Tracking</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 FlexiHire may use cookies to:  
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Maintain sessions</li>
-                    <li>Improve user experience</li> 
+                  <li>Maintain sessions</li>
+                  <li>Improve user experience</li> 
                 </ul>   
-              </p>
+              </div>
             </section>
-             <section>
+            <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">9. Protection of Vulnerable Users</h3>
-              <p className="leading-relaxed">
-                <span className="text-black-600 font-bold">FlexiHire is designed to protect:</span>  
-                <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Students</li>
-                    <li>Persons with Disabilities</li> 
+              <div className="leading-relaxed">
+                <span className="text-gray-900 font-bold">FlexiHire is designed to protect:</span>  
+                <ul className="list-disc list-inside mt-2 space-y-2 mb-3">
+                  <li>Students</li>
+                  <li>Persons with Disabilities</li> 
                 </ul>   
-                <span className="text-black-600 font-bold">Safety measures include:</span>
+                <span className="text-gray-900 font-bold">Safety measures include:</span>
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Restricted messaging</li>
-                    <li>Accessibility features (e.g., screen reader compatibility)</li> 
+                  <li>Restricted messaging</li>
+                  <li>Accessibility features (e.g., screen reader compatibility)</li> 
                 </ul> 
-              </p>
+              </div>
             </section>
-          <section>
+            <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">10. Third-Party Services</h3>
               <p className="leading-relaxed">
                 FlexiHire may use third-party tools (e.g., hosting, authentication), which follow their own privacy policies.  
@@ -567,15 +567,13 @@ export function SignupCard() {
             </section>
             <section>
               <h3 className="font-bold text-gray-900 mb-2 text-lg">12. Contact Information</h3>
-              <p className="leading-relaxed">
+              <div className="leading-relaxed">
                 For concerns, contact:
-                <ul className="list-disc list-inside mt-2 space-y-1">
-                  📧 flexihire@gmail.com
+                <ul className="list-none mt-2 space-y-1">
+                  <li>📧 flexihire@gmail.com</li>
+                  <li>📍 123 Main Street, City, Country</li>
                 </ul>
-                <ul className="list-disc list-inside mt-2 space-y-1">
-                  📍 123 Main Street, City, Country
-                </ul>
-              </p>
+              </div>
             </section>
           </>
         )}
