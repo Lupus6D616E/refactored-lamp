@@ -1,6 +1,5 @@
     # Elysia with Bun runtime
 
-this is very much vibecoded slop
 
 ## Development
 To start the development server run:
